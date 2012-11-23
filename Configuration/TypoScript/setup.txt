@@ -1,0 +1,8 @@
+[GLOBAL]
+page = PAGE
+page.typeNum = 0
+page.5 = USER
+page.5.userFunc = tx_extbase_core_bootstrap->run
+page.5.extensionName = Fluidpages
+page.5.pluginName = Page
+page.10 >
