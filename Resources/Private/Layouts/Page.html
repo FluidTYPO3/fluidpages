@@ -4,8 +4,16 @@
      xmlns:v="http://fedext.net/ns/vhs/ViewHelpers"
      xmlns:f="http://typo3.org/ns/fluid/ViewHelpers">
 
-<f:render section="Navigation" partial="PageObjects" />
+<v:page.header>
+	<f:render section="Resources" optional="TRUE" arguments="{_all}" />
+</v:page.header>
+
+<f:render section="Navigation" partial="PageObjects" arguments="{_all}" />
+
 <div class="container">
+	<f:render section="HeroUnit" partial="PageObjects" optional="TRUE" arguments="{_all}" />
+	<f:render section="PageHeader" partial="PageObjects" optional="TRUE" arguments="{_all}" />
+	<f:render section="SubNavigation" partial="PageObjects"  optional="TRUE" arguments="{_all}" />
 	<f:render section="Content" />
 	<f:render section="Footer" />
 </div>

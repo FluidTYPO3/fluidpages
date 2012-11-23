@@ -5,3 +5,12 @@ plugin.tx_fed {
 		layoutRootPath = EXT:fluidpages/Resources/Private/Layouts/
 	}
 }
+
+lib.menu {
+	main {
+		entryLevel = 0
+	}
+	sub {
+		entryLevel = 1
+	}
+}

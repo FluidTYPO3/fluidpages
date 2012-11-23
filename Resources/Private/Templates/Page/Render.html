@@ -30,24 +30,19 @@
 				between pages various objects such as a menu.
 			</p>
 		</flux:flexform.field.custom>
-		<flux:flexform.field.input name="settings.entryLevel" label="Menu entry level" eval="int,trim" minimum="0" maximum="6">
+		<flux:flexform.field.input name="settings.entryLevel" label="Main menu entry level override for this page only"
+		        eval="int,trim" minimum="0" maximum="6" default="{v:var.typoscript(path: 'lib.menu.main.entryLevel')}">
 			<flux:flexform.field.wizard.slider hideParent="TRUE" step="1" width="100" />
 		</flux:flexform.field.input>
 	</flux:flexform>
 </f:section>
 
-<f:section name="Content">
-	<!-- hero unit, optional content elements from colPos 1 (one) -->
-	<v:page.content.render column="1" as="heroUnitContentElements">
-		<f:if condition="{heroUnitContentElements}">
-			<div class="hero-unit">
-				<f:for each="{heroUnitContentElements}" as="heroContentElement">
-					<f:format.raw>{heroContentElement}</f:format.raw>
-				</f:for>
-			</div>
-		</f:if>
-	</v:page.content.render>
+<f:section name="Resources">
+	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap.min.css" rel="stylesheet" />
+	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+</f:section>
 
+<f:section name="Content">
 	<!-- main content output - default rendering -->
 	<v:page.content.render column="0" />
 </f:section>

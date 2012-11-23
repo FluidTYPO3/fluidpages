@@ -4,11 +4,17 @@
      xmlns:v="http://fedext.net/ns/vhs/ViewHelpers"
      xmlns:f="http://typo3.org/ns/fluid/ViewHelpers">
 
+<f:section name="PageHeader">
+	<div class="page-header">
+		<h1>{page.title}</h1>
+	</div>
+</f:section>
+
 <f:section name="Navigation">
-	<div id="navbar" class="navbar navbar-fixed-top">
+	<div id="navbar" class="navbar navbar-inverse">
 		<div class="navbar-inner">
 			<div class="container">
-				<v:page.siteUrl />
+				<a class="brand" href="{v:page.siteUrl()}"><v:page.siteUrl /></a>
 				<v:page.menu entryLevel="{settings.entryLevel}">
 					<ul class="nav">
 						<f:for each="{menu}" as="mainPage">
@@ -24,8 +30,8 @@
 <f:section name="SubNavigation">
 	<!-- submenu navigation, collapsible -->
 	<div class="subnav">
-		<div class="">
-			<v:page.menu entryLevel="{settings.entryLevel -> v:math.sum(b: 1)}">
+		<div class="container">
+			<v:page.menu entryLevel="{v:var.typoscript(path: 'lib.menu.sub.entryLevel')}">
 				<ul class="nav nav-tabs">
 					<f:for each="{menu}" as="submenuPage">
 						<li class="{submenuPage.class}"><a href="{submenuPage.link}" class="{submenuPage.class}">{submenuPage.title}</a></li>
@@ -36,5 +42,17 @@
 	</div>
 </f:section>
 
-</div>
+<f:section name="HeroUnit">
+	<!-- hero unit, optional content elements from colPos 1 (one) -->
+	<v:page.content.render column="1" as="heroUnitContentElements">
+		<f:if condition="{heroUnitContentElements}">
+			<div class="hero-unit">
+				<f:for each="{heroUnitContentElements}" as="heroContentElement">
+					<f:format.raw>{heroContentElement}</f:format.raw>
+				</f:for>
+			</div>
+		</f:if>
+	</v:page.content.render>
+</f:section>
 
+</div>
