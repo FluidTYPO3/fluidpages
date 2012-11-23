@@ -1,0 +1,7 @@
+plugin.tx_fed {
+	page.fluidpages {
+		templateRootPath = EXT:fluidpages/Resources/Private/Templates/
+		partialRootPath = EXT:fluidpages/Resources/Private/Partials/
+		layoutRootPath = EXT:fluidpages/Resources/Private/Layouts/
+	}
+}

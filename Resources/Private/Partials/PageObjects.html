@@ -1,0 +1,40 @@
+{namespace v=Tx_Vhs_ViewHelpers}
+<f:layout name="Page" />
+<div xmlns="http://www.w3.org/1999/xhtml" lang="en"
+     xmlns:v="http://fedext.net/ns/vhs/ViewHelpers"
+     xmlns:f="http://typo3.org/ns/fluid/ViewHelpers">
+
+<f:section name="Navigation">
+	<div id="navbar" class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<v:page.siteUrl />
+				<v:page.menu entryLevel="{settings.entryLevel}">
+					<ul class="nav">
+						<f:for each="{menu}" as="mainPage">
+							<li class="{mainPage.class}"><a href="{mainPage.link}" class="{mainPage.class}">{mainPage.title}</a></li>
+						</f:for>
+					</ul>
+				</v:page.menu>
+			</div>
+		</div>
+	</div>
+</f:section>
+
+<f:section name="SubNavigation">
+	<!-- submenu navigation, collapsible -->
+	<div class="subnav">
+		<div class="">
+			<v:page.menu entryLevel="{settings.entryLevel -> v:math.sum(b: 1)}">
+				<ul class="nav nav-tabs">
+					<f:for each="{menu}" as="submenuPage">
+						<li class="{submenuPage.class}"><a href="{submenuPage.link}" class="{submenuPage.class}">{submenuPage.title}</a></li>
+					</f:for>
+				</ul>
+			</v:page.menu>
+		</div>
+	</div>
+</f:section>
+
+</div>
+

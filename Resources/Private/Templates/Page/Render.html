@@ -1,0 +1,70 @@
+{namespace v=Tx_Vhs_ViewHelpers}
+{namespace flux=Tx_Flux_ViewHelpers}
+<f:layout name="Page" />
+<div xmlns="http://www.w3.org/1999/xhtml" lang="en"
+     xmlns:v="http://fedext.net/ns/vhs/ViewHelpers"
+     xmlns:flux="http://fedext.net/ns/flux/ViewHelpers"
+     xmlns:f="http://typo3.org/ns/fluid/ViewHelpers">
+
+<f:section name="Configuration">
+	<flux:flexform id="sample-page" label="Sample Fluid page">
+		<flux:flexform.field.custom name="void" label="Explanation">
+			<h2>Welcome to the Fluid Pages world!</h2>
+			<p>
+				This template file is located at EXT:fluidpages/Resources/Private/Templates/Page/Render.html - take
+				a look at this file to learn how to create Fluid Page Templates.
+			</p>
+			<h3>Very quick-n-dirty tutorial</h3>
+			<p>
+				* Template files are scanned from directories which are added by inserting TypoScript (see
+				EXT:fluidpages/Configuration/SamplePage/setup.txt).
+			</p>
+			<p>
+				* Each template file contains a Flux FlexForm definition (see this file).
+			</p>
+			<p>
+				* This template file contains sections rendered by the very simple Layout.
+			</p>
+			<p>
+				* A Partial template contains the navigation blocks (main menu, sub menu) and illustrates how to share
+				between pages various objects such as a menu.
+			</p>
+		</flux:flexform.field.custom>
+		<flux:flexform.field.input name="settings.entryLevel" label="Menu entry level" eval="int,trim" minimum="0" maximum="6">
+			<flux:flexform.field.wizard.slider hideParent="TRUE" step="1" width="100" />
+		</flux:flexform.field.input>
+	</flux:flexform>
+</f:section>
+
+<f:section name="Content">
+	<!-- hero unit, optional content elements from colPos 1 (one) -->
+	<v:page.content.render column="1" as="heroUnitContentElements">
+		<f:if condition="{heroUnitContentElements}">
+			<div class="hero-unit">
+				<f:for each="{heroUnitContentElements}" as="heroContentElement">
+					<f:format.raw>{heroContentElement}</f:format.raw>
+				</f:for>
+			</div>
+		</f:if>
+	</v:page.content.render>
+
+	<!-- main content output - default rendering -->
+	<v:page.content.render column="0" />
+</f:section>
+
+<f:section name="Footer">
+	<!-- footer, optional content elements from colPos 2 (two) -->
+	<v:page.content.render column="2" as="footerContentElements">
+		<f:if condition="{footerContentElements}">
+			<div class="footer">
+			<span class="right">
+				<f:for each="{footerContentElements}" as="footerContentElement">
+					<f:format.raw>{footerContentElement}</f:format.raw>
+				</f:for>
+			</span>
+			</div>
+		</f:if>
+	</v:page.content.render>
+</f:section>
+
+</div>
