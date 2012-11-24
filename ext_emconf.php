@@ -37,6 +37,7 @@ $EM_CONF[$_EXTKEY] = array(
 			'flux' => '5.0.0',
 		),
 		'conflicts' => array(
+			'templavoila' => ''
 		),
 		'suggests' => array(
 			'vhs' => '',
