@@ -94,7 +94,7 @@ EXT:myextension/Resources/Private/Templates/Page/FrontPage.html):
 </f:section>
 
 <f:section name="AnotherSection">
-	<!-- additional sections as necessary, rendering triggered from the "Page.html" Layout template file -->
+	<!-- more sections as desired, rendering triggered from the "Page.html" Layout file -->
 </f:section>
 
 </div>
