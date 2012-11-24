@@ -3,7 +3,7 @@ TYPO3 extension Fluidpages: Fluid Page Templates
 
 ## What is it?
 
-**Fluid Pages** enable page template selection and rendering á la TemplaVoila - but using Fluid templates. The feature was born
+**Fluid Pages** enables page template selection and rendering á la TemplaVoila - but using Fluid templates. The feature was born
 in the extension FED and ported into this extension, making a very light (actually bordering on simple) extension. It uses Flux
 to enable highly dynamic configuration of variables used when rendering the template.
 
