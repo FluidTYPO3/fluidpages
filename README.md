@@ -1,9 +1,11 @@
 TYPO3 extension Fluidpages: Fluid Page Templates
 ================================================
 
-## Purpose
+## What is it?
 
-Enable page template selection á la TemplaVoila - but using Fluid templates.
+**Fluid Pages** enable page template selection and rendering á la TemplaVoila - but using Fluid templates. The feature was born
+in the extension FED and ported into this extension, making a very light (actually bordering on simple) extension. It uses Flux
+to enable highly dynamic configuration of variables used when rendering the template.
 
 ## What does it do?
 
@@ -129,3 +131,12 @@ Pages - but you will be able to use the Fluid Content extension.
 
 There is no plan to make Fluid Pages compatible with TemplaVoila - sorry, all TemplaVoila users. I hope you will consider Fluid
 Pages for your next site!
+
+## References
+
+Other extensions which are either dependencies of or closely related to this extension:
+
+* https://github.com/NamelessCoder/flux is a dependency and is used to configure how the page template variable are defined.
+* https://github.com/NamelessCoder/vhs is a highly suggested companion for Fluid Pages templates, providing useful ViewHelpers.
+* https://github.com/NamelessCoder/fluidcontent is a suggested companion for sites built with Fluid Pages.
+* https://github.com/NamelessCoder/schemaker is a nice-to-have tool to generate XSD schemas for a great Fluid experience.
