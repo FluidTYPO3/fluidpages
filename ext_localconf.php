@@ -15,3 +15,8 @@ Tx_Extbase_Utility_Extension::configurePlugin(
 );
 
 $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] .= ($GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] == '' ? '' : ',') . 'tx_fed_page_controller_action,tx_fed_page_controller_action_sub,tx_fed_page_flexform,';
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\View\\BackendLayoutView'] =
+	array('className' => 'Tx_Fluidpages_Override_Backend_View_BackendLayoutView');
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\View\\PageLayoutView'] =
+	array('className' => 'Tx_Fluidpages_Override_Backend_View_PageLayoutView');
