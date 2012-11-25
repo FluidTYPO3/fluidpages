@@ -9,6 +9,9 @@ plugin.tx_fed {
 page.includeJS.jQuery = //ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
 page.includeJS.jQuery.external = 1
 page.includeJS.jQuery.forceOnTop = 1
+page.includeJS.jQueryUI = //ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js
+page.includeJS.jQueryUI.external = 1
+page.includeJS.jQueryUI.forceOnTop = 1
 
 lib.menu {
 	main {
