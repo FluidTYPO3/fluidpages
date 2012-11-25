@@ -34,6 +34,17 @@
 		        eval="int,trim" minimum="0" maximum="6" default="{v:var.typoscript(path: 'lib.menu.main.entryLevel')}">
 			<flux:flexform.field.wizard.slider hideParent="TRUE" step="1" width="100" />
 		</flux:flexform.field.input>
+		<flux:flexform.grid>
+			<flux:flexform.grid.row>
+				<flux:flexform.grid.column colPos="0" name="Main Content" />
+			</flux:flexform.grid.row>
+			<flux:flexform.grid.row>
+				<flux:flexform.grid.column colPos="1" name="Hero Unit" />
+			</flux:flexform.grid.row>
+			<flux:flexform.grid.row>
+				<flux:flexform.grid.column colPos="2" name="Footer Content" />
+			</flux:flexform.grid.row>
+		</flux:flexform.grid>
 	</flux:flexform>
 </f:section>
 
