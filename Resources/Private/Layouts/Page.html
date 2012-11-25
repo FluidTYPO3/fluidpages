@@ -11,6 +11,17 @@
 <f:render section="Navigation" partial="PageObjects" arguments="{_all}" />
 
 <div class="container">
+	<v:security.allow anyBackendUser="TRUE">
+		<v:once.session>
+			<div class="alert alert-success">
+				<h1 class="alert-header">Welcome to the Fluid Pages sample page!</h1>
+				<p>
+					This page is the built-in sample Fluid Pages template file being
+					rendered by EXT:fluidpages. Looks like you set things up just right!
+				</p>
+			</div>
+		</v:once.session>
+	</v:security.allow>
 	<f:render section="HeroUnit" partial="PageObjects" optional="TRUE" arguments="{_all}" />
 	<f:render section="PageHeader" partial="PageObjects" optional="TRUE" arguments="{_all}" />
 	<f:render section="SubNavigation" partial="PageObjects"  optional="TRUE" arguments="{_all}" />
