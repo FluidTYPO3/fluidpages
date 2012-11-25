@@ -6,6 +6,10 @@ plugin.tx_fed {
 	}
 }
 
+page.includeJS.jQuery = //ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
+page.includeJS.jQuery.external = 1
+page.includeJS.jQuery.forceOnTop = 1
+
 lib.menu {
 	main {
 		entryLevel = 0
