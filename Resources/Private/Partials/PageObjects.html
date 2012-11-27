@@ -15,7 +15,7 @@
 		<div class="navbar-inner">
 			<div class="container">
 				<a class="brand" href="{v:site.url()}"><v:site.name /></a>
-				<v:page.menu entryLevel="{settings.entryLevel}">
+				<v:page.menu entryLevel="{v:var.typoscript(path: 'lib.menu.main.entryLevel')}">
 					<ul class="nav">
 						<f:for each="{menu}" as="mainPage">
 							<li class="{mainPage.class}"><a href="{mainPage.link}" class="{mainPage.class}">{mainPage.title}</a></li>
