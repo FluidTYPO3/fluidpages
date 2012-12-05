@@ -3,7 +3,7 @@
 /***************************************************************
  * Extension Manager/Repository config file for ext "fluidpages".
  *
- * Auto generated 02-12-2012 19:40
+ * Auto generated 05-12-2012 20:56
  *
  * Manual updates:
  * Only the data in the array - everything else is removed by next
@@ -21,15 +21,20 @@ $EM_CONF[$_EXTKEY] = array(
 	'dependencies' => 'cms,flux',
 	'conflicts' => 'templavoila',
 	'priority' => '',
+	'loadOrder' => '',
 	'module' => '',
 	'state' => 'stable',
-	'internal' => '',
 	'uploadfolder' => 0,
 	'createDirs' => '',
 	'modify_tables' => '',
-	'clearCacheOnLoad' => 1,
+	'clearcacheonload' => 1,
 	'lockType' => '',
 	'version' => '1.0.0',
+	'author' => 'Claus Due',
+	'author_email' => 'claus@wildside.dk',
+	'author_company' => 'Wildside A/S',
+	'CGLcompliance' => '',
+	'CGLcompliance_note' => '',
 	'constraints' => array(
 		'depends' => array(
 			'typo3' => '4.5-0.0.0',
@@ -40,7 +45,6 @@ $EM_CONF[$_EXTKEY] = array(
 			'templavoila' => '',
 		),
 		'suggests' => array(
-			'vhs' => '',
 		),
 	),
 	'suggests' => array(
