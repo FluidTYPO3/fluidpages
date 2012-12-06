@@ -107,17 +107,55 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			return NULL;
 		}
 		$pageSelect = new t3lib_pageSelect();
-		$rootLine = $pageSelect->getRootLine($pageUid);
-		$rootLine = array_values($rootLine);
-		foreach ($rootLine as $index => $row) {
-			if ($index == 0 && strpos($row['tx_fed_page_controller_action'], '->')) {
-				return $row;
-			} elseif ($index > 0 && strpos($row['tx_fed_page_controller_action_sub'], '->')) {
-				$row['tx_fed_page_controller_action'] = $row['tx_fed_page_controller_action_sub'];
-				return $row;
+		$page = $pageSelect->getPage($pageUid);
+		if (strpos($page['tx_fed_page_controller_action'], '->')) {
+			return $page;
+		}
+		do {
+			$page = $this->getWorkspaceParentPage($page);
+			$workspacePage = NULL;
+			$workspacePage = $this->getWorkspacePage($page);
+			if ($workspacePage) {
+				$page = $workspacePage;
+			}
+		} while ($page && !strpos($page['tx_fed_page_controller_action_sub'], '->'));
+		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
+		return $page;
+	}
+
+	protected function getWorkspaceParentPage($page) {
+		$page = $this->getPositionPlaceholder($page);
+		$page = t3lib_BEfunc::getRecord('pages', $page['pid']);
+		$page = $this->getPositionPlaceholder($page);
+		return $page;
+	}
+
+
+	protected function getWorkspacePage($page) {
+		if ($page) {
+			$wsid = $GLOBALS['BE_USER']->workspace ?: 0;
+			if ($wsid != 0 && $page['t3ver_wsid'] != $wsid) {
+				$workspacePage = t3lib_BEfunc::getRecordRaw('pages', $where = sprintf('t3ver_oid=%d AND t3ver_wsid=%d', $page['uid'], $wsid), $fields = '*');
+				if ($workspacePage !== NULL) {
+					$page = $workspacePage;
+				}
 			}
 		}
-		return NULL;
+		return $page;
+	}
+
+	protected function getPositionPlaceholder($page) {
+		if ($page['pid'] != -1) {
+			// original, dont do anything
+		} elseif ($page['t3ver_state'] == 0) {
+			// page has changed, but not moved
+			$page = t3lib_BEfunc::getRecord('pages', $page['t3ver_oid']);
+		} elseif ($page['t3ver_state'] == 4) {
+			// page has moved. get placeholder for new position
+			$page = t3lib_BEfunc::getRecordRaw('pages', $where = sprintf('t3ver_move_id=%d AND t3ver_state=3', $page['t3ver_oid']), $fields = '*');
+			//$page = t3lib_BEfunc::getRecord('pages', $page['t3ver_move_id']);
+		}
+		return $page;
 	}
 
 	/**
@@ -150,13 +188,18 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			return NULL;
 		}
 		$pageSelect = new t3lib_pageSelect();
-		$rootLine = $pageSelect->getRootLine($pageUid);
-		foreach ($rootLine as $row) {
-			if (!empty($row['tx_fed_page_flexform'])) {
-				return $row['tx_fed_page_flexform'];
+		$page = $pageSelect->getPage($pageUid);
+		while ($page['uid'] != 0 && empty($page['tx_fed_page_flexform'])) {
+			$page = $this->getWorkspaceParentPage($page);
+			$workspacePage = $this->getWorkspaceOverlay($page);
+			if ($workspacePage) {
+				$page = $workspacePage;
 			}
+		};
+		if (empty($page['tx_fed_page_flexform'])) {
+			return NULL;
 		}
-		return NULL;
+		return $page['tx_fed_page_flexform'];
 	}
 
 	/**
