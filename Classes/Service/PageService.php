@@ -123,6 +123,12 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		return $page;
 	}
 
+	/**
+	 * Gets the workspace parent for a given page
+	 *
+	 * @param array $page
+	 * @return array
+	 */
 	protected function getWorkspaceParentPage($page) {
 		$page = $this->getPositionPlaceholder($page);
 		$page = t3lib_BEfunc::getRecord('pages', $page['pid']);
@@ -130,7 +136,12 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		return $page;
 	}
 
-
+	/**
+	 * Gets the workspace version of a given page
+	 *
+	 * @param array $page
+	 * @return array
+	 */
 	protected function getWorkspacePage($page) {
 		if ($page) {
 			$wsid = $GLOBALS['BE_USER']->workspace ?: 0;
@@ -144,6 +155,12 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		return $page;
 	}
 
+	/**
+	 * Gets a placeholder for a given page
+	 *
+	 * @param array $page
+	 * @return array
+	 */
 	protected function getPositionPlaceholder($page) {
 		if ($page['pid'] != -1) {
 			// original, dont do anything
