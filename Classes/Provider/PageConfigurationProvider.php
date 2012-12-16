@@ -132,9 +132,11 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	 */
 	public function getTemplateVariables(array $row) {
 		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		#/** @var Tx_Flux_Service_FlexForm $flexFormUtility */
-		#$flexFormUtility = $this->objectManager->get('Tx_Flux_Service_FlexForm');
-		#$flexFormUtility->setContentObjectData($row['tx_fed_page_flexform']);
+		try {
+			$this->flexFormService->setContentObjectData($row['tx_fed_page_flexform']);
+		} catch (Exception $error) {
+			return array();
+		}
 		$this->flexFormService->setContentObjectData($row['tx_fed_page_flexform']);
 		$flexform = $this->flexFormService->getAll();
 		if ($configuration['tx_fed_page_controller_action']) {
