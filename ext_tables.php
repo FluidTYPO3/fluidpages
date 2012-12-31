@@ -7,7 +7,6 @@ Tx_Flux_Core::unregisterConfigurationProvider('Tx_Fed_Provider_Configuration_Pag
 Tx_Flux_Core::registerConfigurationProvider('Tx_Fluidpages_Provider_PageConfigurationProvider');
 
 t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Fluid Pages: PAGE');
-t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/SamplePage', 'Fluid Pages: Sample Page Template');
 
 t3lib_div::loadTCA('pages');
 t3lib_extMgm::addTCAcolumns('pages', array(
