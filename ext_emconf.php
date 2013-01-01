@@ -11,7 +11,7 @@
  ***************************************************************/
 
 $EM_CONF[$_EXTKEY] = array(
-	'title' => 'Fluid Page Templates',
+	'title' => 'Fluid Pages Engine',
 	'description' => 'Fluid Page Template engine - integrates compact and highly dynamic page templates with all the benefits of Fluid.',
 	'category' => 'misc',
 	'author' => 'Claus Due',
