@@ -72,6 +72,9 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 		$variables = array();
 		list ($extensionName, $action) = explode('->', $record['tx_fed_page_controller_action']);
 		$paths = $this->configurationService->getPageConfiguration($extensionName);
+		if (count($paths) === 0) {
+			return;
+		}
 		$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
 		$grid = $this->gridService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths);
 		if (is_array($grid) === FALSE) {
