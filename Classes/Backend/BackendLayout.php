@@ -73,6 +73,11 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 		list ($extensionName, $action) = explode('->', $record['tx_fed_page_controller_action']);
 		$paths = $this->configurationService->getPageConfiguration($extensionName);
 		if (count($paths) === 0) {
+			if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
+				// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
+				header('Location: ?id=' . $pageUid);
+				exit();
+			}
 			return;
 		}
 		$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
