@@ -94,8 +94,8 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 				'rows.' => array()
 			)
 		);
-		$colPosList = array();
-		$items = array();
+		$colPosList = array(-42);
+		$items = array(array('Fluid Content Area', -42, NULL));
 
 		foreach ($grid as $rowIndex => $row) {
 			$colCount = 0;
