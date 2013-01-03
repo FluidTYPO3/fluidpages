@@ -146,7 +146,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	 * @param t3lib_TCEForms $tceForms A back reference to the TCEforms object which generated the item list
 	 * @return void
 	 */
-	public function postProcessColPosListItemsParsed(&$id, array &$tcaItems, t3lib_TCEForms &$tceForms) {
+	public function postProcessColPosListItemsParsed(&$id, array &$tcaItems, &$tceForms) {
 	}
 
 	/**
