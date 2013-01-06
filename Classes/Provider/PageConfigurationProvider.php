@@ -110,16 +110,32 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 
 	/**
 	 * @param array $row
-	 * @return string
+	 * @return array|NULL
 	 */
-	public function getTemplatePathAndFilename(array $row) {
+	public function getTemplatePaths(array $row) {
 		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		$templatePathAndFilename = NULL;
+		$paths = NULL;
 		if ($configuration['tx_fed_page_controller_action']) {
 			$action = $configuration['tx_fed_page_controller_action'];
 			list ($extensionName, $action) = explode('->', $action);
 			$paths = $this->configurationService->getPageConfiguration($extensionName);
-			$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
+		}
+		return $paths;
+	}
+
+	/**
+	 * @param array $row
+	 * @return string
+	 */
+	public function getTemplatePathAndFilename(array $row) {
+		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		$paths = $this->getTemplatePaths($row);
+		if ($configuration['tx_fed_page_controller_action']) {
+			$action = $configuration['tx_fed_page_controller_action'];
+			list ($extensionName, $action) = explode('->', $action);
+			if (is_array($paths)) {
+				$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
+			}
 		} elseif ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFallbackFluidPageTemplate']) {
 			$templatePathAndFilename = $this->pageService->getFallbackPageTemplatePathAndFilename();
 		}
@@ -131,44 +147,52 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	 * @return array
 	 */
 	public function getTemplateVariables(array $row) {
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
 		try {
 			$this->flexFormService->setContentObjectData($row['tx_fed_page_flexform']);
 		} catch (Exception $error) {
 			return array();
 		}
-		$this->flexFormService->setContentObjectData($row['tx_fed_page_flexform']);
-		$flexform = $this->flexFormService->getAll();
-		if ($configuration['tx_fed_page_controller_action']) {
-			$action = $configuration['tx_fed_page_controller_action'];
-			list ($extensionName, $action) = explode('->', $action);
-			$paths = Tx_Flux_Utility_Path::translatePath((array) $this->configurationService->getPageConfiguration($extensionName));
-			$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
-		} elseif ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFallbackFluidPageTemplate']) {
-			$templatePathAndFilename = $this->pageService->getFallbackPageTemplatePathAndFilename();
-		} else {
-			return array();
-		}
-
-		/** @var Tx_Flux_MVC_View_ExposedStandaloneView $view */
-		$view = $this->objectManager->get('Tx_Flux_MVC_View_ExposedStandaloneView');
-		$view->setTemplatePathAndFilename($templatePathAndFilename);
-		$view->assignMultiple($flexform);
-		$stored = $view->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', 'storage', 'Configuration');
-		$stored['sheets'] = array();
-		foreach ($stored['fields'] as $field) {
-			$groupKey = $field['sheets']['name'];
-			$groupLabel = $field['sheets']['label'];
-			if (is_array($stored['sheets'][$groupKey]) === FALSE) {
-				$stored['sheets'][$groupKey] = array(
-					'name' => $groupKey,
-					'label' => $groupLabel,
-					'fields' => array()
-				);
+		try {
+			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+			$flexform = $this->flexFormService->getAll();
+			if ($configuration['tx_fed_page_controller_action']) {
+				$action = $configuration['tx_fed_page_controller_action'];
+				list ($extensionName, $action) = explode('->', $action);
+				$paths = Tx_Flux_Utility_Path::translatePath((array) $this->configurationService->getPageConfiguration($extensionName));
+				$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
+			} elseif ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFallbackFluidPageTemplate']) {
+				$templatePathAndFilename = $this->pageService->getFallbackPageTemplatePathAndFilename();
+			} else {
+				return array();
 			}
-			array_push($stored['sheets'][$groupKey]['fields'], $field);
+
+			/** @var Tx_Flux_MVC_View_ExposedStandaloneView $view */
+			$view = $this->objectManager->get('Tx_Flux_MVC_View_ExposedStandaloneView');
+			$view->setTemplatePathAndFilename($templatePathAndFilename);
+			$view->setPartialRootPath($paths['partialRootPath']);
+			$view->setLayoutRootPath($paths['layoutRootPath']);
+			$view->assignMultiple($flexform);
+			$stored = $view->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', 'storage', 'Configuration');
+			$stored['sheets'] = array();
+			foreach ($stored['fields'] as $field) {
+				$groupKey = $field['sheets']['name'];
+				$groupLabel = $field['sheets']['label'];
+				if (is_array($stored['sheets'][$groupKey]) === FALSE) {
+					$stored['sheets'][$groupKey] = array(
+						'name' => $groupKey,
+						'label' => $groupLabel,
+						'fields' => array()
+					);
+				}
+				array_push($stored['sheets'][$groupKey]['fields'], $field);
+			}
+			return $stored;
+		} catch (Exception $error) {
+			if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
+				throw $error;
+			}
 		}
-		return $stored;
+		return array();
 	}
 
 	/**
