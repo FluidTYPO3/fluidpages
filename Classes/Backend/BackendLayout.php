@@ -51,6 +51,11 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	protected $pageService;
 
 	/**
+	 * @var Tx_Flux_Service_FlexForm
+	 */
+	protected $flexformService;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -58,6 +63,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 		$this->configurationService = $this->objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
 		$this->gridService = $this->objectManager->get('Tx_Flux_Service_Grid');
 		$this->pageService = $this->objectManager->get('Tx_Fluidpages_Service_PageService');
+		$this->flexformService = $this->objectManager->get('Tx_Flux_Service_FlexForm');
 	}
 
 	/**
@@ -79,6 +85,10 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 				exit();
 			}
 			return;
+		}
+		$flexFormSource = isset($record['tx_fed_page_flexform']) ? $record['tx_fed_page_flexform'] : NULL;
+		if ($flexFormSource !== NULL) {
+			$variables = $this->flexformService->convertFlexFormContentToArray($flexFormSource);
 		}
 		$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
 		$grid = $this->gridService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths);
