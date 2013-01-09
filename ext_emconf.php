@@ -3,7 +3,7 @@
 /***************************************************************
  * Extension Manager/Repository config file for ext "fluidpages".
  *
- * Auto generated 31-12-2012 01:23
+ * Auto generated 09-01-2013 01:16
  *
  * Manual updates:
  * Only the data in the array - everything else is removed by next
@@ -29,7 +29,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'modify_tables' => '',
 	'clearcacheonload' => 1,
 	'lockType' => '',
-	'version' => '1.1.0',
+	'version' => '1.1.1',
 	'CGLcompliance' => '',
 	'CGLcompliance_note' => '',
 	'constraints' => array(
@@ -46,7 +46,7 @@ $EM_CONF[$_EXTKEY] = array(
 	),
 	'suggests' => array(
 	),
-	'_md5_values_when_last_written' => 'a:16:{s:12:"ext_icon.gif";s:4:"68b4";s:17:"ext_localconf.php";s:4:"7c93";s:14:"ext_tables.php";s:4:"ca80";s:14:"ext_tables.sql";s:4:"f145";s:9:"README.md";s:4:"5c8b";s:33:"Classes/Backend/BackendLayout.php";s:4:"6458";s:38:"Classes/Backend/PageLayoutSelector.php";s:4:"9ac7";s:37:"Classes/Controller/PageController.php";s:4:"70be";s:51:"Classes/Override/Backend/View/BackendLayoutView.php";s:4:"a702";s:48:"Classes/Override/Backend/View/PageLayoutView.php";s:4:"ff40";s:46:"Classes/Provider/PageConfigurationProvider.php";s:4:"c1e5";s:40:"Classes/Service/ConfigurationService.php";s:4:"2a41";s:31:"Classes/Service/PageService.php";s:4:"2fa5";s:34:"Configuration/TypoScript/setup.txt";s:4:"e37a";s:43:"Resources/Private/Language/locallang_db.xml";s:4:"1cd3";s:44:"Resources/Private/Templates/Page/Render.html";s:4:"d41d";}',
+	'_md5_values_when_last_written' => 'a:16:{s:12:"ext_icon.gif";s:4:"68b4";s:17:"ext_localconf.php";s:4:"7c93";s:14:"ext_tables.php";s:4:"ca80";s:14:"ext_tables.sql";s:4:"f145";s:9:"README.md";s:4:"5c8b";s:33:"Classes/Backend/BackendLayout.php";s:4:"a010";s:38:"Classes/Backend/PageLayoutSelector.php";s:4:"9ac7";s:37:"Classes/Controller/PageController.php";s:4:"70be";s:51:"Classes/Override/Backend/View/BackendLayoutView.php";s:4:"a702";s:48:"Classes/Override/Backend/View/PageLayoutView.php";s:4:"ff40";s:46:"Classes/Provider/PageConfigurationProvider.php";s:4:"9298";s:40:"Classes/Service/ConfigurationService.php";s:4:"2a41";s:31:"Classes/Service/PageService.php";s:4:"2fa5";s:34:"Configuration/TypoScript/setup.txt";s:4:"e37a";s:43:"Resources/Private/Language/locallang_db.xml";s:4:"1cd3";s:44:"Resources/Private/Templates/Page/Render.html";s:4:"d41d";}',
 );
 
 ?>
