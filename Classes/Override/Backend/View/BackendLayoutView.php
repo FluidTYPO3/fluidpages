@@ -84,12 +84,9 @@ class Tx_Fluidpages_Override_Backend_View_BackendLayoutView extends TYPO3\CMS\Ba
 	 * @return array|NULL $backendLayout
 	 */
 	public function getSelectedBackendLayout($id) {
-		#$this->backendLayout->preProcessBackendLayoutPageUid($id);
-		#$backendLayout = parent::getSelectedBackendLayout($id);
-		#\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($backendLayout);
+		$this->backendLayout->preProcessBackendLayoutPageUid($id);
+		$backendLayout = parent::getSelectedBackendLayout($id);
 		$this->backendLayout->postProcessBackendLayout($id, $backendLayout);
-		#\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($backendLayout);
-		#exit();
 		return array(
 			'__config' => $backendLayout['__config'],
 			'__items' => $backendLayout['__items'],
