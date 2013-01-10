@@ -104,8 +104,8 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 				'rows.' => array()
 			)
 		);
-		$colPosList = array(-42);
-		$items = array(array('Fluid Content Area', -42, NULL));
+		$colPosList = array();
+		$items = array();
 
 		foreach ($grid as $rowIndex => $row) {
 			$colCount = 0;
@@ -166,6 +166,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	 * @return void
 	 */
 	public function postProcessColPosProcFuncItems(array &$params) {
+		array_push($params['items'], array('Fluid Content Area', -42, NULL));
 	}
 
 }
