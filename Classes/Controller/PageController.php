@@ -48,6 +48,11 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Extbase_MVC_Controller_
 	protected $configurationService;
 
 	/**
+	 * @var Tx_Flux_Provider_ConfigurationService
+	 */
+	protected $providerConfigurationService;
+
+	/**
 	 * @var Tx_Flux_Service_FlexForm
 	 */
 	protected $flexFormService;
@@ -76,23 +81,39 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Extbase_MVC_Controller_
 	}
 
 	/**
+	 * @param Tx_Flux_Provider_ConfigurationService $providerConfigurationService
+	 * @return void
+	 */
+	public function injectProviderConfigurationService(Tx_Flux_Provider_ConfigurationService $providerConfigurationService) {
+		$this->providerConfigurationService = $providerConfigurationService;
+	}
+
+	/**
 	 * @param Tx_Flux_MVC_View_ExposedTemplateView $view
 	 *
 	 * @return void
 	 */
 	public function initializeView(Tx_Flux_MVC_View_ExposedTemplateView $view) {
+		$row = $GLOBALS['TSFE']->page;
+		$providers = $this->providerConfigurationService->resolveConfigurationProviders('pages', 'tx_fed_page_flexform', $row);
+		$priority = 0;
+		/** @var $pageConfigurationProvider Tx_Fluidpages_Provider_PageConfigurationProvider */
+		$pageConfigurationProvider = NULL;
+		foreach ($providers as $provider) {
+			if ($provider->getPriority($row) >= $priority) {
+				$pageConfigurationProvider = $provider;
+			}
+		}
+		if (NULL === $pageConfigurationProvider) {
+			throw new Exception('Unable to resolve the PageConfigurationProvider - this is grave error and indicates that EXT:fluidpages is broken', 1358693007);
+		}
 		$configuration = $this->pageService->getPageTemplateConfiguration($GLOBALS['TSFE']->id);
 		list ($extensionName, $action) = explode('->', $configuration['tx_fed_page_controller_action']);
-		$paths = $this->configurationService->getPageConfiguration($extensionName);
-		$flexFormSource = $this->pageService->getPageFlexFormSource($GLOBALS['TSFE']->id);
-		$flexformData = $this->flexFormService->convertFlexFormContentToArray($flexFormSource);
+		$paths = $pageConfigurationProvider->getTemplatePaths($row);
+		$flexformData = $pageConfigurationProvider->getFlexFormValues($row);
 		$view->setLayoutRootPath($paths['layoutRootPath']);
 		$view->setPartialRootPath($paths['partialRootPath']);
-		$templatePathAndFilename = $paths['templateRootPath'] . 'Page/' . $action . '.html';
-		if (file_exists($templatePathAndFilename) === FALSE && $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFallbackFluidPageTemplate']) {
-			$templatePathAndFilename = $this->settings['templates']['fallbackFluidPageTemplate'];
-		}
-		$templatePathAndFilename = Tx_Flux_Utility_Path::translatePath($templatePathAndFilename);
+		$templatePathAndFilename = $provider->getTemplatePathAndFilename($row);
 		if (file_exists($templatePathAndFilename) === TRUE) {
 			$view->setTemplatePathAndFilename($templatePathAndFilename);
 			$view->assignMultiple($flexformData);

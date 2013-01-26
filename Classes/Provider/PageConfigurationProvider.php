@@ -40,6 +40,11 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	/**
 	 * @var string
 	 */
+	protected $parentFieldName = 'pid';
+
+	/**
+	 * @var string
+	 */
 	protected $fieldName = 'tx_fed_page_flexform';
 
 	/**
@@ -136,8 +141,6 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			if (is_array($paths)) {
 				$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
 			}
-		} elseif ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFallbackFluidPageTemplate']) {
-			$templatePathAndFilename = $this->pageService->getFallbackPageTemplatePathAndFilename();
 		}
 		return $templatePathAndFilename;
 	}
@@ -150,19 +153,25 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 		try {
 			$this->flexFormService->setContentObjectData($row['tx_fed_page_flexform']);
 		} catch (Exception $error) {
+			if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
+				throw $error;
+			}
 			return array();
 		}
 		try {
 			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-			$flexform = $this->flexFormService->getAll();
 			if ($configuration['tx_fed_page_controller_action']) {
 				$action = $configuration['tx_fed_page_controller_action'];
 				list ($extensionName, $action) = explode('->', $action);
 				$paths = Tx_Flux_Utility_Path::translatePath((array) $this->configurationService->getPageConfiguration($extensionName));
 				$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
-			} elseif ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFallbackFluidPageTemplate']) {
-				$templatePathAndFilename = $this->pageService->getFallbackPageTemplatePathAndFilename();
+				if (FALSE === file_exists($templatePathAndFilename)) {
+					throw new Exception('Requested page template file does not exist (' . $templatePathAndFilename . ')', 1359227976);
+				}
 			} else {
+				if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
+					throw new Exception('Unable to get a valid page template configuration from page UID ' . $row['uid'], 1359228024);
+				}
 				return array();
 			}
 
@@ -171,7 +180,7 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			$view->setTemplatePathAndFilename($templatePathAndFilename);
 			$view->setPartialRootPath($paths['partialRootPath']);
 			$view->setLayoutRootPath($paths['layoutRootPath']);
-			$view->assignMultiple($flexform);
+			$view->assignMultiple($this->getFlexFormValues($row));
 			$stored = $view->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', 'storage', 'Configuration');
 			$stored['sheets'] = array();
 			foreach ($stored['fields'] as $field) {
@@ -196,189 +205,26 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	}
 
 	/**
-	 * Pre-process page's FlexForm configuration. Builds an XML array temporarily which
-	 * will contain all configuration of the parent page. If no values are changed, this
-	 * temporary XML is removed after database operation.
+	 * Gets an inheritance tree (ordered parent -> ... -> this record)
+	 * of record arrays containing raw values.
 	 *
-	 * @param array $row the record data, by reference. Changing fields' values changes the record's values just before saving
-	 * @param integer $id The ID of the current record (which is sometimes now included in $row
-	 * @param t3lib_TCEmain $reference A reference to the t3lib_TCEmain object that is currently saving the record
-	 * @return void
-	 */
-	public function preProcessRecord(array &$row, $id, t3lib_TCEmain $reference) {
-		if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFluidPageTemplateVariableInheritance'] < 1) {
-			return;
-		}
-		if (strpos($id, 'NEW') === FALSE) {
-			$newElement = FALSE;
-			$existingPageRecord = array_pop($GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*', 'pages', "uid = '" . $id . "'"));
-			$existingConfigurationString = $existingPageRecord['tx_fed_page_flexform'];
-		} else {
-			$existingConfigurationString = NULL;
-			$newElement = TRUE;
-		}
-		$pageSelect = new t3lib_pageSelect();
-		$pages = $pageSelect->getRootLine($newElement ? $row['pid'] : $id);
-		$inheritedConfiguration = NULL;
-		$inheritedConfigurationString = NULL;
-		foreach ($pages as $page) {
-			if (empty($page['tx_fed_page_flexform']) === FALSE) {
-				$inheritedConfigurationString = $page['tx_fed_page_flexform'];
-				$inheritedConfiguration = t3lib_div::xml2array($inheritedConfigurationString);
-				if ($existingConfigurationString === NULL) {
-					$existingConfigurationString = $inheritedConfigurationString;
-				}
-				break;
-			}
-		}
-		if ($inheritedConfiguration === NULL) {
-				// no configuration exists in rootline - no need to proceed
-			return;
-		} elseif ($newElement) {
-			$row['tx_fed_page_flexform'] = $inheritedConfiguration;
-		}
-		$selectedTemplate = $row['tx_fed_page_controller_action'];
-		if (empty($selectedTemplate) === TRUE) {
-			foreach ($pages as $page) {
-				if (empty($page['tx_fed_page_controller_action_sub']) === FALSE) {
-					$selectedTemplate = $page['tx_fed_page_controller_action_sub'];
-					break;
-				}
-			}
-		}
-		if (empty($row['tx_fed_page_flexform']) === TRUE) {
-				// this page has no configuration, read the configuration from parent
-			$row['tx_fed_page_flexform'] = $inheritedConfigurationString;
-		}
-		if ($inheritedConfigurationString === $row['tx_fed_page_flexform']) {
-				// quick decision on raw string comparison which would indicate an old page that has previously stored an inherited configuration
-			$configurationsMatch = TRUE;
-		} else {
-			$currentConfiguration = is_array($row['tx_fed_page_flexform']) === TRUE ? $row['tx_fed_page_flexform'] : (array) t3lib_div::xml2array($row['tx_fed_page_flexform']);
-			$configurationsMatch = $this->assertMultidimensionalArraysAreIdentical($currentConfiguration, $inheritedConfiguration);
-		}
-		if ($configurationsMatch === TRUE) {
-				// inherited configuration is the same as the
-			$row['tx_fed_page_flexform'] = $inheritedConfiguration;
-		}
-		$existingConfiguration = (array) t3lib_div::xml2array($existingConfigurationString);
-		$newConfiguration = is_array($row['tx_fed_page_flexform']) === TRUE ? $row['tx_fed_page_flexform'] : (array) t3lib_div::xml2array($row['tx_fed_page_flexform']);
-		$newConfigurationString = t3lib_div::array2xml($newConfiguration, '', 0, 'T3FlexForms');
-		$configurationsMatch = $this->assertMultidimensionalArraysAreIdentical($newConfiguration, $inheritedConfiguration);
-		if ($configurationsMatch === TRUE) {
-			// ensure that this page has exactly the same FlexForm XML as its parent if the fields match.
-			// this will synchronize this page with its parent, so that whenever the parent is updated
-			// this page will also be updated.
-			$existingConfigurationString = $inheritedConfigurationString;
-			$overrideValues = array('tx_fed_page_flexform' => $inheritedConfigurationString);
-		} else {
-			$overrideValues = array('tx_fed_page_flexform' => $newConfigurationString);
-		}
-		$treeChildrenWhichRequireUpdate = $this->getAllSubPageIdsWhichInheritConfiguration($id, $selectedTemplate, $existingConfigurationString, $existingConfiguration);
-		if (count($treeChildrenWhichRequireUpdate) > 0) {
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', "uid IN (" . implode(',', $treeChildrenWhichRequireUpdate) . ")", $overrideValues);
-		}
-		unset($reference);
-	}
-
-	/**
-	 * Post-process database operations on the "pages" table, triggering configuration comparison
-	 * with the new parent (if parent has changed, naturally).
-	 *
-	 * @param string $status TYPO3 operation identifier, i.e. "new" etc.
-	 * @param integer $id The ID of the current record (which is sometimes now included in $row
-	 * @param array $row The record's data, by reference. Changing fields' values changes the record's values just before saving after operation
-	 * @param t3lib_TCEmain $reference A reference to the t3lib_TCEmain object that is currently performing the database operation
-	 * @return void
-	 */
-	public function postProcessDatabaseOperation($status, $id, &$row, t3lib_TCEmain $reference) {
-		if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFluidPageTemplateVariableInheritance'] < 1) {
-			return;
-		}
-		$pageSelect = new t3lib_pageSelect();
-		$pages = $pageSelect->getRootLine($id);
-		$inheritedConfiguration = NULL;
-		$inheritedConfigurationString = NULL;
-		foreach ($pages as $page) {
-			if (empty($page['tx_fed_page_flexform']) === FALSE) {
-				$inheritedConfigurationString = $page['tx_fed_page_flexform'];
-				$inheritedConfiguration = t3lib_div::xml2array($inheritedConfigurationString);
-				break;
-			}
-		}
-		if ($inheritedConfiguration === NULL) {
-				// no manipulation necessary, there is no inherited configuration
-			return;
-		}
-		if (empty($row['tx_fed_page_flexform']) === TRUE) {
-				// no manipulation necessary, record does not have a flexform
-			return;
-		}
-		unset($status, $reference);
-	}
-
-	/**
-	 * Returns an array of every child subpage of the current page, which
-	 * has requested to inherit configuration and has not changed any variables
-	 * which are currently set in the configuration. The result can then be used for
-	 * a bulk update.
-	 *
-	 * @param integer $pid
-	 * @param string $selectedTemplate
-	 * @param string $configurationString
-	 * @param array $configuration
+	 * @param array $row
 	 * @return array
 	 */
-	protected function getAllSubPageIdsWhichInheritConfiguration($pid, $selectedTemplate, $configurationString, $configuration) {
-		$subpages = array();
-		$clause = "pid = '" . $pid . "' AND (tx_fed_page_controller_action = '' OR tx_fed_page_controller_action = '" . $selectedTemplate . "')";
-		$subpagesWithSameOrNoController = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-			'uid,tx_fed_page_flexform,tx_fed_page_controller_action_sub',
-			'pages',
-			$clause
-		);
-		foreach ($subpagesWithSameOrNoController as $page) {
-			if ($page['tx_fed_page_flexform'] === $configurationString || empty($page['tx_fed_page_flexform']) === TRUE) {
-				array_push($subpages, $page['uid']);
-				continue;
-			}
-			$pageConfiguration = (array) t3lib_div::xml2array($page['tx_fed_page_flexform']);
-			if ($this->assertMultidimensionalArraysAreIdentical($pageConfiguration, $configuration) === TRUE) {
-				array_push($subpages, $page['uid']);
-				continue;
-			}
-			if (empty($page['tx_fed_page_controller_action_sub']) === FALSE && $page['tx_fed_page_controller_action_sub'] != $selectedTemplate) {
-					// changed templates, do not propagate to children
-				continue;
-			}
-			$children = $this->getAllSubPageIdsWhichInheritConfiguration($page['uid'], $selectedTemplate, $configurationString, $configuration);
-			if (count($children) > 0) {
-				array_merge($subpages, $children);
+	public function getInheritanceTree(array $row) {
+		$main = 'tx_fed_page_controller_action';
+		$sub = 'tx_fed_page_controller_action_sub';
+		$records = parent::getInheritanceTree($row);
+		if (0 === count($records)) {
+			return $records;
+		}
+		$template = $records[0][$sub];
+		foreach ($records as $index => $record) {
+			if ((FALSE === empty($record[$main]) && $template !== $record[$main]) || (FALSE === empty($record[$sub]) && $template !== $record[$sub])) {
+				return array_slice($records, $index);
 			}
 		}
-		return $subpages;
-	}
-
-	/**
-	 * @param array $a First multidimensional array
-	 * @param array $b Second multidimensional array
-	 * @return boolean
-	 */
-	protected function assertMultidimensionalArraysAreIdentical(array $a, array $b) {
-		foreach ($a as $index => $value) {
-			if (isset($b[$index]) === FALSE) {
-				return FALSE;
-			} elseif (is_array($value)) {
-				if ($this->assertMultidimensionalArraysAreIdentical($value, $b[$index]) === FALSE) {
-					return FALSE;
-				}
-			} else {
-				if ($value != $b[$index]) {
-					return FALSE;
-				}
-			}
-		}
-		return (boolean) (count(array_diff(array_keys($a), array_keys($b)) > 0));
+		return $records;
 	}
 
 }
