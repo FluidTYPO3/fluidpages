@@ -35,6 +35,11 @@
 class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 
 	/**
+	 * @var array
+	 */
+	private static $cache = array();
+
+	/**
 	 * @var Tx_Extbase_Object_ObjectManager
 	 */
 	protected $objectManager;
@@ -212,21 +217,47 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @api
 	 */
 	public function getPageTemplateLabel($extensionName, $templateFile) {
-		if ($extensionName === NULL) {
-			$extensionName = 'fed';
-		}
 		$config = $this->configurationService->getPageConfiguration($extensionName);
-		if (file_exists($templateFile) === TRUE) {
-			$templatePathAndFilename = $templateFile;
-		} else {
-			$templatePathAndFilename = $config['templateRootPath'] . 'Page/' . $templateFile . '.html';
+		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
+		$page = $this->getStoredVariable($templateFile, 'storage', $config);
+		return $page['label'] ? $page['label'] : $templateFile . '.html';
+	}
+
+	/**
+	 * Returns TRUE if the template is enabled
+	 *
+	 * @param string $extensionName
+	 * @param string $templateFile
+	 * @return string
+	 * @api
+	 */
+	public function getPageTemplateEnabled($extensionName, $templateFile) {
+		$config = $this->configurationService->getPageConfiguration($extensionName);
+		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
+		$page = $this->getStoredVariable($templatePathAndFilename, 'storage', $config);
+		return (TRUE === (boolean) $page['enabled']);
+	}
+
+	/**
+	 * @param string $templatePathAndFilename
+	 * @param string $variableName
+	 * @param array $paths
+	 * @param string $section
+	 * @return mixed
+	 */
+	public function getStoredVariable($templatePathAndFilename, $variableName, $paths = array(), $section = 'Configuration') {
+		if (TRUE === isset(self::$cache[$templatePathAndFilename])) {
+			return self::$cache[$templatePathAndFilename];
 		}
 		$exposedView = $this->objectManager->get('Tx_Flux_MVC_View_ExposedStandaloneView');
 		$exposedView->setTemplatePathAndFilename($templatePathAndFilename);
-		$exposedView->setLayoutRootPath($config['layoutRootPath']);
-		$exposedView->setPartialRootPath($config['partialRootPath']);
-		$page = $exposedView->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', 'storage', 'Configuration');
-		return $page['label'] ? $page['label'] : $templateFile . '.html';
+		if (TRUE === isset($paths['layoutRootPath'])) {
+			$exposedView->setLayoutRootPath($paths['layoutRootPath']);
+			$exposedView->setPartialRootPath($paths['partialRootPath']);
+		}
+		$value = $exposedView->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', $variableName, $section);
+		self::$cache[$templatePathAndFilename] = $value;
+		return self::$cache[$templatePathAndFilename];
 	}
 
 	/**
@@ -270,6 +301,20 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			}
 		}
 		return $output;
+	}
+
+	/**
+	 * @param array $paths
+	 * @param string $template
+	 * @return string
+	 */
+	public function expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template) {
+		if (TRUE === file_exists($template)) {
+			$templatePathAndFilename = $template;
+		} else {
+			$templatePathAndFilename = $paths['templateRootPath'] . 'Page/' . $template . '.html';
+		}
+		return $templatePathAndFilename;
 	}
 
 }

@@ -51,6 +51,11 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 	protected $pageService;
 
 	/**
+	 * @var Tx_Flux_Service_Flexform
+	 */
+	protected $flexformService;
+
+	/**
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
@@ -58,6 +63,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		$this->configurationManager = $objectManager->get('Tx_Extbase_Configuration_BackendConfigurationManager');
 		$this->configurationService = $objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
 		$this->pageService = $objectManager->get('Tx_Fluidpages_Service_PageService');
+		$this->flexformService = $objectManager->get('Tx_Flux_Service_Flexform');
 	}
 
 	/**
@@ -84,17 +90,24 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 				require $emConfigFile;
 				$groupTitle = $EM_CONF['']['title'];
 			}
+
 			$selector .= '<optgroup label="' . $groupTitle . '">' . LF;
 			foreach ($group as $template) {
-				$optionValue = $extension . '->' . $template;
 				try {
-					$label = $this->pageService->getPageTemplateLabel($extension, $template);
+					$paths = $this->configurationService->getPageConfiguration($extension);
+					$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
+					$configuration = $this->pageService->getStoredVariable($templatePathAndFilename, 'storage', $paths);
 				} catch (Exception $error) {
 					if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
 						throw $error;
 					}
 					continue;
 				}
+				if (FALSE === (boolean) $configuration['enabled']) {
+					continue;
+				}
+				$label = $configuration['label'];
+				$optionValue = $extension . '->' . $template;
 				$selected = ($optionValue == $value ? ' selected="formField selected"' : '');
 				$option = '<option value="' . $optionValue . '"' . $selected . '>' . $label . '</option>';
 				$selector .= $option . LF;
