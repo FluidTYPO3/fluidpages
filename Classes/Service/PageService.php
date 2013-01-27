@@ -176,24 +176,6 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	}
 
 	/**
-	 * Gets the fallback Fluid Page Template defined in TypoScript
-	 *
-	 * @param boolean $translatePath If FALSE, does not translate the TypoScript path
-	 * @return string
-	 */
-	public function getFallbackPageTemplatePathAndFilename($translatePath = TRUE) {
-		$fallbackTemplatePathAndFilename = $this->settings['defaults']['templates']['fallbackFluidPageTemplate'];
-		if ($translatePath === TRUE) {
-			$fallbackTemplatePathAndFilename = t3lib_div::getFileAbsFileName($fallbackTemplatePathAndFilename);
-		}
-		if (file_exists($fallbackTemplatePathAndFilename) || ($translatePath === FALSE)) {
-			return $fallbackTemplatePathAndFilename;
-		} else {
-			return t3lib_extMgm::extPath('fluidpages', 'Resources/Private/Templates/Page/Render.html');
-		}
-	}
-
-	/**
 	 * Get a usable page configuration flexform from rootline
 	 *
 	 * @param integer $pageUid
@@ -275,7 +257,15 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 				} else if (strtolower($extension) != strtolower($format)) {
 					unset($files[$k]);
 				} else {
-					$output[$extensionName][] = $pathinfo['filename'];
+					try {
+						$this->getPageTemplateLabel($extensionName, $path . $file);
+						$output[$extensionName][] = $pathinfo['filename'];
+					} catch (Exception $error) {
+						if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
+							throw $error;
+						}
+						continue;
+					}
 				}
 			}
 		}

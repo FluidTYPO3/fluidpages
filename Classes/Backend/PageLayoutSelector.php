@@ -74,19 +74,6 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		if (strpos($name, 'tx_fed_controller_action_sub') === FALSE) {
 			$onChange = 'onchange="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
 		}
-		if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFallbackFluidPageTemplate'] && empty($value) === TRUE) {
-			$fallbackTemplatePathAndFilename = $this->pageService->getFallbackPageTemplatePathAndFilename();
-			if (strpos($fallbackTemplatePathAndFilename, '->')) {
-				list ($extensionName, $templateFileBase) = explode('->', $fallbackTemplatePathAndFilename);
-				$fallbackTemplateIdentifier = trim($fallbackTemplatePathAndFilename, '.html');
-				unset($templateFileBase);
-			} else {
-				$extensionName = NULL;
-				$fallbackTemplateIdentifier = $fallbackTemplatePathAndFilename;
-			}
-			$value = $fallbackTemplateIdentifier;
-			$emptyLabel = $this->configurationManager->getPageTemplateLabel($extensionName, $fallbackTemplateIdentifier);
-		}
 		$selector = '<select name="' . $name . '" class="formField select" ' . $onChange . '>' . LF;
 		$selector .= '<option value="">' . $emptyLabel . '</option>' . LF;
 		foreach ($availableTemplates as $extension=>$group) {
@@ -100,7 +87,14 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 			$selector .= '<optgroup label="' . $groupTitle . '">' . LF;
 			foreach ($group as $template) {
 				$optionValue = $extension . '->' . $template;
-				$label = $this->pageService->getPageTemplateLabel($extension, $template);
+				try {
+					$label = $this->pageService->getPageTemplateLabel($extension, $template);
+				} catch (Exception $error) {
+					if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
+						throw $error;
+					}
+					continue;
+				}
 				$selected = ($optionValue == $value ? ' selected="formField selected"' : '');
 				$option = '<option value="' . $optionValue . '"' . $selected . '>' . $label . '</option>';
 				$selector .= $option . LF;

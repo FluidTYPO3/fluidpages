@@ -89,11 +89,11 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Extbase_MVC_Controller_
 	}
 
 	/**
-	 * @param Tx_Flux_MVC_View_ExposedTemplateView $view
+	 * @param Tx_Extbase_MVC_View_ViewInterface $view
 	 *
 	 * @return void
 	 */
-	public function initializeView(Tx_Flux_MVC_View_ExposedTemplateView $view) {
+	public function initializeView(Tx_Extbase_MVC_View_ViewInterface $view) {
 		$row = $GLOBALS['TSFE']->page;
 		$providers = $this->providerConfigurationService->resolveConfigurationProviders('pages', 'tx_fed_page_flexform', $row);
 		$priority = 0;
@@ -113,28 +113,12 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Extbase_MVC_Controller_
 		$flexformData = $pageConfigurationProvider->getFlexFormValues($row);
 		$view->setLayoutRootPath($paths['layoutRootPath']);
 		$view->setPartialRootPath($paths['partialRootPath']);
-		$templatePathAndFilename = $provider->getTemplatePathAndFilename($row);
-		if (file_exists($templatePathAndFilename) === TRUE) {
-			$view->setTemplatePathAndFilename($templatePathAndFilename);
-			$view->assignMultiple($flexformData);
-			$view->assign('page', $GLOBALS['TSFE']->page);
-			$view->assign('user', $GLOBALS['TSFE']->fe_user->user);
-			$view->assign('cookies', $_COOKIE);
-			$view->assign('session', $_SESSION);
-		} else {
-			$message = 'Template file "' . $templatePathAndFilename . '" does not exist.';
-			if (pathinfo($templatePathAndFilename, PATHINFO_BASENAME) === '') {
-				$message .= ' Additionally, the specified template file basename was empty.';
-				if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fed']['setup']['enableFallbackFluidPageTemplate']) {
-					$message .= ' The fallback page template feature is enabled but the fallback template was not found.';
-				} else {
-					$message .= ' A fallback page template was not defined - which means that you probably just need to';
-					$message .= ' select a page template for this page or make sure your page inherits its template ';
-					$message .= ' from the parent page template.';
-				}
-			}
-			$this->flashMessageContainer->add($message, 'Template file not found');
-		}
+		$view->setTemplateRootPath($paths['templateRootPath']);
+		$view->assignMultiple($flexformData);
+		$view->assign('page', $GLOBALS['TSFE']->page);
+		$view->assign('user', $GLOBALS['TSFE']->fe_user->user);
+		$view->assign('cookies', $_COOKIE);
+		$view->assign('session', $_SESSION);
 		$this->view = $view;
 	}
 
@@ -143,8 +127,20 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Extbase_MVC_Controller_
 	 * @route off
 	 */
 	public function renderAction() {
-		$this->view->setControllerContext($this->controllerContext);
-		return $this->view->render();
+		$content = NULL;
+		try {
+			$content = $this->view->render();
+		} catch (Exception $error) {
+			if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
+				throw $error;
+			}
+			$this->request->setErrors(array('page' => $error));
+			$this->forward('error');
+		}
+		return $content;
+	}
+
+	public function errorAction() {
 	}
 
 }

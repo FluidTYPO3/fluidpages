@@ -10,7 +10,7 @@ Tx_Extbase_Utility_Extension::configurePlugin(
 	$_EXTKEY,
 	'Page',
 	array(
-		'Page' => 'render',
+		'Page' => 'render,error',
 	),
 	array(
 	),
