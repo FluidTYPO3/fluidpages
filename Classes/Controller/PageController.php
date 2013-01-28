@@ -111,6 +111,8 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Extbase_MVC_Controller_
 		list ($extensionName, $action) = explode('->', $configuration['tx_fed_page_controller_action']);
 		$paths = $pageConfigurationProvider->getTemplatePaths($row);
 		$flexformData = $pageConfigurationProvider->getFlexFormValues($row);
+		$templatePathAndFilename = $provider->getTemplatePathAndFilename($row);
+		$view->setTemplatePathAndFilename($templatePathAndFilename);
 		$view->setLayoutRootPath($paths['layoutRootPath']);
 		$view->setPartialRootPath($paths['partialRootPath']);
 		$view->setTemplateRootPath($paths['templateRootPath']);
