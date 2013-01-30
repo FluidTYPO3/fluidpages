@@ -78,10 +78,10 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 		$variables = array();
 		list ($extensionName, $action) = explode('->', $record['tx_fed_page_controller_action']);
 		$paths = $this->configurationService->getPageConfiguration($extensionName);
-		if (count($paths) === 0) {
+		if (0 === count($paths) && FALSE === (boolean) t3lib_div::_GET('redirected')) {
 			if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
 				// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
-				header('Location: ?id=' . $pageUid);
+				header('Location: ?id=' . $pageUid . '&redirected=1');
 				exit();
 			}
 			return;
