@@ -115,6 +115,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 			$selector .= '</optgroup>' . LF;
 		}
 		$selector .= '</select>' . LF;
+		unset($pObj);
 		return $selector;
 	}
 
