@@ -107,8 +107,6 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Extbase_MVC_Controller_
 		if (NULL === $pageConfigurationProvider) {
 			throw new Exception('Unable to resolve the PageConfigurationProvider - this is grave error and indicates that EXT:fluidpages is broken', 1358693007);
 		}
-		$configuration = $this->pageService->getPageTemplateConfiguration($GLOBALS['TSFE']->id);
-		list ($extensionName, $action) = explode('->', $configuration['tx_fed_page_controller_action']);
 		$paths = $pageConfigurationProvider->getTemplatePaths($row);
 		$flexformData = $pageConfigurationProvider->getFlexFormValues($row);
 		$templatePathAndFilename = $provider->getTemplatePathAndFilename($row);
