@@ -78,10 +78,14 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		$value = $parameters['itemFormElValue'];
 		$availableTemplates = $this->pageService->getAvailablePageTemplateFiles();
 		if (strpos($name, 'tx_fed_controller_action_sub') === FALSE) {
-			$onChange = 'onchange="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
+			$onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
 		}
-		$selector = '<select name="' . $name . '" class="formField select" ' . $onChange . '>' . LF;
-		$selector .= '<option value="">' . $emptyLabel . '</option>' . LF;
+		$selector = '<div>';
+		$emptyLabel = 'Parent decides';
+		$selected = (TRUE === empty($value) ? ' checked="checked" ' : NULL);
+		$selector .= '<label>';
+		$selector .= '<input type="radio" name="' . $name . '" ' . $onChange . '" value="" ' . $selected . '/> ' . $emptyLabel . LF;
+		$selector .= '</label>' . LF;
 		foreach ($availableTemplates as $extension=>$group) {
 			if (!t3lib_extMgm::isLoaded($extension)) {
 				$groupTitle = ucfirst($extension);
@@ -91,12 +95,13 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 				$groupTitle = $EM_CONF['']['title'];
 			}
 
-			$selector .= '<optgroup label="' . $groupTitle . '">' . LF;
+			$selector .= '<h4 style="clear: both; margin-top: 1em;">Package: ' . $groupTitle . '</h4>' . LF;
 			foreach ($group as $template) {
 				try {
 					$paths = $this->configurationService->getPageConfiguration($extension);
 					$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
 					$configuration = $this->pageService->getStoredVariable($templatePathAndFilename, 'storage', $paths);
+					$thumbnail = $configuration['icon'];
 				} catch (Exception $error) {
 					if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
 						throw $error;
@@ -108,13 +113,15 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 				}
 				$label = $configuration['label'];
 				$optionValue = $extension . '->' . $template;
-				$selected = ($optionValue == $value ? ' selected="formField selected"' : '');
-				$option = '<option value="' . $optionValue . '"' . $selected . '>' . $label . '</option>';
+				$selected = ($optionValue == $value ? ' checked="checked"' : '');
+				$option = '<label style="padding: 0.5em; border: 1px solid #CCC; display: inline-block; vertical-align: bottom; margin: 0 1em 1em 0; cursor: pointer; ' . ($selected ? 'background-color: #DDD;' : '')  . '">';
+				$option .= '<img src="' . $thumbnail . '" alt="' . $label . '" style="margin: 0.5em 0 0.5em 0; max-width: 196px; max-height: 128px;"/><br />';
+				$option .= '<input type="radio" value="' . $optionValue . '"' . $selected . ' name="' . $name . '" ' . $onChange . ' /> ' . $label;
+				$option .= '</label>';
 				$selector .= $option . LF;
 			}
-			$selector .= '</optgroup>' . LF;
 		}
-		$selector .= '</select>' . LF;
+		$selector .= '</div>' . LF;
 		unset($pObj);
 		return $selector;
 	}
