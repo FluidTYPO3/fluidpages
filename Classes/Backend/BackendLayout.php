@@ -125,7 +125,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 				}
 				array_push($colPosList, $columns[$key]['colPos']);
 				array_push($items, array($columns[$key]['name'], $columns[$key]['colPos'], NULL));
-				$colCount++;
+				$colCount += $column['colspan'] ? $column['colspan'] : 1;
 			}
 			$config['colCount'] = max($config['colCount'], $colCount);
 			$config['rowCount']++;
