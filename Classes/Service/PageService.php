@@ -79,26 +79,6 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	}
 
 	/**
-	 * Gets an array of the column definition in a BackendLayout object
-	 *
-	 * @return array
-	 * @api
-	 */
-	public function getColumnConfiguration() {
-		$config = $page->getBackendLayout()->getConfig();
-		$parser = $this->objectManager->get('t3lib_tsparser');
-		$parser->parse($config);
-		$array = $parser->setup;
-		$columns = array();
-		foreach ($array['rows'] as $row) {
-			foreach ($row['columns'] as $column) {
-				$columns[$column['colPos']] = $column['name'];
-			}
-		}
-		return $columns;
-	}
-
-	/**
 	 * Process RootLine to find first usable, configured Fluid Page Template.
 	 * WARNING: do NOT use the output of this feature to overwrite $row - the
 	 * record returned may or may not be the same recod as defined in $id.
