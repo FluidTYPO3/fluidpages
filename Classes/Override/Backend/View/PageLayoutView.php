@@ -114,10 +114,11 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 	/**
 	 * @param integer $pid
 	 * @param integer $colPos
+	 * @param integer $relativeUid
 	 * @param bool $reference
 	 * @return string
 	 */
-	protected function getPasteIcon($pid, $colPos, $reference = FALSE) {
+	protected function getPasteIcon($pid, $colPos, $relativeUid = 0, $reference = FALSE) {
 		$clipData = $GLOBALS['BE_USER']->getModuleData('clipboard', $GLOBALS['BE_USER']->getTSConfigVal('options.saveClipboard') ? '' : 'ses');
 		$mode = TRUE === isset($clipData['current']) ? $clipData['current'] : 'normal';
 		$hasClip = TRUE === isset($clipData[$mode]['el']) && 0 < count($clipData[$mode]['el']);
@@ -127,7 +128,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 		if (FALSE === isset($clipData[$mode]['mode']) && TRUE === $reference) {
 			return NULL;
 		}
-		$relativeUid = $uid = 0;
+		$uid = 0;
 		$clipBoard = new t3lib_clipboard();
 		if (TRUE === $reference) {
 			$command = 'reference';
@@ -208,7 +209,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 					$content[$key] .= '<div class="t3-page-ce-wrapper">';
 					// Add new content at the top most position
 					$pasteIcon = $this->getPasteIcon($id, $key);
-					$pasteReferenceIcon = $this->getPasteIcon($id, $key, TRUE);
+					$pasteReferenceIcon = $this->getPasteIcon($id, $key, 0, TRUE);
 					$content[$key] .= '
 					<div class="t3-page-ce" id="' . uniqid() . '">
 						<div class="t3-page-ce-dropzone" id="colpos-' . $key . '-' . 'page-' . $id . '-' . uniqid() . '">
@@ -259,9 +260,12 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 									$params = '&edit[tt_content][' . -$row['uid'] . ']=new';
 									$onClick = \TYPO3\CMS\Backend\Utility\BackendUtility::editOnClick($params, $this->backPath);
 								}
+								$pasteIcon = $this->getPasteIcon($id, $key, $row['uid']);
+								$pasteReferenceIcon = $this->getPasteIcon($id, $key, $row['uid'], TRUE);
 								$singleElementHTML .= '
 									<div class="t3-page-ce-wrapper-new-ce">
 										<a href="#" onclick="' . htmlspecialchars($onClick) . '" title="' . $GLOBALS['LANG']->getLL('newRecordHere', 1) . '">' . \TYPO3\CMS\Backend\Utility\IconUtility::getSpriteIcon('actions-document-new') . '</a>
+										' . $pasteIcon . $pasteReferenceIcon . '
 									</div>
 								';
 							}
