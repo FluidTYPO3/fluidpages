@@ -81,7 +81,8 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 		if (0 === count($paths) && FALSE === (boolean) t3lib_div::_GET('redirected')) {
 			if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
 				// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
-				header('Location: ?id=' . $pageUid . '&redirected=1');
+				$module = t3lib_div::_GET('M');
+				header('Location: ?M=' . $module . '&id=' . $pageUid . '&redirected=1');
 				exit();
 			}
 			return;
