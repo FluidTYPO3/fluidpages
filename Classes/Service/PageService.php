@@ -55,6 +55,11 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	protected $configurationService;
 
 	/**
+	 * @var Tx_Flux_Service_Debug
+	 */
+	protected $debugService;
+
+	/**
 	 * @param Tx_Extbase_Object_ObjectManager $objectManager
 	 * @return void
 	 */
@@ -76,6 +81,14 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 */
 	public function injectConfigurationService(Tx_Fluidpages_Service_ConfigurationService $configurationService) {
 		$this->configurationService = $configurationService;
+	}
+
+	/**
+	 * @param Tx_Flux_Service_Debug $debugService
+	 * @return void
+	 */
+	public function injectDebugService(Tx_Flux_Service_Debug $debugService) {
+		$this->debugService = $debugService;
 	}
 
 	/**
@@ -272,9 +285,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 						$this->getPageTemplateLabel($extensionName, $path . $file);
 						$output[$extensionName][] = $pathinfo['filename'];
 					} catch (Exception $error) {
-						if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
-							throw $error;
-						}
+						$this->debugService->debug($error);
 						continue;
 					}
 				}

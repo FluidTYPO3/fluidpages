@@ -118,12 +118,16 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	 * @return array|NULL
 	 */
 	public function getTemplatePaths(array $row) {
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
 		$paths = NULL;
-		if ($configuration['tx_fed_page_controller_action']) {
-			$action = $configuration['tx_fed_page_controller_action'];
-			list ($extensionName, $action) = explode('->', $action);
-			$paths = $this->configurationService->getPageConfiguration($extensionName);
+		try {
+			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+			if ($configuration['tx_fed_page_controller_action']) {
+				$action = $configuration['tx_fed_page_controller_action'];
+				list ($extensionName, $action) = explode('->', $action);
+				$paths = $this->configurationService->getPageConfiguration($extensionName);
+			}
+		} catch (Exception $error) {
+			$this->debugService->debug($error);
 		}
 		return $paths;
 	}
@@ -152,13 +156,6 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	public function getTemplateVariables(array $row) {
 		try {
 			$this->flexFormService->setContentObjectData($row['tx_fed_page_flexform']);
-		} catch (Exception $error) {
-			if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
-				throw $error;
-			}
-			return array();
-		}
-		try {
 			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
 			if ($configuration['tx_fed_page_controller_action']) {
 				$action = $configuration['tx_fed_page_controller_action'];
@@ -169,19 +166,23 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 					throw new Exception('Requested page template file does not exist (' . $templatePathAndFilename . ')', 1359227976);
 				}
 			} else {
-				if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
-					throw new Exception('Unable to get a valid page template configuration from page UID ' . $row['uid'], 1359228024);
-				}
+				$this->debugService->message('Unable to get a valid page template configuration from page UID ' . $row['uid'], t3lib_div::SYSLOG_SEVERITY_WARNING);
 				return array();
 			}
 
+			$values = $this->getFlexFormValues($row);
 			/** @var Tx_Flux_MVC_View_ExposedStandaloneView $view */
 			$view = $this->objectManager->get('Tx_Flux_MVC_View_ExposedStandaloneView');
 			$view->setTemplatePathAndFilename($templatePathAndFilename);
 			$view->setPartialRootPath($paths['partialRootPath']);
 			$view->setLayoutRootPath($paths['layoutRootPath']);
-			$view->assignMultiple($this->getFlexFormValues($row));
+			$view->assignMultiple($values);
 			$stored = $view->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', 'storage', 'Configuration');
+			if (NULL === $stored) {
+				$this->debugService->message('A valid configuration could not be retrieved from file ' . $templatePathAndFilename .
+					' - processing aborted; see earlier errors', t3lib_div::SYSLOG_SEVERITY_FATAL);
+				return array();
+			}
 			$stored['sheets'] = array();
 			foreach ($stored['fields'] as $field) {
 				$groupKey = $field['sheets']['name'];
@@ -195,11 +196,10 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 				}
 				array_push($stored['sheets'][$groupKey]['fields'], $field);
 			}
+			$this->debugService->message('Flux is able to read template variables from file ' . $templatePathAndFilename, t3lib_div::SYSLOG_SEVERITY_INFO);
 			return $stored;
 		} catch (Exception $error) {
-			if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
-				throw $error;
-			}
+			$this->debugService->debug($error);
 		}
 		return array();
 	}
