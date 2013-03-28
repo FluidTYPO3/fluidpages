@@ -44,7 +44,10 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configu
 	 * @api
 	 */
 	public function getPageConfiguration($extensionName = NULL) {
-		return $this->getTypoScriptSubConfiguration($extensionName, 'page');
+		$newLocation = $this->getTypoScriptSubConfiguration($extensionName, 'collections', array(), 'fluidpages');
+		$oldLocation = $this->getTypoScriptSubConfiguration($extensionName, 'page', array(), 'fed');
+		$merged = t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
+		return $merged;
 	}
 
 }
