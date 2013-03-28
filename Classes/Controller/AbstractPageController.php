@@ -30,12 +30,12 @@
  * @subpackage Controller
  * @route off
  */
-class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Extbase_MVC_Controller_ActionController {
+class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_Controller_AbstractFluxController {
 
 	/**
 	 * @var string
 	 */
-	protected $defaultViewObjectName = 'Tx_Flux_MVC_View_ExposedTemplateView';
+	protected $fluxRecordField = 'tx_fed_page_flexform';
 
 	/**
 	 * @var Tx_Fluidpages_Service_PageService
@@ -46,36 +46,6 @@ class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Extbase_MVC_Con
 	 * @var Tx_Fluidpages_Service_ConfigurationService
 	 */
 	protected $configurationService;
-
-	/**
-	 * @var Tx_Flux_Provider_ConfigurationService
-	 */
-	protected $providerConfigurationService;
-
-	/**
-	 * @var Tx_Flux_Service_FlexForm
-	 */
-	protected $flexFormService;
-
-	/**
-	 * @var Tx_Flux_Service_Debug
-	 */
-	protected $debugService;
-
-	/**
-	 * @var Tx_Flux_Provider_ConfigurationProviderInterface
-	 */
-	protected $provider;
-
-	/**
-	 * @var array
-	 */
-	private $setup = array();
-
-	/**
-	 * @var array
-	 */
-	private $data = array();
 
 	/**
 	 * @param Tx_Fluidpages_Service_PageService $pageService
@@ -93,75 +63,15 @@ class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Extbase_MVC_Con
 	}
 
 	/**
-	 * @param Tx_Flux_Service_FlexForm $flexFormService
-	 * @return void
-	 */
-	public function injectFlexFormService(Tx_Flux_Service_FlexForm $flexformService) {
-		$this->flexFormService = $flexformService;
-	}
-
-	/**
-	 * @param Tx_Flux_Provider_ConfigurationService $providerConfigurationService
-	 * @return void
-	 */
-	public function injectProviderConfigurationService(Tx_Flux_Provider_ConfigurationService $providerConfigurationService) {
-		$this->providerConfigurationService = $providerConfigurationService;
-	}
-
-	/**
-	 * @param Tx_Flux_Service_Debug $debugService
-	 * @return void
-	 */
-	public function injectDebugService(Tx_Flux_Service_Debug $debugService) {
-		$this->debugService = $debugService;
-	}
-
-	/**
 	 * @param Tx_Extbase_MVC_View_ViewInterface $view
-	 *
 	 * @return void
 	 */
 	public function initializeView(Tx_Extbase_MVC_View_ViewInterface $view) {
-		$row = $GLOBALS['TSFE']->page;
-		$this->provider = $this->providerConfigurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $row);
-		if (NULL === $this->provider) {
-			throw new Exception('Unable to resolve the PageConfigurationProvider - this is a grave error and indicates that EXT:fluidpages ' .
-				'itself is broken - or that EXT:fluidpages has been overridden by another implementation which is broken', 1358693007);
-		}
-		$this->setup = $this->provider->getTemplatePaths($row);
-		$this->data = $this->provider->getFlexFormValues($row);
-		$templatePathAndFilename = $this->provider->getTemplatePathAndFilename($row);
-		$view->setTemplatePathAndFilename($templatePathAndFilename);
-		$view->setLayoutRootPath($this->setup['layoutRootPath']);
-		$view->setPartialRootPath($this->setup['partialRootPath']);
-		$view->setTemplateRootPath($this->setup['templateRootPath']);
-		$view->assignMultiple($this->data);
+		parent::initializeView($view);
 		$view->assign('page', $GLOBALS['TSFE']->page);
 		$view->assign('user', $GLOBALS['TSFE']->fe_user->user);
 		$view->assign('cookies', $_COOKIE);
 		$view->assign('session', $_SESSION);
-		$this->view = $view;
-	}
-
-	/**
-	 * Get the data stored in the page record's Flux-enabled field,
-	 * i.e. the variables of the page template as configured in this
-	 * particular page record.
-	 *
-	 * @return array
-	 */
-	protected function getData() {
-		return $this->data;
-	}
-
-	/**
-	 * Get the array of TS configuration associated with the page
-	 * template currently being rendered.
-	 *
-	 * @return array
-	 */
-	protected function getSetup() {
-		return $this->setup;
 	}
 
 }
