@@ -50,7 +50,7 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	/**
 	 * @var string
 	 */
-	protected $extensionKey = 'fed';
+	protected $extensionKey = 'fluidpages';
 
 	/**
 	 * @var string
