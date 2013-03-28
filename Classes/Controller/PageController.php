@@ -39,13 +39,47 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 	public function renderAction() {
 		$content = NULL;
 		try {
-			$content = $this->view->render();
+			$row = $this->configurationManager->getContentObject()->data;
+			$extensionKey = $this->provider->getExtensionKey($row);
+			$extensionName = ucfirst(t3lib_div::underscoredToLowerCamelCase($extensionKey));
+			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+			$action = $configuration['tx_fed_page_controller_action'];
+			$controllerActionName = array_pop(explode('->', $action));
+			$controllerActionName{0} = strtolower($controllerActionName{0});
+			// failure toggles. Instructs ConfigurationService to throw Exceptions when not being able to detect. We capture these and pass to debug.
+			$failHardClass = TRUE;
+			$failHardAction = TRUE;
+			$potentialControllerClassName = $this->configurationService->resolveFluxControllerClassName($action, 'Page', $failHardClass, $failHardAction);
+			if (NULL !== $potentialControllerClassName) {
+				$request = clone $this->request;
+				$request->setControllerExtensionName($extensionName);
+				$request->setControllerActionName($controllerActionName);
+				/** @var $response Tx_Extbase_MVC_Web_Response */
+				$response = $this->objectManager->create('Tx_Extbase_MVC_Web_Response');
+				/** @var $controller Tx_Extbase_Mvc_Controller_ControllerInterface */
+				$controller = $this->objectManager->create($potentialControllerClassName);
+				$content = $controller->processRequest($request, $response);
+			}
 		} catch (Exception $error) {
 			$this->debugService->debug($error);
-			$this->request->setErrors(array('page' => $error));
-			$this->forward('error');
+			$code = $error->getCode();
+			if (1364498093 !== $code && 1364498223 !== $code) {
+				$this->request->setErrors(array('page' => $error));
+				$this->request->setControllerActionName('error');
+				$this->forward('error');
+			}
+			$content = $this->view->render();
 		}
 		return $content;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function errorAction() {
+		$setup = $this->getSetup();
+		$this->view->assign('errors', $this->request->getErrors());
+		$this->view->setTemplatePathAndFilename($setup['templateRootPath'] . 'Page/Error.' . $this->request->getFormat());
 	}
 
 }
