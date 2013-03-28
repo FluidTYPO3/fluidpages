@@ -2,7 +2,7 @@
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2011 Claus Due <claus@wildside.dk>, Wildside A/S
+ *  (c) 2013 Claus Due <claus@wildside.dk>, Wildside A/S
  *
  *  All rights reserved
  *
@@ -24,30 +24,15 @@
  ***************************************************************/
 
 /**
- * Page Controller
+ * Page Controller Interface
+ *
+ * Implement in custom controllers which must be located at
+ * <PackageName>/Classes/Controller/PageController by convention.
  *
  * @package Fluidpages
  * @subpackage Controller
  * @route off
  */
-class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_AbstractPageController {
-
-	/**
-	 * @return string
-	 * @route off
-	 */
-	public function renderAction() {
-		$content = NULL;
-		try {
-			$content = $this->view->render();
-		} catch (Exception $error) {
-			if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
-				throw $error;
-			}
-			$this->request->setErrors(array('page' => $error));
-			$this->forward('error');
-		}
-		return $content;
-	}
+interface Tx_Fluidpages_Controller_PageControllerInterface extends Tx_Extbase_MVC_Controller_ControllerInterface {
 
 }
