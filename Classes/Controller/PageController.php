@@ -41,9 +41,7 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 		try {
 			$content = $this->view->render();
 		} catch (Exception $error) {
-			if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['flux']['setup']['debugMode'] > 0) {
-				throw $error;
-			}
+			$this->debugService->debug($error);
 			$this->request->setErrors(array('page' => $error));
 			$this->forward('error');
 		}

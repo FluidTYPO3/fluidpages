@@ -58,6 +58,11 @@ class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Extbase_MVC_Con
 	protected $flexFormService;
 
 	/**
+	 * @var Tx_Flux_Service_Debug
+	 */
+	protected $debugService;
+
+	/**
 	 * @var Tx_Flux_Provider_ConfigurationProviderInterface
 	 */
 	protected $provider;
@@ -101,6 +106,14 @@ class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Extbase_MVC_Con
 	 */
 	public function injectProviderConfigurationService(Tx_Flux_Provider_ConfigurationService $providerConfigurationService) {
 		$this->providerConfigurationService = $providerConfigurationService;
+	}
+
+	/**
+	 * @param Tx_Flux_Service_Debug $debugService
+	 * @return void
+	 */
+	public function injectDebugService(Tx_Flux_Service_Debug $debugService) {
+		$this->debugService = $debugService;
 	}
 
 	/**
