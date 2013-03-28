@@ -110,14 +110,8 @@ class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Extbase_MVC_Con
 	 */
 	public function initializeView(Tx_Extbase_MVC_View_ViewInterface $view) {
 		$row = $GLOBALS['TSFE']->page;
-		$providers = $this->providerConfigurationService->resolveConfigurationProviders('pages', 'tx_fed_page_flexform', $row);
-		$priority = 0;
-		foreach ($providers as $provider) {
-			if ($provider->getPriority($row) >= $priority) {
-				$this->provider = $provider;
-			}
-		}
-		if (NULL === $pageConfigurationProvider) {
+		$this->provider = $this->providerConfigurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $row);
+		if (NULL === $this->provider) {
 			throw new Exception('Unable to resolve the PageConfigurationProvider - this is grave error and indicates that EXT:fluidpages is broken', 1358693007);
 		}
 		$this->setup = $this->provider->getTemplatePaths($row);
