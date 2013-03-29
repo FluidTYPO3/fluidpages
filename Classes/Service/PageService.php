@@ -104,6 +104,10 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		if ($pageUid < 1) {
 			return NULL;
 		}
+		$cacheKey = 'page_' . $pageUid;
+		if (TRUE === isset(self::$cache[$cacheKey])) {
+			return self::$cache[$cacheKey];
+		}
 		$pageSelect = new t3lib_pageSelect();
 		$page = $pageSelect->getPage($pageUid);
 		if (strpos($page['tx_fed_page_controller_action'], '->')) {
@@ -118,6 +122,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			}
 		} while ($page && !strpos($page['tx_fed_page_controller_action_sub'], '->'));
 		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
+		self::$cache[$cacheKey] = $page;
 		return $page;
 	}
 
