@@ -59,6 +59,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configu
 		if (NULL === $extensionName) {
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$nativeViewLocation = $this->getNativePluginViewConfiguration($registeredExtensionKey);
+				self::$cache[$registeredExtensionKey] = $nativeViewLocation;
 				$merged[$registeredExtensionKey] = $nativeViewLocation;
 			}
 		} else {
