@@ -44,10 +44,32 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configu
 	 * @api
 	 */
 	public function getPageConfiguration($extensionName = NULL) {
-		$newLocation = $this->getTypoScriptSubConfiguration($extensionName, 'collections', array(), 'fluidpages');
-		$oldLocation = $this->getTypoScriptSubConfiguration($extensionName, 'page', array(), 'fed');
+		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', array(), 'fluidpages');
+		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', array(), 'fed');
 		$merged = t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
+		$registeredExtensionKeys = Tx_Fluidpages_Core::getRegisteredProviderExtensionKeys();
+		if (NULL === $extensionName) {
+			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
+				$nativeViewLocation = $this->getNativePluginViewConfiguration($registeredExtensionKey);
+				$merged[$registeredExtensionKey] = $nativeViewLocation;
+			}
+		} else {
+			$extensionKey = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+			$nativeViewLocation = $this->getNativePluginViewConfiguration($extensionKey);
+			$merged = t3lib_div::array_merge_recursive_overrule($merged, $nativeViewLocation);
+		}
 		return $merged;
+	}
+
+	/**
+	 * @param string $extensionKey
+	 * @return array
+	 */
+	protected function getNativePluginViewConfiguration($extensionKey) {
+		$typoScriptExtensionKey = str_replace('_', '', $extensionKey);
+		$nativeViewLocation = $this->getTypoScriptSubConfiguration(NULL, 'view', array(), $typoScriptExtensionKey);
+		$nativeViewLocation = Tx_Flux_Utility_Path::translatePath($nativeViewLocation);
+		return $nativeViewLocation;
 	}
 
 }
