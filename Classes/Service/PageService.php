@@ -239,8 +239,9 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @return mixed
 	 */
 	public function getStoredVariable($templatePathAndFilename, $variableName, $paths = array(), $section = 'Configuration') {
-		if (TRUE === isset(self::$cache[$templatePathAndFilename])) {
-			return self::$cache[$templatePathAndFilename];
+		$cacheKey = $templatePathAndFilename . $variableName . json_encode($paths) . $section;
+		if (TRUE === isset(self::$cache[$cacheKey])) {
+			return self::$cache[$cacheKey];
 		}
 		$exposedView = $this->objectManager->get('Tx_Flux_MVC_View_ExposedStandaloneView');
 		$exposedView->setTemplatePathAndFilename($templatePathAndFilename);
@@ -249,8 +250,8 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			$exposedView->setPartialRootPath($paths['partialRootPath']);
 		}
 		$value = $exposedView->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', $variableName, $section);
-		self::$cache[$templatePathAndFilename] = $value;
-		return self::$cache[$templatePathAndFilename];
+		self::$cache[$cacheKey] = $value;
+		return self::$cache[$cacheKey];
 	}
 
 	/**
