@@ -189,6 +189,10 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		if ($pageUid < 1) {
 			return NULL;
 		}
+		$cacheKey = 'flexform_' . $pageUid;
+		if (TRUE === isset(self::$cache[$cacheKey])) {
+			return self::$cache[$cacheKey];
+		}
 		$pageSelect = new t3lib_pageSelect();
 		$page = $pageSelect->getPage($pageUid);
 		$page = $this->getWorkspacePage($page);
@@ -203,6 +207,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		if (empty($page['tx_fed_page_flexform'])) {
 			return NULL;
 		}
+		self::$cache[$cacheKey] = $page['tx_fed_page_flexform'];
 		return $page['tx_fed_page_flexform'];
 	}
 
