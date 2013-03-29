@@ -35,6 +35,10 @@
  */
 class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configuration implements t3lib_Singleton {
 
+	/**
+	 * @var array
+	 */
+	private static $cache = array();
 
 	/**
 	 * Get definitions of paths for Page Templates defined in TypoScript
@@ -44,6 +48,10 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configu
 	 * @api
 	 */
 	public function getPageConfiguration($extensionName = NULL) {
+		$cacheKey = NULL === $extensionName ? 0 : $extensionName;
+		if (TRUE === isset(self::$cache[$cacheKey])) {
+			return self::$cache[$cacheKey];
+		}
 		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', array(), 'fluidpages');
 		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', array(), 'fed');
 		$merged = t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
@@ -51,6 +59,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configu
 		if (NULL === $extensionName) {
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$nativeViewLocation = $this->getNativePluginViewConfiguration($registeredExtensionKey);
+				self::$cache[$registeredExtensionKey] = $nativeViewLocation;
 				$merged[$registeredExtensionKey] = $nativeViewLocation;
 			}
 		} else {
@@ -58,6 +67,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configu
 			$nativeViewLocation = $this->getNativePluginViewConfiguration($extensionKey);
 			$merged = t3lib_div::array_merge_recursive_overrule($merged, $nativeViewLocation);
 		}
+		self::$cache[$cacheKey] = $merged;
 		return $merged;
 	}
 
