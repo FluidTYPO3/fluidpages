@@ -39,7 +39,8 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 	public function renderAction() {
 		$content = NULL;
 		try {
-			$row = $this->configurationManager->getContentObject()->data;
+			$row = $GLOBALS['TSFE']->page;
+			$this->provider = $this->providerConfigurationService->resolvePrimaryConfigurationProvider($this->fluxTableName, $this->fluxRecordField, $row, 'fluidpages');
 			$extensionKey = $this->provider->getExtensionKey($row);
 			$extensionName = ucfirst(t3lib_div::underscoredToLowerCamelCase($extensionKey));
 			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
