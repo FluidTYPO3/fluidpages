@@ -60,6 +60,11 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	protected $debugService;
 
 	/**
+	 * @var Tx_Flux_Service_Flexform
+	 */
+	protected $flexformService;
+
+	/**
 	 * @param Tx_Extbase_Object_ObjectManager $objectManager
 	 * @return void
 	 */
@@ -89,6 +94,14 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 */
 	public function injectDebugService(Tx_Flux_Service_Debug $debugService) {
 		$this->debugService = $debugService;
+	}
+
+	/**
+	 * @param Tx_Flux_Service_Flexform $flexformService
+	 * @return void
+	 */
+	public function injectFlexformService(Tx_Flux_Service_Flexform $flexformService) {
+		$this->flexformService = $flexformService;
 	}
 
 	/**
@@ -222,7 +235,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	public function getPageTemplateLabel($extensionName, $templateFile) {
 		$config = $this->configurationService->getPageConfiguration($extensionName);
 		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$page = $this->getStoredVariable($templateFile, 'storage', $config);
+		$page = $this->flexformService->getStoredVariable($templateFile, 'storage', 'Configuration', $config, $extensionName);
 		return $page['label'] ? $page['label'] : $templateFile . '.html';
 	}
 
@@ -237,31 +250,8 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	public function getPageTemplateEnabled($extensionName, $templateFile) {
 		$config = $this->configurationService->getPageConfiguration($extensionName);
 		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$page = $this->getStoredVariable($templatePathAndFilename, 'storage', $config);
+		$page = $this->flexformService->getStoredVariable($templateFile, 'storage', 'Configuration', $config, $extensionName);
 		return (TRUE === (boolean) $page['enabled']);
-	}
-
-	/**
-	 * @param string $templatePathAndFilename
-	 * @param string $variableName
-	 * @param array $paths
-	 * @param string $section
-	 * @return mixed
-	 */
-	public function getStoredVariable($templatePathAndFilename, $variableName, $paths = array(), $section = 'Configuration') {
-		$cacheKey = $templatePathAndFilename . $variableName . json_encode($paths) . $section;
-		if (TRUE === isset(self::$cache[$cacheKey])) {
-			return self::$cache[$cacheKey];
-		}
-		$exposedView = $this->objectManager->get('Tx_Flux_MVC_View_ExposedStandaloneView');
-		$exposedView->setTemplatePathAndFilename($templatePathAndFilename);
-		if (TRUE === isset($paths['layoutRootPath'])) {
-			$exposedView->setLayoutRootPath($paths['layoutRootPath']);
-			$exposedView->setPartialRootPath($paths['partialRootPath']);
-		}
-		$value = $exposedView->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', $variableName, $section);
-		self::$cache[$cacheKey] = $value;
-		return self::$cache[$cacheKey];
 	}
 
 	/**
