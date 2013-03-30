@@ -63,12 +63,8 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 		} catch (Exception $error) {
 			$this->debugService->debug($error);
 			$code = $error->getCode();
-			if (1364498093 !== $code && 1364498223 !== $code) {
-				$this->request->setErrors(array('page' => $error));
-				$this->request->setControllerActionName('error');
-				$this->forward('error');
-			}
-			$content = $this->view->render();
+			$errors = array('page' => $error->getCode());
+			$this->redirect('error', $this->request->getControllerName(), $this->request->getControllerExtensionName(), $errors);
 		}
 		return $content;
 	}
