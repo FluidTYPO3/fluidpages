@@ -51,7 +51,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 	protected $pageService;
 
 	/**
-	 * @var Tx_Flux_Service_Flexform
+	 * @var Tx_Flux_Service_FlexForm
 	 */
 	protected $flexformService;
 
@@ -63,7 +63,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		$this->configurationManager = $objectManager->get('Tx_Extbase_Configuration_BackendConfigurationManager');
 		$this->configurationService = $objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
 		$this->pageService = $objectManager->get('Tx_Fluidpages_Service_PageService');
-		$this->flexformService = $objectManager->get('Tx_Flux_Service_Flexform');
+		$this->flexformService = $objectManager->get('Tx_Flux_Service_FlexForm');
 	}
 
 	/**
@@ -98,8 +98,9 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 			$selector .= '<h4 style="clear: both; margin-top: 1em;">Package: ' . $groupTitle . '</h4>' . LF;
 			foreach ($group as $template) {
 				$paths = $this->configurationService->getPageConfiguration($extension);
+				$extensionName = t3lib_div::underscoredToUpperCamelCase($extension);
 				$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
-				$configuration = $this->pageService->getStoredVariable($templatePathAndFilename, 'storage', $paths);
+				$configuration = $this->flexformService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
 				$thumbnail = $configuration['icon'];
 				if (FALSE === (boolean) $configuration['enabled']) {
 					continue;
