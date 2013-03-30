@@ -51,7 +51,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 	protected $pageService;
 
 	/**
-	 * @var Tx_Flux_Service_Flexform
+	 * @var Tx_Flux_Service_FlexForm
 	 */
 	protected $flexformService;
 
@@ -63,7 +63,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		$this->configurationManager = $objectManager->get('Tx_Extbase_Configuration_BackendConfigurationManager');
 		$this->configurationService = $objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
 		$this->pageService = $objectManager->get('Tx_Fluidpages_Service_PageService');
-		$this->flexformService = $objectManager->get('Tx_Flux_Service_Flexform');
+		$this->flexformService = $objectManager->get('Tx_Flux_Service_FlexForm');
 	}
 
 	/**
