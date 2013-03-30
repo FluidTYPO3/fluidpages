@@ -98,8 +98,9 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 			$selector .= '<h4 style="clear: both; margin-top: 1em;">Package: ' . $groupTitle . '</h4>' . LF;
 			foreach ($group as $template) {
 				$paths = $this->configurationService->getPageConfiguration($extension);
+				$extensionName = t3lib_div::underscoredToUpperCamelCase($extension);
 				$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
-				$configuration = $this->pageService->getStoredVariable($templatePathAndFilename, 'storage', $paths);
+				$configuration = $this->flexformService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
 				$thumbnail = $configuration['icon'];
 				if (FALSE === (boolean) $configuration['enabled']) {
 					continue;

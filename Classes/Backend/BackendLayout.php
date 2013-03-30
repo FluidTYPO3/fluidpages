@@ -95,7 +95,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 			$variables = $this->flexformService->convertFlexFormContentToArray($flexFormSource);
 		}
 		$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
-		$grid = $this->gridService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths);
+		$grid = $this->gridService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths, $extensionName);
 		if (is_array($grid) === FALSE) {
 			// no grid is defined; we use the "raw" BE layout as a default behavior
 			return;
