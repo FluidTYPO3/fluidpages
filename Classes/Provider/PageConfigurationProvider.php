@@ -171,13 +171,7 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			}
 
 			$values = $this->getFlexFormValues($row);
-			/** @var Tx_Flux_MVC_View_ExposedStandaloneView $view */
-			$view = $this->objectManager->get('Tx_Flux_MVC_View_ExposedStandaloneView');
-			$view->setTemplatePathAndFilename($templatePathAndFilename);
-			$view->setPartialRootPath($paths['partialRootPath']);
-			$view->setLayoutRootPath($paths['layoutRootPath']);
-			$view->assignMultiple($values);
-			$stored = $view->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', 'storage', 'Configuration');
+			$stored = $this->flexFormService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
 			if (NULL === $stored) {
 				$this->debugService->message('A valid configuration could not be retrieved from file ' . $templatePathAndFilename .
 					' - processing aborted; see earlier errors', t3lib_div::SYSLOG_SEVERITY_FATAL);
