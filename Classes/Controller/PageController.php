@@ -57,15 +57,8 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 		$failHardAction = TRUE;
 		$potentialControllerClassName = $this->configurationService->resolveFluxControllerClassName($action, 'Page', $failHardClass, $failHardAction);
 		if (NULL !== $potentialControllerClassName) {
-			$request = clone $this->request;
-			$request->setControllerExtensionName($extensionName);
-			$request->setControllerActionName($controllerActionName);
-			/** @var $response Tx_Extbase_MVC_Web_Response */
-			$response = $this->objectManager->create('Tx_Extbase_MVC_Web_Response');
-			/** @var $controller Tx_Extbase_Mvc_Controller_ControllerInterface */
-			$controller = $this->objectManager->create($potentialControllerClassName);
-			$content = $controller->processRequest($request, $response);
-			return $content;
+			$this->request->setControllerObjectName($potentialControllerClassName);
+			$this->forward('render');
 		}
 	}
 
@@ -74,15 +67,12 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 	 */
 	public function errorAction() {
 		try {
-			$content = parent::errorAction();
+			parent::errorAction();
 		} catch (Exception $error) {
 			$code = $error->getCode();
 			$this->view->assign('error', $error);
 			$this->view->setTemplateRootPath(t3lib_extMgm::extPath('fluidpages', 'Resources/Private/Templates/'));
-			$content = $this->view->render();
 		}
-		return $content;
 	}
-
 
 }
