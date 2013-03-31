@@ -38,6 +38,11 @@ class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_Controller
 	protected $fluxRecordField = 'tx_fed_page_flexform';
 
 	/**
+	 * @var string
+	 */
+	protected $fluxTableName = 'pages';
+
+	/**
 	 * @var Tx_Fluidpages_Service_PageService
 	 */
 	protected $pageService;
