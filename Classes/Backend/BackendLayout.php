@@ -41,19 +41,9 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	protected $configurationService;
 
 	/**
-	 * @var Tx_Flux_Service_GridService
-	 */
-	protected $gridService;
-
-	/**
 	 * @var Tx_Fluidpages_Service_PageService
 	 */
 	protected $pageService;
-
-	/**
-	 * @var Tx_Flux_Service_FlexForm
-	 */
-	protected $flexformService;
 
 	/**
 	 * Constructor
@@ -61,9 +51,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	public function __construct() {
 		$this->objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
 		$this->configurationService = $this->objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
-		$this->gridService = $this->objectManager->get('Tx_Flux_Service_GridService');
 		$this->pageService = $this->objectManager->get('Tx_Fluidpages_Service_PageService');
-		$this->flexformService = $this->objectManager->get('Tx_Flux_Service_FlexForm');
 	}
 
 	/**
@@ -92,10 +80,10 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 		}
 		$flexFormSource = isset($record['tx_fed_page_flexform']) ? $record['tx_fed_page_flexform'] : NULL;
 		if ($flexFormSource !== NULL) {
-			$variables = $this->flexformService->convertFlexFormContentToArray($flexFormSource);
+			$variables = $this->configurationService->convertFlexFormContentToArray($flexFormSource);
 		}
 		$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
-		$grid = $this->gridService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths, $extensionName);
+		$grid = $this->configurationService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths, $extensionName);
 		if (is_array($grid) === FALSE) {
 			// no grid is defined; we use the "raw" BE layout as a default behavior
 			return;

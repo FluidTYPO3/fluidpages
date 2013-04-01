@@ -33,7 +33,7 @@
  * @package Fluidpages
  * @subpackage Service
  */
-class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configuration implements t3lib_Singleton {
+class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxService implements t3lib_Singleton {
 
 	/**
 	 * @var array
