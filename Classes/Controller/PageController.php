@@ -37,28 +37,35 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 	 * @route off
 	 */
 	public function renderAction() {
-		$row = $GLOBALS['TSFE']->page;
-		$this->provider = $this->providerConfigurationService->resolvePrimaryConfigurationProvider($this->fluxTableName, $this->fluxRecordField, $row);
-		$extensionKey = $this->provider->getExtensionKey($row);
-		$extensionName = ucfirst(t3lib_div::underscoredToLowerCamelCase($extensionKey));
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		if (NULL === $configuration) {
-			throw new Exception('No page template selected (or PageConfigurationProvider could not detect the configuration ' .
-				'which defines the page templates that should be used)', 1364737534);
-		}
-		if (NULL === $configuration['tx_fed_page_controller_action']) {
-			throw new Exception('No page template selected and none inherited from parents. To fix this problem, select a page template.', 1364737584);
-		}
-		$action = $configuration['tx_fed_page_controller_action'];
-		$controllerActionName = array_pop(explode('->', $action));
-		$controllerActionName{0} = strtolower($controllerActionName{0});
-		// failure toggles. Instructs ConfigurationService to throw Exceptions when not being able to detect. We capture these and pass to debug.
-		$failHardClass = TRUE;
-		$failHardAction = TRUE;
-		$potentialControllerClassName = $this->configurationService->resolveFluxControllerClassName($action, 'Page', $failHardClass, $failHardAction);
-		if (NULL !== $potentialControllerClassName) {
-			$this->request->setControllerObjectName($potentialControllerClassName);
-			$this->forward('render');
+		$content = NULL;
+		try {
+			$row = $GLOBALS['TSFE']->page;
+			$this->provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->fluxTableName, $this->fluxRecordField, $row);
+			$extensionKey = $this->provider->getExtensionKey($row);
+			$extensionName = ucfirst(t3lib_div::underscoredToLowerCamelCase($extensionKey));
+			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+			$action = $configuration['tx_fed_page_controller_action'];
+			$controllerActionName = array_pop(explode('->', $action));
+			$controllerActionName{0} = strtolower($controllerActionName{0});
+			// failure toggles. Instructs ConfigurationService to throw Exceptions when not being able to detect. We capture these and pass to debug.
+			$failHardClass = TRUE;
+			$failHardAction = TRUE;
+			$potentialControllerClassName = $this->configurationService->resolveFluxControllerClassName($action, 'Page', $failHardClass, $failHardAction);
+			if (NULL !== $potentialControllerClassName) {
+				$request = clone $this->request;
+				$request->setControllerExtensionName($extensionName);
+				$request->setControllerActionName($controllerActionName);
+				/** @var $response Tx_Extbase_MVC_Web_Response */
+				$response = $this->objectManager->create('Tx_Extbase_MVC_Web_Response');
+				/** @var $controller Tx_Extbase_Mvc_Controller_ControllerInterface */
+				$controller = $this->objectManager->create($potentialControllerClassName);
+				$content = $controller->processRequest($request, $response);
+			}
+		} catch (Exception $error) {
+			$this->debugService->debug($error);
+			$code = $error->getCode();
+			$errors = array('page' => $error->getCode());
+			$this->redirect('error', $this->request->getControllerName(), $this->request->getControllerExtensionName(), $errors);
 		}
 	}
 
@@ -66,13 +73,13 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 	 * @return string
 	 */
 	public function errorAction() {
-		try {
-			parent::errorAction();
-		} catch (Exception $error) {
-			$code = $error->getCode();
-			$this->view->assign('error', $error);
-			$this->view->setTemplateRootPath(t3lib_extMgm::extPath('fluidpages', 'Resources/Private/Templates/'));
+		$setup = $this->getSetup();
+		$this->view->assign('errors', $this->request->getErrors());
+		$errorPageTemplatePathAndFilename = $setup['templateRootPath'] . 'Page/Error.' . $this->request->getFormat();
+		if (FALSE === file_exists($errorPageTemplatePathAndFilename)) {
+			$errorPageTemplatePathAndFilename = t3lib_extMgm::extPath('fluidpages', 'Resources/Private/Templates/Page/Error.html');
 		}
+		$this->view->setTemplatePathAndFilename($errorPageTemplatePathAndFilename);
 	}
 
 }

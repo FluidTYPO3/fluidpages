@@ -97,14 +97,6 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	}
 
 	/**
-	 * @param Tx_Flux_Service_Flexform $flexformService
-	 * @return void
-	 */
-	public function injectFlexformService(Tx_Flux_Service_Flexform $flexformService) {
-		$this->flexformService = $flexformService;
-	}
-
-	/**
 	 * Process RootLine to find first usable, configured Fluid Page Template.
 	 * WARNING: do NOT use the output of this feature to overwrite $row - the
 	 * record returned may or may not be the same recod as defined in $id.
@@ -235,7 +227,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	public function getPageTemplateLabel($extensionName, $templateFile) {
 		$config = $this->configurationService->getPageConfiguration($extensionName);
 		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$page = $this->flexformService->getStoredVariable($templateFile, 'storage', 'Configuration', $config, $extensionName);
+		$page = $this->configurationService->getStoredVariable($templateFile, 'storage', 'Configuration', $config, $extensionName);
 		return $page['label'] ? $page['label'] : $templateFile . '.html';
 	}
 
@@ -250,7 +242,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	public function getPageTemplateEnabled($extensionName, $templateFile) {
 		$config = $this->configurationService->getPageConfiguration($extensionName);
 		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$page = $this->flexformService->getStoredVariable($templateFile, 'storage', 'Configuration', $config, $extensionName);
+		$page = $this->configurationService->getStoredVariable($templateFile, 'storage', 'Configuration', $config, $extensionName);
 		return (TRUE === (boolean) $page['enabled']);
 	}
 
