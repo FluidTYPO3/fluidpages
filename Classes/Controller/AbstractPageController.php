@@ -30,7 +30,7 @@
  * @subpackage Controller
  * @route off
  */
-class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_Controller_AbstractFluxController implements Tx_Fluidpages_Controller_PageControllerInterface {
+abstract class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_Controller_AbstractFluxController implements Tx_Fluidpages_Controller_PageControllerInterface {
 
 	/**
 	 * @var string
