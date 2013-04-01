@@ -59,13 +59,17 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		if (NULL === $extensionName) {
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$nativeViewLocation = $this->getPageConfiguration($registeredExtensionKey);
+				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+					$nativeViewLocation['extensionKey'] = $registeredExtensionKey;
+				}
 				self::$cache[$registeredExtensionKey] = $nativeViewLocation;
 				$merged[$registeredExtensionKey] = $nativeViewLocation;
 			}
 		} else {
-			$extensionKey = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
-			$nativeViewLocation = $this->getNativePluginViewConfiguration($extensionKey);
 			$nativeViewLocation = $this->getViewConfigurationForExtensionName($extensionName);
+			if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+				$nativeViewLocation['extensionKey'] = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+			}
 			$merged = t3lib_div::array_merge_recursive_overrule($merged, $nativeViewLocation);
 		}
 		self::$cache[$cacheKey] = $merged;
