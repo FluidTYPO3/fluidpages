@@ -115,6 +115,19 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 
 	/**
 	 * @param array $row
+	 * @return NULL|string
+	 */
+	public function getExtensionKey(array $row) {
+		$selectedTemplate = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		list ($extensionKey, $selectedAction) = explode('->', $selectedTemplate['tx_fed_page_controller_action']);
+		if (TRUE === empty($extensionKey)) {
+			$extensionKey = 'fluidpages';
+		}
+		return $extensionKey;
+	}
+
+	/**
+	 * @param array $row
 	 * @return array|NULL
 	 */
 	public function getTemplatePaths(array $row) {
@@ -171,13 +184,7 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			}
 
 			$values = $this->getFlexFormValues($row);
-			/** @var Tx_Flux_MVC_View_ExposedStandaloneView $view */
-			$view = $this->objectManager->get('Tx_Flux_MVC_View_ExposedStandaloneView');
-			$view->setTemplatePathAndFilename($templatePathAndFilename);
-			$view->setPartialRootPath($paths['partialRootPath']);
-			$view->setLayoutRootPath($paths['layoutRootPath']);
-			$view->assignMultiple($values);
-			$stored = $view->getStoredVariable('Tx_Flux_ViewHelpers_FlexformViewHelper', 'storage', 'Configuration');
+			$stored = $this->flexFormService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
 			if (NULL === $stored) {
 				$this->debugService->message('A valid configuration could not be retrieved from file ' . $templatePathAndFilename .
 					' - processing aborted; see earlier errors', t3lib_div::SYSLOG_SEVERITY_FATAL);
