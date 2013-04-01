@@ -55,16 +55,4 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 		}
 	}
 
-	/**
-	 * @return string
-	 */
-	public function errorAction() {
-		$setup = $this->getSetup();
-		$errorPageTemplatePathAndFilename = $setup['templateRootPath'] . 'Page/Error.' . $this->request->getFormat();
-		if (FALSE === file_exists($errorPageTemplatePathAndFilename)) {
-			$errorPageTemplatePathAndFilename = t3lib_extMgm::extPath('fluidpages', 'Resources/Private/Templates/Page/Error.html');
-		}
-		$this->view->setTemplatePathAndFilename($errorPageTemplatePathAndFilename);
-	}
-
 }
