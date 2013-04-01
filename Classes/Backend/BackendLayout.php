@@ -41,7 +41,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	protected $configurationService;
 
 	/**
-	 * @var Tx_Flux_Service_Grid
+	 * @var Tx_Flux_Service_GridService
 	 */
 	protected $gridService;
 
@@ -61,7 +61,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	public function __construct() {
 		$this->objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
 		$this->configurationService = $this->objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
-		$this->gridService = $this->objectManager->get('Tx_Flux_Service_Grid');
+		$this->gridService = $this->objectManager->get('Tx_Flux_Service_GridService');
 		$this->pageService = $this->objectManager->get('Tx_Fluidpages_Service_PageService');
 		$this->flexformService = $this->objectManager->get('Tx_Flux_Service_FlexForm');
 	}
