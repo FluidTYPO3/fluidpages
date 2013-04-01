@@ -55,7 +55,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	protected $configurationService;
 
 	/**
-	 * @var Tx_Flux_Service_Debug
+	 * @var Tx_Flux_Service_DebugService
 	 */
 	protected $debugService;
 
@@ -89,10 +89,10 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	}
 
 	/**
-	 * @param Tx_Flux_Service_Debug $debugService
+	 * @param Tx_Flux_Service_DebugService $debugService
 	 * @return void
 	 */
-	public function injectDebugService(Tx_Flux_Service_Debug $debugService) {
+	public function injectDebugService(Tx_Flux_Service_DebugService $debugService) {
 		$this->debugService = $debugService;
 	}
 
