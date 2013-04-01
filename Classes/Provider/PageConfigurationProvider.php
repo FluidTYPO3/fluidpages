@@ -128,6 +128,18 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 
 	/**
 	 * @param array $row
+	 * @return string
+	 */
+	public function getExtensionKey(array $row) {
+		$paths = $this->getTemplatePaths($row);
+		if (TRUE === isset($paths['extensionKey'])) {
+			return $paths['extensionKey'];
+		}
+		return parent::getExtensionKey($row);
+	}
+
+	/**
+	 * @param array $row
 	 * @return array|NULL
 	 */
 	public function getTemplatePaths(array $row) {
