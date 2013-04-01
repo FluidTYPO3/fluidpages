@@ -33,7 +33,7 @@
  * @package Fluidpages
  * @subpackage Service
  */
-class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configuration implements t3lib_Singleton {
+class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxService implements t3lib_Singleton {
 
 	/**
 	 * @var array
@@ -59,27 +59,21 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_Configu
 		if (NULL === $extensionName) {
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$nativeViewLocation = $this->getPageConfiguration($registeredExtensionKey);
+				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+					$nativeViewLocation['extensionKey'] = $registeredExtensionKey;
+				}
 				self::$cache[$registeredExtensionKey] = $nativeViewLocation;
 				$merged[$registeredExtensionKey] = $nativeViewLocation;
 			}
 		} else {
-			$extensionKey = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
-			$nativeViewLocation = $this->getNativePluginViewConfiguration($extensionKey);
+			$nativeViewLocation = $this->getViewConfigurationForExtensionName($extensionName);
+			if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+				$nativeViewLocation['extensionKey'] = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+			}
 			$merged = t3lib_div::array_merge_recursive_overrule($merged, $nativeViewLocation);
 		}
 		self::$cache[$cacheKey] = $merged;
 		return $merged;
-	}
-
-	/**
-	 * @param string $extensionKey
-	 * @return array
-	 */
-	protected function getNativePluginViewConfiguration($extensionKey) {
-		$typoScriptExtensionKey = str_replace('_', '', $extensionKey);
-		$nativeViewLocation = $this->getTypoScriptSubConfiguration(NULL, 'view', array(), $typoScriptExtensionKey);
-		$nativeViewLocation = Tx_Flux_Utility_Path::translatePath($nativeViewLocation);
-		return $nativeViewLocation;
 	}
 
 }
