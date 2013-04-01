@@ -115,19 +115,6 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 
 	/**
 	 * @param array $row
-	 * @return NULL|string
-	 */
-	public function getExtensionKey(array $row) {
-		$selectedTemplate = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		list ($extensionKey, $selectedAction) = explode('->', $selectedTemplate['tx_fed_page_controller_action']);
-		if (TRUE === empty($extensionKey)) {
-			$extensionKey = 'fluidpages';
-		}
-		return $extensionKey;
-	}
-
-	/**
-	 * @param array $row
 	 * @return string
 	 */
 	public function getExtensionKey(array $row) {
