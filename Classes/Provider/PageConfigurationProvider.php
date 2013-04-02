@@ -231,11 +231,19 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	 * @return string
 	 */
 	public function getControllerActionFromRecord(array $row) {
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		$action = $configuration['tx_fed_page_controller_action'];
+		$action = $this->getControllerActionReferenceFromRecord($row);
 		$controllerActionName = array_pop(explode('->', $action));
 		$controllerActionName{0} = strtolower($controllerActionName{0});
 		return $controllerActionName;
+	}
+
+	/**
+	 * @param array $row
+	 * @return string
+	 */
+	public function getControllerActionReferenceFromRecord(array $row) {
+		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		return $configuration['tx_fed_page_controller_action'];
 	}
 
 }
