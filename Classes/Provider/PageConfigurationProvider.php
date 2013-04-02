@@ -141,6 +141,7 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 		} catch (Exception $error) {
 			$this->debugService->debug($error);
 		}
+		$paths = Tx_Flux_Utility_Path::translatePath($paths);
 		return $paths;
 	}
 
@@ -155,9 +156,14 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			$action = $configuration['tx_fed_page_controller_action'];
 			list ($extensionName, $action) = explode('->', $action);
 			if (is_array($paths)) {
-				$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
+				$templateRootPath = $paths['templateRootPath'];
+				if ('/' === substr($templateRootPath, -1)) {
+					$templateRootPath = substr($templateRootPath, 0, -1);
+				}
+				$templatePathAndFilename = $templateRootPath . '/Page/' . $action . '.html';
 			}
 		}
+		$templatePathAndFilename = t3lib_div::getFileAbsFileName($templatePathAndFilename);
 		return $templatePathAndFilename;
 	}
 
@@ -170,7 +176,11 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 		$action = $configuration['tx_fed_page_controller_action'];
 		list ($extensionName, $action) = explode('->', $action);
 		$paths = Tx_Flux_Utility_Path::translatePath((array) $this->configurationService->getPageConfiguration($extensionName));
-		$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
+		$templateRootPath = $paths['templateRootPath'];
+		if ('/' === substr($templateRootPath, -1)) {
+			$templateRootPath = substr($templateRootPath, 0, -1);
+		}
+		$templatePathAndFilename = $templateRootPath . '/Page/' . $action . '.html';
 		$stored = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
 		if (NULL === $stored) {
 			$this->debugService->message('A valid configuration could not be retrieved from file ' . $templatePathAndFilename .
