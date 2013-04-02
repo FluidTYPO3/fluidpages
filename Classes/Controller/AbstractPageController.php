@@ -77,6 +77,7 @@ abstract class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_C
 	 * @return void
 	 */
 	public function initializeView(Tx_Extbase_MVC_View_ViewInterface $view) {
+		$this->configurationManager->getContentObject()->data = $GLOBALS['TSFE']->page;
 		parent::initializeView($view);
 		$view->assign('page', $GLOBALS['TSFE']->page);
 		$view->assign('user', $GLOBALS['TSFE']->fe_user->user);
