@@ -48,10 +48,12 @@ class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_A
 		// failure toggles. Instructs ConfigurationService to throw Exceptions when not being able to detect. We capture these and pass to debug.
 		$failHardClass = TRUE;
 		$failHardAction = TRUE;
-		$potentialControllerClassName = $this->configurationService->resolveFluxControllerClassName($action, 'Page', $failHardClass, $failHardAction);
-		if (NULL !== $potentialControllerClassName) {
+		try {
+			$potentialControllerClassName = $this->configurationService->resolveFluxControllerClassName($action, 'Page', $failHardClass, $failHardAction);
 			$this->request->setControllerObjectName($potentialControllerClassName);
 			$this->forward('render');
+		} catch (Exception $error) {
+			// no Controller class exists; let EXT:fluidpages render everything.
 		}
 	}
 
