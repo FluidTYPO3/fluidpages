@@ -30,7 +30,7 @@
  * @subpackage Controller
  * @route off
  */
-class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_Controller_AbstractFluxController implements Tx_Fluidpages_Controller_PageControllerInterface {
+abstract class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_Controller_AbstractFluxController implements Tx_Fluidpages_Controller_PageControllerInterface {
 
 	/**
 	 * @var string
@@ -41,6 +41,11 @@ class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_Controller
 	 * @var string
 	 */
 	protected $fluxTableName = 'pages';
+
+	/**
+	 * @var string
+	 */
+	protected $fallbackExtensionKey = 'fluidpages';
 
 	/**
 	 * @var Tx_Fluidpages_Service_PageService

@@ -264,6 +264,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 				continue;
 			}
 			$path = $group['templateRootPath'] . 'Page' . '/';
+			$path = t3lib_div::getFileAbsFileName($path);
 			$files = scandir($path);
 			$output[$extensionName] = array();
 			foreach ($files as $k=>$file) {
