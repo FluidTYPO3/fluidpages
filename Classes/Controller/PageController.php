@@ -32,28 +32,4 @@
  */
 class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_AbstractPageController {
 
-	/**
-	 * @return string
-	 * @route off
-	 */
-	public function renderAction() {
-		$row = $GLOBALS['TSFE']->page;
-		$this->provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->fluxTableName, $this->fluxRecordField, $row);
-		$extensionKey = $this->provider->getExtensionKey($row);
-		$extensionName = ucfirst(t3lib_div::underscoredToLowerCamelCase($extensionKey));
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		$action = $configuration['tx_fed_page_controller_action'];
-		$controllerActionName = array_pop(explode('->', $action));
-		$controllerActionName{0} = strtolower($controllerActionName{0});
-		// failure toggles. Instructs ConfigurationService to throw Exceptions when not being able to detect. We capture these and pass to debug.
-		$failHardClass = TRUE;
-		$failHardAction = TRUE;
-		try {
-			$potentialControllerClassName = $this->configurationService->resolveFluxControllerClassName($action, 'Page', $failHardClass, $failHardAction);
-			return call_user_func_array(array($potentialControllerClassName, $controllerActionName . 'Action'), array());
-		} catch (Exception $error) {
-			// no Controller class exists; let EXT:fluidpages render everything.
-		}
-	}
-
 }

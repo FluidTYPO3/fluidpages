@@ -85,4 +85,11 @@ abstract class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_C
 		$view->assign('session', $_SESSION);
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getRecord() {
+		return $GLOBALS['TSFE']->page;
+	}
+
 }

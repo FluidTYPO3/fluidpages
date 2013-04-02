@@ -204,4 +204,28 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 		return $records;
 	}
 
+	/**
+	 * @param array $row
+	 * @return string
+	 */
+	public function getControllerExtensionKeyFromRecord(array $row) {
+		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		$action = $configuration['tx_fed_page_controller_action'];
+		$extensionName = array_shift(explode('->', $action));
+		$extensionKey = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+		return $extensionKey;
+	}
+
+	/**
+	 * @param array $row
+	 * @return string
+	 */
+	public function getControllerActionFromRecord(array $row) {
+		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		$action = $configuration['tx_fed_page_controller_action'];
+		$controllerActionName = array_pop(explode('->', $action));
+		$controllerActionName{0} = strtolower($controllerActionName{0});
+		return $controllerActionName;
+	}
+
 }
