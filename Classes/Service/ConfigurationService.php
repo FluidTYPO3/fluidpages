@@ -49,13 +49,14 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 	 */
 	public function getPageConfiguration($extensionName = NULL) {
 		$cacheKey = NULL === $extensionName ? 0 : $extensionName;
+		$cacheKey = 'page_' . $cacheKey;
 		if (TRUE === isset(self::$cache[$cacheKey])) {
 			return self::$cache[$cacheKey];
 		}
 		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', array(), 'fluidpages');
 		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', array(), 'fed');
 		$merged = t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
-		$registeredExtensionKeys = Tx_Fluidpages_Core::getRegisteredProviderExtensionKeys();
+		$registeredExtensionKeys = Tx_Flux_Core::getRegisteredProviderExtensionKeys('Page');
 		if (NULL === $extensionName) {
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$nativeViewLocation = $this->getPageConfiguration($registeredExtensionKey);

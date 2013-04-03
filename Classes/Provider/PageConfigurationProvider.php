@@ -141,6 +141,7 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 		} catch (Exception $error) {
 			$this->debugService->debug($error);
 		}
+		$paths = Tx_Flux_Utility_Path::translatePath($paths);
 		return $paths;
 	}
 
@@ -155,9 +156,14 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			$action = $configuration['tx_fed_page_controller_action'];
 			list ($extensionName, $action) = explode('->', $action);
 			if (is_array($paths)) {
-				$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
+				$templateRootPath = $paths['templateRootPath'];
+				if ('/' === substr($templateRootPath, -1)) {
+					$templateRootPath = substr($templateRootPath, 0, -1);
+				}
+				$templatePathAndFilename = $templateRootPath . '/Page/' . $action . '.html';
 			}
 		}
+		$templatePathAndFilename = t3lib_div::getFileAbsFileName($templatePathAndFilename);
 		return $templatePathAndFilename;
 	}
 
@@ -170,7 +176,11 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 		$action = $configuration['tx_fed_page_controller_action'];
 		list ($extensionName, $action) = explode('->', $action);
 		$paths = Tx_Flux_Utility_Path::translatePath((array) $this->configurationService->getPageConfiguration($extensionName));
-		$templatePathAndFilename = $paths['templateRootPath'] . '/Page/' . $action . '.html';
+		$templateRootPath = $paths['templateRootPath'];
+		if ('/' === substr($templateRootPath, -1)) {
+			$templateRootPath = substr($templateRootPath, 0, -1);
+		}
+		$templatePathAndFilename = $templateRootPath . '/Page/' . $action . '.html';
 		$stored = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
 		if (NULL === $stored) {
 			$this->debugService->message('A valid configuration could not be retrieved from file ' . $templatePathAndFilename .
@@ -202,6 +212,38 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			}
 		}
 		return $records;
+	}
+
+	/**
+	 * @param array $row
+	 * @return string
+	 */
+	public function getControllerExtensionKeyFromRecord(array $row) {
+		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		$action = $configuration['tx_fed_page_controller_action'];
+		$extensionName = array_shift(explode('->', $action));
+		$extensionKey = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+		return $extensionKey;
+	}
+
+	/**
+	 * @param array $row
+	 * @return string
+	 */
+	public function getControllerActionFromRecord(array $row) {
+		$action = $this->getControllerActionReferenceFromRecord($row);
+		$controllerActionName = array_pop(explode('->', $action));
+		$controllerActionName{0} = strtolower($controllerActionName{0});
+		return $controllerActionName;
+	}
+
+	/**
+	 * @param array $row
+	 * @return string
+	 */
+	public function getControllerActionReferenceFromRecord(array $row) {
+		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		return $configuration['tx_fed_page_controller_action'];
 	}
 
 }
