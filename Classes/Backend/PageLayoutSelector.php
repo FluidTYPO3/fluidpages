@@ -75,7 +75,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 			$onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
 		}
 		$selector = '<div>';
-		$emptyLabel = 'Parent decides';
+		$emptyLabel = Tx_Extbase_Utility_Localization::translate('pages.tx_fed_page_controller_action.default', 'Fluidpages');
 		$selected = (TRUE === empty($value) ? ' checked="checked" ' : NULL);
 		$selector .= '<label>';
 		$selector .= '<input type="radio" name="' . $name . '" ' . $onChange . '" value="" ' . $selected . '/> ' . $emptyLabel . LF;
@@ -89,7 +89,8 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 				$groupTitle = $EM_CONF['']['title'];
 			}
 
-			$selector .= '<h4 style="clear: both; margin-top: 1em;">Package: ' . $groupTitle . '</h4>' . LF;
+			$packageLabel = Tx_Extbase_Utility_Localization::translate('pages.tx_fed_page_package', 'Fluidpages');
+			$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
 			foreach ($group as $template) {
 				$paths = $this->configurationService->getPageConfiguration($extension);
 				$extensionName = t3lib_div::underscoredToUpperCamelCase($extension);
