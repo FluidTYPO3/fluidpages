@@ -122,6 +122,10 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 		if (TRUE === isset($paths['extensionKey'])) {
 			return $paths['extensionKey'];
 		}
+		$controllerExtensionKey = $this->getControllerExtensionKeyFromRecord($row);
+		if (FALSE === empty($controllerExtensionKey)) {
+			return $controllerExtensionKey;
+		}
 		return parent::getExtensionKey($row);
 	}
 
