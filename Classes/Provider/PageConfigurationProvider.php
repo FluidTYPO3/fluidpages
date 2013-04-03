@@ -68,11 +68,6 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	protected $pageService;
 
 	/**
-	 * @var Tx_Extbase_Configuration_ConfigurationManagerInterface
-	 */
-	protected $configurationManager;
-
-	/**
 	 * @var Tx_Fluidpages_Service_ConfigurationService
 	 */
 	protected $configurationService;
@@ -87,14 +82,6 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	 */
 	public function __construct() {
 		$this->flexformTool = t3lib_div::makeInstance('t3lib_flexFormTools');
-	}
-
-	/**
-	 * @param Tx_Extbase_Configuration_ConfigurationManagerInterface $configurationManager
-	 * @return void
-	 */
-	public function injectConfigurationManager(Tx_Extbase_Configuration_ConfigurationManagerInterface $configurationManager) {
-		$this->configurationManager = $configurationManager;
 	}
 
 	/**
