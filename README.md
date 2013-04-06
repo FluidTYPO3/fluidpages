@@ -119,7 +119,7 @@ Some facts about the above sample template:
 
 * The `flux` namespace is used for configuration, the `v` namespace for output.
 * A `<div>` wraps the entire template, allowing tag autocompletion and attribute validation (by associating XSD schemas to each
-  namespace - see https://github.com/NamelessCoder/schemaker for more information about this feature).
+  namespace - see https://github.com/FluidTYPO3/schemaker for more information about this feature).
 * The `Page.html`  Layout file is used. It is allowed to render any section **except for the `Configuration` section**
 * The `Configuration` section contains:
 	* A `<flux:flexform>` node with the minimum allowed configuration: an ID unique to this file (among files in this same
@@ -142,7 +142,7 @@ supported on TYPO3 6.0 and above. On 4.x branches you still have to use the trad
 Currently it is not possible to run alongside TemplaVoila - which should come as no surprise and most likely is not a factor.
 If you chose Fluid Pages you should not need TemplaVoila (the extension Fluid Content can be used to create content elements that
 work like TemplaVoila's flexible content elements, but written in Fluid and allowing the same type of configuration as Fluid
-Pages - see https://github.com/NamelessCoder/fluidcontent). If you chose TemplaVoila you do not have the option of using Fluid
+Pages - see https://github.com/FluidTYPO3/fluidcontent). If you chose TemplaVoila you do not have the option of using Fluid
 Pages - but you will be able to use the Fluid Content extension.
 
 There is no plan to make Fluid Pages compatible with TemplaVoila - sorry, all TemplaVoila users. I hope you will consider Fluid
@@ -152,7 +152,7 @@ Pages for your next site!
 
 Other extensions which are either dependencies of or closely related to this extension:
 
-* https://github.com/NamelessCoder/flux is a dependency and is used to configure how the page template variable are defined.
-* https://github.com/NamelessCoder/vhs is a highly suggested companion for Fluid Pages templates, providing useful ViewHelpers.
-* https://github.com/NamelessCoder/fluidcontent is a suggested companion for sites built with Fluid Pages.
-* https://github.com/NamelessCoder/schemaker is a nice-to-have tool to generate XSD schemas for a great Fluid experience.
+* https://github.com/FluidTYPO3/flux is a dependency and is used to configure how the page template variable are defined.
+* https://github.com/FluidTYPO3/vhs is a highly suggested companion for Fluid Pages templates, providing useful ViewHelpers.
+* https://github.com/FluidTYPO3/fluidcontent is a suggested companion for sites built with Fluid Pages.
+* https://github.com/FluidTYPO3/schemaker is a nice-to-have tool to generate XSD schemas for a great Fluid experience.
