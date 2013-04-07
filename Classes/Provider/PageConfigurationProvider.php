@@ -130,7 +130,7 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 				$paths = $this->configurationService->getPageConfiguration($extensionName);
 			}
 		} catch (Exception $error) {
-			$this->debugService->debug($error);
+			$this->configurationService->debug($error);
 		}
 		$paths = Tx_Flux_Utility_Path::translatePath($paths);
 		return $paths;
@@ -174,11 +174,11 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 		$templatePathAndFilename = $templateRootPath . '/Page/' . $action . '.html';
 		$stored = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
 		if (NULL === $stored) {
-			$this->debugService->message('A valid configuration could not be retrieved from file ' . $templatePathAndFilename .
+			$this->configurationService->message('A valid configuration could not be retrieved from file ' . $templatePathAndFilename .
 				' - processing aborted; see earlier errors', t3lib_div::SYSLOG_SEVERITY_FATAL);
 			return array();
 		}
-		$this->debugService->message('Flux is able to read template variables from file ' . $templatePathAndFilename, t3lib_div::SYSLOG_SEVERITY_INFO);
+		$this->configurationService->message('Flux is able to read template variables from file ' . $templatePathAndFilename, t3lib_div::SYSLOG_SEVERITY_INFO);
 		return $stored;
 	}
 
