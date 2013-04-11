@@ -100,7 +100,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 				if (FALSE === (boolean) $configuration['enabled']) {
 					continue;
 				}
-				$label = $configuration['label'];
+				$label = Tx_Extbase_Utility_Localization::translate($configuration['label'], $extensionName);
 				$optionValue = $extension . '->' . $template;
 				$selected = ($optionValue == $value ? ' checked="checked"' : '');
 				$option = '<label style="padding: 0.5em; border: 1px solid #CCC; display: inline-block; vertical-align: bottom; margin: 0 1em 1em 0; cursor: pointer; ' . ($selected ? 'background-color: #DDD;' : '')  . '">';
