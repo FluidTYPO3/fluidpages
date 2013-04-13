@@ -37,3 +37,8 @@ t3lib_extMgm::addToAllTCAtypes(
 	'0,1,4',
 	'before:layout'
 );
+t3lib_extMgm::addToAllTCAtypes(
+	'pages',
+	'--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_layoutselect,tx_fed_page_controller_action_sub',
+	'254'
+);

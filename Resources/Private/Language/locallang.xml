@@ -11,6 +11,7 @@
 			<label index="pages.tx_fed_page_controller_action_sub">Page Layout - subpages</label>
 			<label index="pages.tx_fed_page_flexform">Page Configuration</label>
 			<label index="pages.tx_fed_page_package">Package</label>
+			<label index="pages.tx_fed_page_layoutselect">Page Layouts</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="pages.tx_fed_page_controller_action">Seitenlayout - diese Seite</label>
@@ -18,6 +19,7 @@
 			<label index="pages.tx_fed_page_controller_action_sub">Seitenlayout - Unterseiten</label>
 			<label index="pages.tx_fed_page_flexform">Seitenkonfiguration</label>
 			<label index="pages.tx_fed_page_package">Paket</label>
+            <label index="pages.tx_fed_page_layoutselect">Seitenlayouts</label>
 		</languageKey>
 	</data>
 </T3locallang>
