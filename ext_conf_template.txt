@@ -1,0 +1,2 @@
+  # cat=basic/enable; type=input; label=Doktypes: CSV list of additional doktypes to add the page layout selectors to. Possible use cases are sysfolders (254) or custom page types.
+doktypes =

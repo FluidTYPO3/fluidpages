@@ -31,14 +31,16 @@ t3lib_extMgm::addTCAcolumns('pages', array(
 		)
 	),
 ), 1);
+
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EXTCONF);
+$doktypes = '0,1,4';
+$additionalDoktypes = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['doktypes'];
+if (FALSE === empty($additionalDoktypes)) {
+	$doktypes .= ',' . $additionalDoktypes;
+}
 t3lib_extMgm::addToAllTCAtypes(
 	'pages',
 	'tx_fed_page_controller_action,tx_fed_page_controller_action_sub,tx_fed_page_flexform',
-	'0,1,4',
+	$doktypes,
 	'before:layout'
-);
-t3lib_extMgm::addToAllTCAtypes(
-	'pages',
-	'--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_layoutselect,tx_fed_page_controller_action_sub,tx_fed_page_flexform',
-	'254'
 );
