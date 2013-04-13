@@ -39,6 +39,6 @@ t3lib_extMgm::addToAllTCAtypes(
 );
 t3lib_extMgm::addToAllTCAtypes(
 	'pages',
-	'--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_layoutselect,tx_fed_page_controller_action_sub',
+	'--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_layoutselect,tx_fed_page_controller_action_sub,tx_fed_page_flexform',
 	'254'
 );
