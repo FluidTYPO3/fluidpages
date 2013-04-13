@@ -19,7 +19,7 @@
 			<label index="pages.tx_fed_page_controller_action_sub">Seitenlayout - Unterseiten</label>
 			<label index="pages.tx_fed_page_flexform">Seitenkonfiguration</label>
 			<label index="pages.tx_fed_page_package">Paket</label>
-            <label index="pages.tx_fed_page_layoutselect">Seitenlayouts</label>
+			<label index="pages.tx_fed_page_layoutselect">Seitenlayouts</label>
 		</languageKey>
 	</data>
 </T3locallang>
