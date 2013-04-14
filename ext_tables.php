@@ -46,11 +46,9 @@ t3lib_extMgm::addToAllTCAtypes(
 
 if (FALSE === empty($additionalDoktypes)) {
 	$fields = '--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_layoutselect,' . $fields;
-	$position = '';
 	t3lib_extMgm::addToAllTCAtypes(
 		'pages',
 		$fields,
-		$additionalDoktypes,
-		$position
+		$additionalDoktypes
 	);
 }
