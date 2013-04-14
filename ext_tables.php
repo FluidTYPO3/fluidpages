@@ -37,14 +37,20 @@ $doktypes = '0,1,4';
 $fields = 'tx_fed_page_controller_action,tx_fed_page_controller_action_sub,tx_fed_page_flexform';
 $position = 'before:layout';
 $additionalDoktypes = trim($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['doktypes'], ',');
-if (FALSE === empty($additionalDoktypes)) {
-	$doktypes .= ',' . $additionalDoktypes;
-	$fields = '--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_layoutselect,' . $fields;
-	$position = '';
-}
 t3lib_extMgm::addToAllTCAtypes(
 	'pages',
 	$fields,
 	$doktypes,
 	$position
 );
+
+if (FALSE === empty($additionalDoktypes)) {
+	$fields = '--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_layoutselect,' . $fields;
+	$position = '';
+	t3lib_extMgm::addToAllTCAtypes(
+		'pages',
+		$fields,
+		$additionalDoktypes,
+		$position
+	);
+}
