@@ -35,6 +35,7 @@ t3lib_extMgm::addTCAcolumns('pages', array(
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EXTCONF);
 $doktypes = '0,1,4';
 $additionalDoktypes = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['doktypes'];
+$additionalDoktypes = trim($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['doktypes'], ',');
 if (FALSE === empty($additionalDoktypes)) {
 	$doktypes .= ',' . $additionalDoktypes;
 }
