@@ -53,6 +53,21 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		if (TRUE === isset(self::$cache[$cacheKey])) {
 			return self::$cache[$cacheKey];
 		}
+		if (TYPO3_MODE === 'BE') {
+			// Hack. This is no fun matter, but the TYPO3 BackendConfigurationManager
+			// is incapable of considering how to fetch a page UID from the "editconf"
+			// array which is used when editing a particular page. The result is that
+			// because Flux uses Extbase's resolve methods for TypoScript, the methods
+			// will use the fallback behavior (only root TS templates). Forcibly setting
+			// this GET['id'] should not have a negative effect on other scripts and will
+			// fix the problem - because Extbase will instantly detect and use this ID.
+			// New behaviour has one flaw: editing multiple pages will cause every page
+			// to use the first page's TypoScript settings and therefore page templates -
+			// which could be a problem when editing multiple pages each having own TS.
+			if (TRUE === isset($GLOBALS['SOBE']->editconf['pages'])) {
+				$_GET['id'] = key($GLOBALS['SOBE']->editconf['pages']);
+			}
+		}
 		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', array(), 'fluidpages');
 		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', array(), 'fed');
 		$merged = t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
@@ -60,6 +75,9 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		if (NULL === $extensionName) {
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$nativeViewLocation = $this->getPageConfiguration($registeredExtensionKey);
+				if (NULL === $nativeViewLocation) {
+					continue;
+				}
 				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
 					$nativeViewLocation['extensionKey'] = $registeredExtensionKey;
 				}
@@ -68,10 +86,12 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 			}
 		} else {
 			$nativeViewLocation = $this->getViewConfigurationForExtensionName($extensionName);
-			if (FALSE === isset($nativeViewLocation['extensionKey'])) {
-				$nativeViewLocation['extensionKey'] = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+			if (NULL !== $nativeViewLocation) {
+				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+					$nativeViewLocation['extensionKey'] = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+				}
+				$merged = t3lib_div::array_merge_recursive_overrule($merged, $nativeViewLocation);
 			}
-			$merged = t3lib_div::array_merge_recursive_overrule($merged, $nativeViewLocation);
 		}
 		self::$cache[$cacheKey] = $merged;
 		return $merged;
