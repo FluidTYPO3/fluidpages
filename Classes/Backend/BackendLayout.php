@@ -86,9 +86,8 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 			$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
 			$grid = $this->configurationService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths, $extensionName);
 		} catch (Exception $error) {
-			$this->configurationService->message($error->getMessage() . ' This may indicate a problem with your TypoScript configuration but
-				may also indicate that your template simply does not contain a backend layout definition.',
-				t3lib_div::SYSLOG_SEVERITY_NOTICE, 'Fluid Pages cannot find template file - #' . $error->getCode());
+			$this->configurationService->message($error->getMessage() . ' This may indicate a problem with your TypoScript configuration.',
+				t3lib_div::SYSLOG_SEVERITY_NOTICE, 'Fluid Pages error #' . $error->getCode());
 		}
 		if (is_array($grid) === FALSE) {
 			// no grid is defined; we use the "raw" BE layout as a default behavior
