@@ -215,16 +215,16 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	 * @param array $row
 	 * @param mixed $dataStructure
 	 * @param array $conf
-	 * @return void
+	 * @return NULL
 	 */
 	public function postProcessDataStructure(array &$row, &$dataStructure, array $conf) {
 		$selectedPageTemplate = $this->pageService->getPageTemplateConfiguration($row['uid']);
 		if (TRUE === empty($selectedPageTemplate['tx_fed_page_controller_action'])) {
 			$config['parameters'] = array(
-				'userFunction' => 'Tx_Flux_UserFunction_NoTemplate->renderField'
+				'userFunction' => 'Tx_Flux_UserFunction_NoSelection->renderField'
 			);
 			$dataStructure = $this->objectManager->create('Tx_Flux_Provider_Structure_FallbackStructureProvider')->render($config);
-			return;
+			return NULL;
 		}
 		parent::postProcessDataStructure($row, $dataStructure, $conf);
 	}
