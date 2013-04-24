@@ -160,7 +160,7 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 
 	/**
 	 * @param array $row
-	 * @return array
+	 * @return array|void
 	 */
 	public function getTemplateVariables(array $row) {
 		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
@@ -172,11 +172,14 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			$templateRootPath = substr($templateRootPath, 0, -1);
 		}
 		$templatePathAndFilename = $templateRootPath . '/Page/' . $action . '.html';
+		if (FALSE === file_exists($templatePathAndFilename)) {
+			return;
+		}
 		$stored = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
 		if (NULL === $stored) {
 			$this->configurationService->message('A valid configuration could not be retrieved from file ' . $templatePathAndFilename .
 				' - processing aborted; see earlier errors', t3lib_div::SYSLOG_SEVERITY_FATAL);
-			return array();
+			return;
 		}
 		$this->configurationService->message('Flux is able to read template variables from file ' . $templatePathAndFilename, t3lib_div::SYSLOG_SEVERITY_INFO);
 		return $stored;
@@ -203,6 +206,27 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			}
 		}
 		return $records;
+	}
+
+	/**
+	 * Post-process the TCEforms DataStructure for a record associated
+	 * with this ConfigurationProvider
+	 *
+	 * @param array $row
+	 * @param mixed $dataStructure
+	 * @param array $conf
+	 * @return void
+	 */
+	public function postProcessDataStructure(array &$row, &$dataStructure, array $conf) {
+		$selectedPageTemplate = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		if (TRUE === empty($selectedPageTemplate['tx_fed_page_controller_action'])) {
+			$config['parameters'] = array(
+				'userFunction' => 'Tx_Flux_UserFunction_NoTemplate->renderField'
+			);
+			$dataStructure = $this->objectManager->create('Tx_Flux_Provider_Structure_FallbackStructureProvider')->render($config);
+			return;
+		}
+		parent::postProcessDataStructure($row, $dataStructure, $conf);
 	}
 
 	/**
