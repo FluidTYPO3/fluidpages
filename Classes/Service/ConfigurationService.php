@@ -87,6 +87,12 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		} else {
 			$nativeViewLocation = $this->getViewConfigurationForExtensionName($extensionName);
 			if (NULL !== $nativeViewLocation) {
+				if (FALSE === isset($nativeViewLocation['templateRootPath'])) {
+					$this->message('The extension-native view configuration for extension "' . $extensionName . '" does not contain ' .
+						'at least a templateRootPath. This indicates that the static TypoScript for the extension is not loaded or ' .
+						'it uses constants which are either not defined, cleared or set to an empty value', t3lib_div::SYSLOG_SEVERITY_FATAL);
+					return $merged;
+				}
 				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
 					$nativeViewLocation['extensionKey'] = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
 				}
