@@ -79,12 +79,15 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		$hideInheritFieldSiteRoot = (boolean) (TRUE === isset($typoScript['plugin.']['tx_fluidpages.']['siteRootInheritance']) ? 1 > $typoScript['plugin.']['tx_fluidpages.']['siteRootInheritance'] : FALSE);
 		$pageIsSiteRoot = (boolean) ($parameters['row']['is_siteroot']);
 		$forceDisplayInheritSiteRoot = (boolean) ('tx_fed_page_controller_action_sub' === $parameters['field']);
+		$forceHideInherit = (boolean) (0 === intval($parameters['row']['pid']));
 		if (FALSE === $pageIsSiteRoot || TRUE === $forceDisplayInheritSiteRoot || FALSE === $hideInheritFieldSiteRoot) {
-			$emptyLabel = Tx_Extbase_Utility_Localization::translate('pages.tx_fed_page_controller_action.default', 'Fluidpages');
-			$selected = (TRUE === empty($value) ? ' checked="checked" ' : NULL);
-			$selector .= '<label>';
-			$selector .= '<input type="radio" name="' . $name . '" ' . $onChange . '" value="" ' . $selected . '/> ' . $emptyLabel . LF;
-			$selector .= '</label>' . LF;
+			if (FALSE === $forceHideInherit) {
+				$emptyLabel = Tx_Extbase_Utility_Localization::translate('pages.tx_fed_page_controller_action.default', 'Fluidpages');
+				$selected = (TRUE === empty($value) ? ' checked="checked" ' : NULL);
+				$selector .= '<label>';
+				$selector .= '<input type="radio" name="' . $name . '" ' . $onChange . '" value="" ' . $selected . '/> ' . $emptyLabel . LF;
+				$selector .= '</label>' . LF;
+			}
 		}
 		foreach ($availableTemplates as $extension=>$group) {
 			if (!t3lib_extMgm::isLoaded($extension)) {
