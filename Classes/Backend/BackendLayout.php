@@ -66,6 +66,10 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 			$record = $this->pageService->getPageTemplateConfiguration($pageUid);
 			$variables = array();
 			list ($extensionName, $action) = explode('->', $record['tx_fed_page_controller_action']);
+			if (TRUE === empty($action)) {
+				$this->configurationService->message('No template selected - backend layout will not be rendered', t3lib_div::SYSLOG_SEVERITY_INFO);
+				return;
+			}
 			$paths = $this->configurationService->getPageConfiguration($extensionName);
 			if (0 === count($paths) && FALSE === (boolean) t3lib_div::_GET('redirected')) {
 				if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
@@ -79,18 +83,24 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 				}
 				return;
 			}
+			if (0 === count($paths)) {
+				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
+					. 'have included the TypoScript for the desired template collection.', t3lib_div::SYSLOG_SEVERITY_NOTICE);
+				return;
+			}
 			$flexFormSource = isset($record['tx_fed_page_flexform']) ? $record['tx_fed_page_flexform'] : NULL;
 			if ($flexFormSource !== NULL) {
 				$variables = $this->configurationService->convertFlexFormContentToArray($flexFormSource);
 			}
 			$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
 			$grid = $this->configurationService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths, $extensionName);
+			if (is_array($grid) === FALSE) {
+				// no grid is defined; we use the "raw" BE layout as a default behavior
+				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
+				return;
+			}
 		} catch (Exception $error) {
-			$this->configurationService->message($error->getMessage() . ' This may indicate a problem with your TypoScript configuration.',
-				t3lib_div::SYSLOG_SEVERITY_NOTICE, 'Fluid Pages error #' . $error->getCode());
-		}
-		if (is_array($grid) === FALSE) {
-			// no grid is defined; we use the "raw" BE layout as a default behavior
+			$this->configurationService->debug($error);
 			return;
 		}
 
