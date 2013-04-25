@@ -84,7 +84,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * record returned may or may not be the same recod as defined in $id.
 	 *
 	 * @param integer $pageUid
-	 * @return array
+	 * @return array|NULL
 	 * @api
 	 */
 	public function getPageTemplateConfiguration($pageUid) {
@@ -109,6 +109,9 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			}
 		} while ($page && !strpos($page['tx_fed_page_controller_action_sub'], '->'));
 		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
+		if (TRUE === empty($page['tx_fed_page_controller_action'])) {
+			$page = NULL;
+		}
 		self::$cache[$cacheKey] = $page;
 		return $page;
 	}

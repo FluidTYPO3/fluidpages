@@ -62,28 +62,33 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	 * @return void
 	 */
 	public function postProcessBackendLayout(&$pageUid, &$backendLayout) {
-		$record = $this->pageService->getPageTemplateConfiguration($pageUid);
-		$variables = array();
-		list ($extensionName, $action) = explode('->', $record['tx_fed_page_controller_action']);
-		$paths = $this->configurationService->getPageConfiguration($extensionName);
-		if (0 === count($paths) && FALSE === (boolean) t3lib_div::_GET('redirected')) {
-			if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
-				// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
-				$get = t3lib_div::_GET();
-				unset($get['id']);
-				$get['redirected'] = 1;
-				$params = t3lib_div::implodeArrayForUrl('', $get);
-				header('Location: ?id=' . $pageUid . $params);
-				exit();
+		try {
+			$record = $this->pageService->getPageTemplateConfiguration($pageUid);
+			$variables = array();
+			list ($extensionName, $action) = explode('->', $record['tx_fed_page_controller_action']);
+			$paths = $this->configurationService->getPageConfiguration($extensionName);
+			if (0 === count($paths) && FALSE === (boolean) t3lib_div::_GET('redirected')) {
+				if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
+					// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
+					$get = t3lib_div::_GET();
+					unset($get['id']);
+					$get['redirected'] = 1;
+					$params = t3lib_div::implodeArrayForUrl('', $get);
+					header('Location: ?id=' . $pageUid . $params);
+					exit();
+				}
+				return;
 			}
-			return;
+			$flexFormSource = isset($record['tx_fed_page_flexform']) ? $record['tx_fed_page_flexform'] : NULL;
+			if ($flexFormSource !== NULL) {
+				$variables = $this->configurationService->convertFlexFormContentToArray($flexFormSource);
+			}
+			$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
+			$grid = $this->configurationService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths, $extensionName);
+		} catch (Exception $error) {
+			$this->configurationService->message($error->getMessage() . ' This may indicate a problem with your TypoScript configuration.',
+				t3lib_div::SYSLOG_SEVERITY_NOTICE, 'Fluid Pages error #' . $error->getCode());
 		}
-		$flexFormSource = isset($record['tx_fed_page_flexform']) ? $record['tx_fed_page_flexform'] : NULL;
-		if ($flexFormSource !== NULL) {
-			$variables = $this->configurationService->convertFlexFormContentToArray($flexFormSource);
-		}
-		$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
-		$grid = $this->configurationService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths, $extensionName);
 		if (is_array($grid) === FALSE) {
 			// no grid is defined; we use the "raw" BE layout as a default behavior
 			return;
