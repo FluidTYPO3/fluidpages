@@ -253,11 +253,11 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 					'paths. This indicates a problem with your TypoScript configuration - most likely a static template is not loaded', t3lib_div::SYSLOG_SEVERITY_WARNING);
 				continue;
 			}
-			$path = $group['templateRootPath'] . 'Page' . '/';
-			$path = t3lib_div::getFileAbsFileName($path);
+			$configuredPath = $group['templateRootPath'] . 'Page' . '/';
+			$path = t3lib_div::getFileAbsFileName($configuredPath);
 			if (FALSE === is_dir($path)) {
 				$this->configurationService->message('The template group "' . $extensionName . '" has been configured to use the templateRootPath "' .
-					$path . '" but this directory does not exist.', t3lib_div::SYSLOG_SEVERITY_FATAL);
+					$configuredPath . '" but this directory does not exist.', t3lib_div::SYSLOG_SEVERITY_FATAL);
 				continue;
 			}
 			$files = scandir($path);
