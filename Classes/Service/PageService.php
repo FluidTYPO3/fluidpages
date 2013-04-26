@@ -212,7 +212,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	public function getPageTemplateLabel($extensionName, $templateFile) {
 		$config = $this->configurationService->getPageConfiguration($extensionName);
 		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$page = $this->configurationService->getStoredVariable($templateFile, 'storage', 'Configuration', $config, $extensionName);
+		$page = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $config, $extensionName);
 		return $page['label'] ? $page['label'] : $templateFile . '.html';
 	}
 
@@ -227,7 +227,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	public function getPageTemplateEnabled($extensionName, $templateFile) {
 		$config = $this->configurationService->getPageConfiguration($extensionName);
 		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$page = $this->configurationService->getStoredVariable($templateFile, 'storage', 'Configuration', $config, $extensionName);
+		$page = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $config, $extensionName);
 		return (TRUE === (boolean) $page['enabled']);
 	}
 

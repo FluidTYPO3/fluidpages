@@ -45,10 +45,10 @@ class Tx_Fluidpages_Override_Backend_View_BackendLayoutView extends TYPO3\CMS\Ba
 	}
 
 	/**
-	 * @return void
+	 * Constructor
 	 */
 	public function __construct() {
-		/** @var $objectManager Tx_Extbase_Object_ObjectManagerInterfacee */
+		/** @var $objectManager Tx_Extbase_Object_ObjectManager */
 		$objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
 		/** @var $backendLayout Tx_Fluidpages_Backend_BackendLayout */
 		$backendLayout = $objectManager->get('Tx_Fluidpages_Backend_BackendLayout');

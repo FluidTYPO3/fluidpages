@@ -53,10 +53,10 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 	}
 
 	/**
-	 * @return void
+	 * Constructor
 	 */
 	public function __construct() {
-		/** @var $objectManager Tx_Extbase_Object_ObjectManagerInterfacee */
+		/** @var $objectManager Tx_Extbase_Object_ObjectManager */
 		$objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
 		/** @var $backendLayout Tx_Fluidpages_Backend_BackendLayout */
 		$backendLayout = $objectManager->get('Tx_Fluidpages_Backend_BackendLayout');
@@ -84,7 +84,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 
 	/**
 	 * @param array $array
-	 * @param string $string
+	 * @param integer $indent
 	 * @return string
 	 */
 	protected function compactTypoScriptArray($array, $indent = 0) {
@@ -134,13 +134,12 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 			$command = 'reference';
 			$label = 'Paste as reference in this position';
 			$icon = 'actions-insert-reference';
-			$relativeTo = $pid . '-reference-' . $relativeUid . '-' . $uid;
 		} else {
 			$command = 'paste';
 			$label = 'Paste in this position';
 			$icon = 'actions-document-paste-after';
-			$relativeTo = $pid . '-paste-' . $relativeUid . '-' . $uid;
 		}
+		$relativeTo = $pid . '-' . $command . '-' . $relativeUid . '-' . $uid;
 		$relativeTo .= '--' . $colPos;
 		$icon = t3lib_iconWorks::getSpriteIcon($icon, array('title' => $label, 'class' => 't3-icon-actions t3-icon-document-new'));
 		$uri = "javascript:top.content.list_frame.location.href=top.TS.PATH_typo3+'";
@@ -568,6 +567,3 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 	}
 
 }
-
-
-?>
