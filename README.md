@@ -102,6 +102,9 @@ class Tx_Myext_Controller_PageController extends Tx_Fluidpages_Controller_Abstra
 }
 ```
 
+Actions which do not exist do not get called. If a template file exists but has no corresponding controller action, the default
+Fluid Pages PageController does the job instead.
+
 In every way this controller is a regular controller with just a few added internal properties. However, some parts of the view
 does get overridden and may not act the way you expect. One such concern: do not attempt to override the `viewObjectName` - this
 object name has already been overriddden by Flux (serving as base of Fluid Pages) and overriding it again may cause ill effects,
