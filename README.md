@@ -38,20 +38,41 @@ custom ViewHelpers used by your specific page templates. Such an extension need 
 optionally a static TypoScript configuration and an `ext_localconf.php` to register that TypoScript static configuration. Using
 a static file makes it easy to include the page template.
 
+> Note: You can of course place your template files in fileadmin or another location, but this has disadvantages. The short
+> description of these disadvantages: everything you can normally do in Extbase and Fluid when working in an extension, becomes
+> impossible - or requires the use of many workarounds / additional attributes just to operate the most basic ViewHelpers.
+
 ## How to include page templates
 
 Use the following TypoScript:
 
 ```
-plugin.tx_fed.page.myextension {
+plugin.tx_fluidpages.collections.myextension {
 	templateRootPath = EXT:myextension/Resources/Private/Templates/
 	partialRootPath = EXT:myextension/Resources/Private/Partials/
 	layoutRootPath = EXT:myextension/Resources/Private/Layouts/
 }
 ```
 
-_Note: the `tx_fed` namespace is legacy from FED, it is still currently in use but will be replaced (but with backwards
-compatibility preserved)_
+Or this line in ext_tables.php and ext_localconf.php (double registration _is_ necessary):
+
+```
+Tx_Flux_Core::registerProviderExtensionKey('myextensionkey', 'Page');
+```
+
+Or if your extension uses namespaces **and contain a vendor name**:
+
+```
+Tx_Flux_Core::registerProviderExtensionKey('VendorName.ExtensionName', 'Page');
+```
+
+Fluid Pages transparently recognises the difference between a lowercase_underscored extension key and a Vendor.ExtensioName syntax.
+
+> Note: the extension key you use when registering templates will also be used as extension name for the controller context used
+in rendering the Fluid template (in other words: things like `<v:translate>` and `{f:uri.resource()}` will use your extension's
+scope - and thus will create links to your extension's resources, LLL labels etc).
+
+## The PageController
 
 Fluid Pages emulates a `Page` object and an associated `PageController` - therefore, Fluid Pages will look for template files in
 the location `templateRootPath` . `/Page/` which becomes `EXT:myextension/Resources/Private/Templates/Page/`, just as if you had
@@ -62,7 +83,35 @@ available. _Because an Extbase context is used you should include the TypoScript
 templates unless you also include those in a root template_. The reason for this is a slightly off behavior that Extbase exhibits
 when there is no page UID available - which happens in some actions of the page backend module.
 
-## How to create page templates
+## Using an Extbase controller native to your extension
+
+When you use an extension to provide your templates you will implicitly get the option to create a custom controller which will
+be used to render your individual page templates. In addition to using your extension's scope this also allows you to use a proper
+controller context - including arguments. To create such a controller you only need to add the class and extend the right parent.
+
+Each "action" method on the controller then corresponds to one template file - just like a normal Extbase controller:
+
+```
+class Tx_Myext_Controller_PageController extends Tx_Fluidpages_Controller_AbstractPageController {
+
+	public function defaultAction() {
+		// this action renders the template EXT:myext/Resources/Private/Templates/Page/Default.html
+		// - optionally placed in another path if you override the view configuration using TypoScript.
+	}
+
+}
+```
+
+Actions which do not exist do not get called. If a template file exists but has no corresponding controller action, the default
+Fluid Pages PageController does the job instead.
+
+In every way this controller is a regular controller with just a few added internal properties. However, some parts of the view
+does get overridden and may not act the way you expect. One such concern: do not attempt to override the `viewObjectName` - this
+object name has already been overriddden by Flux (serving as base of Fluid Pages) and overriding it again may cause ill effects,
+unless of course you also use a subclass of the Flux view class. There are other circumstances like this one so be prepared for
+some additional workarounds if you attempt overrides.
+
+## How to create page template files
 
 Creating templates follows all the rules of Fluid templates. If you use a Layout, it must be located in the path you configured
 in TypoScript. If rendering Partials, these must be located in the correct path as well. You may use any ViewHelpers you need -
@@ -135,6 +184,8 @@ The template does not contain an example of rendering a menu - you can find a mo
 `EXT:fluidpages/Resources/Private/Partials/`.
 
 ## Incompatibilities
+
+Using EXT:view Fluid Page template rendering cannot be overlaid - but arguments for ViewHelpers used in page templates can.
 
 Backend Layouts defined directly in the page template (and thus dynamic just like other Flux FlexForm configurations) is only
 supported on TYPO3 6.0 and above. On 4.x branches you still have to use the traditional Backend Layout records.
