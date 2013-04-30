@@ -68,8 +68,8 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 				$_GET['id'] = key($GLOBALS['SOBE']->editconf['pages']);
 			}
 		}
-		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', array(), 'fluidpages');
-		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', array(), 'fed');
+		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', 'fluidpages');
+		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', 'fed');
 		$merged = t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
 		$registeredExtensionKeys = Tx_Flux_Core::getRegisteredProviderExtensionKeys('Page');
 		if (NULL === $extensionName) {
