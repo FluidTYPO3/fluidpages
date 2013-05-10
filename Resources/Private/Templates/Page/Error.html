@@ -4,6 +4,6 @@
 	<f:if condition="{version.isLongTermSupport} < 1">
 		<f:render partial="Error/Extended" arguments="{error: error}" />
 	</f:if>
-	<f:render partial="Error/Standard" arguments="" />
+	<f:render partial="Error/Standard" />
 	<f:render partial="Error/Backtrace" arguments="{backtrace: backtrace}" />
 </div>
