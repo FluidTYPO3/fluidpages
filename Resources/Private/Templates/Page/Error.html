@@ -1,3 +1,7 @@
+{namespace flux=Tx_Flux_ViewHelpers}
+<f:section name="Configuration">
+	<flux:flexform id="error" enabled="FALSE" />
+</f:section>
 <f:render partial="Error/Style" />
 <div id="wrap">
 	<f:render partial="Error/Header" arguments="{error: error, class: class}" />
