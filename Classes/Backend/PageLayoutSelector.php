@@ -101,25 +101,33 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 			$packageLabel = Tx_Extbase_Utility_Localization::translate('pages.tx_fed_page_package', 'Fluidpages');
 			$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
 			foreach ($group as $template) {
-				$paths = $this->configurationService->getPageConfiguration($extension);
-				$extensionName = t3lib_div::underscoredToUpperCamelCase($extension);
-				$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
-				$configuration = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
-				$thumbnail = $configuration['icon'];
-				if (FALSE === (boolean) $configuration['enabled']) {
-					continue;
+				try {
+					$paths = $this->configurationService->getPageConfiguration($extension);
+					$extensionName = t3lib_div::underscoredToUpperCamelCase($extension);
+					$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
+					if (FALSE === file_exists($templatePathAndFilename)) {
+						$this->configurationService->message('Missing template file: ' . $templatePathAndFilename);
+						continue;
+					}
+					$configuration = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
+					$thumbnail = $configuration['icon'];
+					if (FALSE === (boolean) $configuration['enabled']) {
+						continue;
+					}
+					$label = $configuration['label'];
+					if (NULL !== ($translatedLabel = Tx_Extbase_Utility_Localization::translate($label, $extensionName))) {
+						$label = $translatedLabel;
+					}
+					$optionValue = $extension . '->' . $template;
+					$selected = ($optionValue == $value ? ' checked="checked"' : '');
+					$option = '<label style="padding: 0.5em; border: 1px solid #CCC; display: inline-block; vertical-align: bottom; margin: 0 1em 1em 0; cursor: pointer; ' . ($selected ? 'background-color: #DDD;' : '')  . '">';
+					$option .= '<img src="' . $thumbnail . '" alt="' . $label . '" style="margin: 0.5em 0 0.5em 0; max-width: 196px; max-height: 128px;"/><br />';
+					$option .= '<input type="radio" value="' . $optionValue . '"' . $selected . ' name="' . $name . '" ' . $onChange . ' /> ' . $label;
+					$option .= '</label>';
+					$selector .= $option . LF;
+				} catch (Exception $error) {
+					$this->configurationService->debug($error);
 				}
-				$label = $configuration['label'];
-				if (NULL !== ($translatedLabel = Tx_Extbase_Utility_Localization::translate($label, $extensionName))) {
-					$label = $translatedLabel;
-				}
-				$optionValue = $extension . '->' . $template;
-				$selected = ($optionValue == $value ? ' checked="checked"' : '');
-				$option = '<label style="padding: 0.5em; border: 1px solid #CCC; display: inline-block; vertical-align: bottom; margin: 0 1em 1em 0; cursor: pointer; ' . ($selected ? 'background-color: #DDD;' : '')  . '">';
-				$option .= '<img src="' . $thumbnail . '" alt="' . $label . '" style="margin: 0.5em 0 0.5em 0; max-width: 196px; max-height: 128px;"/><br />';
-				$option .= '<input type="radio" value="' . $optionValue . '"' . $selected . ' name="' . $name . '" ' . $onChange . ' /> ' . $label;
-				$option .= '</label>';
-				$selector .= $option . LF;
 			}
 		}
 		$selector .= '</div>' . LF;
