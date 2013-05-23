@@ -157,6 +157,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	protected function getPositionPlaceholder($page) {
 		if ($page['pid'] != -1) {
 			// original, dont do anything
+			return $page;
 		} elseif ($page['t3ver_state'] == 0) {
 			// page has changed, but not moved
 			$page = t3lib_BEfunc::getRecord('pages', $page['t3ver_oid']);
