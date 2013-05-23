@@ -1,0 +1,21 @@
+language: php
+php:
+  - 5.3
+  - 5.4
+
+env:
+  - DB=mysql
+
+before_script:
+  - export REPOSITORY="fluidpages"
+  - git clone https://github.com/FluidTYPO3/TYPO3-Travis-Integration.git build-environment
+  - source build-environment/install-utilities.sh
+  - source build-environment/install-helper.sh
+
+script:
+# initial, quick inspection
+  - php build-environment/FluidTYPO3-CodingStandards/commit_message_inspector.php
+# phplint checking on all PHP source files in extension
+  - find $PWD -name *.php -exec phpLint {} --fails-on-warning --report-unused \;
+# PHPCodeSniffer code inspection with only errors displayed (no warnings)
+  - $PWD/build-environment/CodeSniffer/scripts/phpcs -n --standard=$PWD/build-environment/FluidTYPO3-CodingStandards/ruleset.xml $PWD
