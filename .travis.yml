@@ -10,8 +10,11 @@ before_script:
   - export REPOSITORY="fluidpages"
   - git clone https://github.com/FluidTYPO3/TYPO3-Travis-Integration.git build-environment
   - source build-environment/install-utilities.sh
-  - source build-environment/install-helper.sh
   - source build-environment/install-preserve-repository.sh
+  - source build-environment/install-helper.sh
+  - source build-environment/install-typo3.sh
+  - source build-environment/install-reintegrate-repository.sh
+  - source build-environment/install-phpunit-setup.sh
 
 script:
 # initial, quick inspection
