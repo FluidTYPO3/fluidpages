@@ -152,6 +152,19 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 					$templateRootPath = substr($templateRootPath, 0, -1);
 				}
 				$templatePathAndFilename = $templateRootPath . '/Page/' . $action . '.html';
+				if (TRUE === isset($paths['overlays']) && TRUE === is_array($paths['overlays'])) {
+					foreach ($paths['overlays'] as $possibleOverlayPaths) {
+						if (TRUE === isset($possibleOverlayPaths['templateRootPath'])) {
+							$overlayTemplateRootPath = $possibleOverlayPaths['templateRootPath'];
+							$overlayTemplateRootPath = rtrim($overlayTemplateRootPath, '/');
+							$possibleOverlayFile = t3lib_div::getFileAbsFileName($overlayTemplateRootPath . '/Page/' . $action . '.html');
+							if (TRUE === file_exists($possibleOverlayFile)) {
+								$templatePathAndFilename = $possibleOverlayFile;
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 		$templatePathAndFilename = t3lib_div::getFileAbsFileName($templatePathAndFilename);
