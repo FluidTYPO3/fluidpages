@@ -16,9 +16,9 @@ before_script:
   - source build-environment/install-reintegrate-repository.sh
   - source build-environment/install-phpunit-setup.sh
 # install dependencies
-  - git clone https://github.com/FluidTYPO3/flux.git
+  - git clone https://github.com/FluidTYPO3/flux.git $PWD/typo3conf/ext/flux
   - php $PWD/typo3/cli_dispatch.phpsh extbase builder:install flux
-  - git clone https://github.com/FluidTYPO3/vhs.git
+  - git clone https://github.com/FluidTYPO3/vhs.git $PWD/typo3conf/ext/vhs
   - php $PWD/typo3/cli_dispatch.phpsh extbase builder:install vhs
 
 script:
