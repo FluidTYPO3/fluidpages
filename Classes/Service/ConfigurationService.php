@@ -48,8 +48,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 	 * @api
 	 */
 	public function getPageConfiguration($extensionName = NULL) {
-		$cacheKey = NULL === $extensionName ? 0 : $extensionName;
-		$cacheKey = 'page_' . $cacheKey;
+		$cacheKey = NULL === $extensionName ? 'pages_global' : 'pages_' . $extensionName;
 		if (TRUE === isset(self::$cache[$cacheKey])) {
 			return self::$cache[$cacheKey];
 		}
