@@ -70,37 +70,46 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		}
 		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', 'fluidpages');
 		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', 'fed');
-		$merged = t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
+		$merged = (array) t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
 		$registeredExtensionKeys = Tx_Flux_Core::getRegisteredProviderExtensionKeys('Page');
 		if (NULL === $extensionName) {
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
-				$nativeViewLocation = $this->getPageConfiguration($registeredExtensionKey);
-				if (NULL === $nativeViewLocation) {
+				$extensionViewPaths = $this->getPageConfiguration($registeredExtensionKey);
+				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+					$extensionViewPaths['extensionKey'] = $registeredExtensionKey;
+				}
+				// preemptive caching; once read here, the cached value is returned when asking for specific extensions later
+				if (FALSE === isset($extensionViewPaths['templateRootPath'])) {
+					$this->sendWarningAboutMissingTemplatePath($registeredExtensionKey);
 					continue;
 				}
-				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
-					$nativeViewLocation['extensionKey'] = $registeredExtensionKey;
-				}
-				self::$cache[$registeredExtensionKey] = $nativeViewLocation;
-				$merged[$registeredExtensionKey] = $nativeViewLocation;
+				self::$cache[$registeredExtensionKey] = $extensionViewPaths;
+				$merged[$registeredExtensionKey] = $extensionViewPaths;
 			}
 		} else {
 			$nativeViewLocation = $this->getViewConfigurationForExtensionName($extensionName);
-			if (NULL !== $nativeViewLocation) {
-				if (FALSE === isset($nativeViewLocation['templateRootPath'])) {
-					$this->message('The extension-native view configuration for extension "' . $extensionName . '" does not contain ' .
-						'at least a templateRootPath. This indicates that the static TypoScript for the extension is not loaded or ' .
-						'it uses constants which are either not defined, cleared or set to an empty value', t3lib_div::SYSLOG_SEVERITY_FATAL);
-					return $merged;
-				}
-				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
-					$nativeViewLocation['extensionKey'] = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
-				}
-				$merged = t3lib_div::array_merge_recursive_overrule($merged, $nativeViewLocation);
+			if (TRUE === is_array($nativeViewLocation)) {
+				$merged = t3lib_div::array_merge_recursive_overrule($nativeViewLocation, $merged);
+			}
+			if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+				$merged['extensionKey'] = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+			}
+			if (FALSE === isset($merged['templateRootPath'])) {
+				$this->sendWarningAboutMissingTemplatePath($extensionName);
 			}
 		}
 		self::$cache[$cacheKey] = $merged;
 		return $merged;
+	}
+
+	/**
+	 * @param string $extensionName
+	 * @return void
+	 */
+	protected function sendWarningAboutMissingTemplatePath($extensionName) {
+		$this->message('The configuration for extension "' . $extensionName . '" does not contain ' .
+			'at least a templateRootPath. This indicates that the static TypoScript for the extension is not loaded or ' .
+			'it uses constants which are either not defined, cleared or set to an empty value', t3lib_div::SYSLOG_SEVERITY_FATAL);
 	}
 
 }
