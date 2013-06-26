@@ -68,11 +68,9 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 				$_GET['id'] = key($GLOBALS['SOBE']->editconf['pages']);
 			}
 		}
-		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', 'fluidpages');
-		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', 'fed');
-		$merged = (array) t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
-		$registeredExtensionKeys = Tx_Flux_Core::getRegisteredProviderExtensionKeys('Page');
+		$merged = array();
 		if (NULL === $extensionName) {
+			$registeredExtensionKeys = Tx_Flux_Core::getRegisteredProviderExtensionKeys('Page');
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$extensionViewPaths = $this->getPageConfiguration($registeredExtensionKey);
 				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
@@ -87,6 +85,9 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 				$merged[$registeredExtensionKey] = $extensionViewPaths;
 			}
 		} else {
+			$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', 'fluidpages');
+			$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', 'fed');
+			$merged = (array) t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
 			$nativeViewLocation = $this->getViewConfigurationForExtensionName($extensionName);
 			if (TRUE === is_array($nativeViewLocation)) {
 				$merged = t3lib_div::array_merge_recursive_overrule($nativeViewLocation, $merged);
