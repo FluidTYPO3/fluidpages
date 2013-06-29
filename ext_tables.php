@@ -3,7 +3,12 @@ if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
 
-t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Fluid Pages: PAGE');
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EXTCONF);
+if (TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['autoRender']) {
+	Tx_Flux_Core::addGlobalTypoScript('EXT:fluidpages/Configuration/TypoScript');
+} else {
+	t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Fluid Pages: PAGE');
+}
 
 t3lib_div::loadTCA('pages');
 t3lib_extMgm::addTCAcolumns('pages', array(
@@ -32,7 +37,6 @@ t3lib_extMgm::addTCAcolumns('pages', array(
 	),
 ), 1);
 
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EXTCONF);
 $doktypes = '0,1,4';
 $fields = 'tx_fed_page_controller_action,tx_fed_page_controller_action_sub,tx_fed_page_flexform';
 $position = 'before:layout';
@@ -52,3 +56,5 @@ if (FALSE === empty($additionalDoktypes)) {
 		$additionalDoktypes
 	);
 }
+
+unset($doktypes, $fields, $position, $additionalDoktypes);
