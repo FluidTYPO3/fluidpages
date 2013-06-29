@@ -7,6 +7,14 @@ Fluidpages: Fluid Page Templates
 
 [![Build Status](https://travis-ci.org/FluidTYPO3/fluidpages.png?branch=master)](https://travis-ci.org/FluidTYPO3/fluidpages)
 
+## Code Quality
+
+![Abstraction Instability Chart](Documentation/ComplexityChart.png)
+![Inheritance and dependency risk](Documentation/PyramidChart.png)
+
+_Understanding the [Abstraction Instability Chart](http://pdepend.org/documentation/handbook/reports/abstraction-instability-chart.html)
+and [Pyramid Chart](http://pdepend.org/documentation/handbook/reports/overview-pyramid.html)._
+
 ## What does it do?
 
 EXT:fluidpages enables the use of Fluid templates as page templates, each template file acting like an individual template. The
