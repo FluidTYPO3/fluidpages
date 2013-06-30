@@ -1,2 +1,4 @@
   # cat=basic/enable; type=input; label=Doktypes: CSV list of doktypes to add the page layout selectors to in addition to the default standard pages and shortcuts (0,1,4). Possible use cases are sysfolders (254) or custom page types.
 doktypes =
+  # cat=basic/enable; type=boolean; label=Use automatic TS inclusion: If enabled, a basic PAGE object which uses Fluid Pages is created automatically in all root templates, hidden from view in the BE.
+autoRender = 0
