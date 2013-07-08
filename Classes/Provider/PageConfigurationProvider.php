@@ -236,7 +236,7 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 			$config['parameters'] = array(
 				'userFunction' => 'Tx_Flux_UserFunction_NoSelection->renderField'
 			);
-			$dataStructure = $this->objectManager->create('Tx_Flux_Provider_Structure_FallbackStructureProvider')->render($config);
+			$dataStructure = $this->objectManager->get('Tx_Flux_Provider_Structure_FallbackStructureProvider')->render($config);
 			return NULL;
 		}
 		parent::postProcessDataStructure($row, $dataStructure, $conf);
