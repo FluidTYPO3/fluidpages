@@ -116,6 +116,31 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		return $page;
 	}
 
+    /**
+     * Return the original or workspace page depending on workspace-mode
+     *
+     * @param integer $pageUid
+     * @return array|bool
+     */
+    protected function getPage($pageUid) {
+
+        $table   = 'pages';
+        $wsId    = (int)$GLOBALS['BE_USER']->workspace;
+        $pageUid = (int)$pageUid;
+
+        if ( $pageUid === 0 )
+            return false;
+
+        // check if active workspace is available
+        if ( !$page = \TYPO3\CMS\Backend\Utility\BackendUtility::getWorkspaceVersionOfRecord($wsId, $table, $pageUid) ) {
+            // no workspace available ... use original one
+            $pgRepo = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
+            $page   = $pgRepo->getPage($pageUid);
+        }
+
+        return $page;
+    }
+
 	/**
 	 * Gets the workspace parent for a given page
 	 *
