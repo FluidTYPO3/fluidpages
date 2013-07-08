@@ -141,6 +141,19 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
         return $page;
     }
 
+    /**
+     * Return parent page array
+     *
+     * @param array $page
+     * @return array|bool
+     */
+    protected function getPageParent($page) {
+        // try to get the original page
+        $live  = \TYPO3\CMS\Backend\Utility\BackendUtility::getLiveVersionOfRecord('pages', (int)$page['uid']);
+        $live  = $live === null ? $page : $live;
+        return $this->getPage( (int)$live['pid'] );
+    }
+
 	/**
 	 * Gets the workspace parent for a given page
 	 *
