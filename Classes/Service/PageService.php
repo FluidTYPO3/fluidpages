@@ -88,33 +88,86 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @api
 	 */
 	public function getPageTemplateConfiguration($pageUid) {
-		if ($pageUid < 1) {
-			return NULL;
-		}
-		$cacheKey = 'page_' . $pageUid;
-		if (TRUE === isset(self::$cache[$cacheKey])) {
-			return self::$cache[$cacheKey];
-		}
-		$pageSelect = new t3lib_pageSelect();
-		$page = $pageSelect->getPage($pageUid);
-		if (strpos($page['tx_fed_page_controller_action'], '->')) {
-			return $page;
-		}
-		do {
-			$page = $this->getWorkspaceParentPage($page);
-			$workspacePage = NULL;
-			$workspacePage = $this->getWorkspacePage($page);
-			if ($workspacePage) {
-				$page = $workspacePage;
-			}
-		} while ($page && !strpos($page['tx_fed_page_controller_action_sub'], '->'));
-		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
-		if (TRUE === empty($page['tx_fed_page_controller_action'])) {
-			$page = NULL;
-		}
-		self::$cache[$cacheKey] = $page;
-		return $page;
+
+        $pageUid  = (int)$pageUid;
+        $wsId     = (int)$GLOBALS['BE_USER']->workspace;
+        $cacheKey = 'page_uid' . $pageUid . '_wsid' . $wsId;
+
+        if ( $pageUid < 1 ) {
+            return NULL;
+        }
+
+        if (TRUE === isset(self::$cache[$cacheKey])) {
+            return self::$cache[$cacheKey];
+        }
+
+        $page = $this->getPage($pageUid);
+
+        // if page has a controller action
+        if (strpos($page['tx_fed_page_controller_action'], '->')) {
+            return $page;
+        }
+
+        // if no controller action was found loop through rootline
+        do {
+            $page = $this->getPageParent($page);
+        } while ($page && !strpos($page['tx_fed_page_controller_action_sub'], '->'));
+
+        if ( !$page ) {
+            self::$cache[$cacheKey] = NULL;
+            return NULL;
+        }
+
+        $page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
+
+        if (TRUE === empty($page['tx_fed_page_controller_action'])) {
+            $page = NULL;
+        }
+
+        self::$cache[$cacheKey] = $page;
+
+        return $page;
+
 	}
+
+    /**
+     * Return the original or workspace page depending on workspace-mode
+     *
+     * @param integer $pageUid
+     * @return array|bool
+     */
+    protected function getPage($pageUid) {
+
+        $table   = 'pages';
+        $wsId    = (int)$GLOBALS['BE_USER']->workspace;
+        $pageUid = (int)$pageUid;
+
+        if ( $pageUid === 0 ) {
+            return FALSE;
+        }
+
+        // check if active workspace is available
+        if ( !$page = \TYPO3\CMS\Backend\Utility\BackendUtility::getWorkspaceVersionOfRecord($wsId, $table, $pageUid) ) {
+            // no workspace available ... use original one
+            $pgRepo = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
+            $page   = $pgRepo->getPage($pageUid);
+        }
+
+        return $page;
+    }
+
+    /**
+     * Return parent page array
+     *
+     * @param array $page
+     * @return array|bool
+     */
+    protected function getPageParent($page) {
+        // try to get the original page
+        $live  = \TYPO3\CMS\Backend\Utility\BackendUtility::getLiveVersionOfRecord('pages', (int)$page['uid']);
+        $live  = $live === NULL ? $page : $live;
+        return $this->getPage( (int)$live['pid'] );
+    }
 
 	/**
 	 * Gets the workspace parent for a given page
@@ -177,29 +230,34 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @api
 	 */
 	public function getPageFlexFormSource($pageUid) {
-		if ($pageUid < 1) {
-			return NULL;
-		}
-		$cacheKey = 'flexform_' . $pageUid;
-		if (TRUE === isset(self::$cache[$cacheKey])) {
-			return self::$cache[$cacheKey];
-		}
-		$pageSelect = new t3lib_pageSelect();
-		$page = $pageSelect->getPage($pageUid);
-		$page = $this->getWorkspacePage($page);
-		while ($page['uid'] != 0 && empty($page['tx_fed_page_flexform'])) {
-			$page = $this->getWorkspaceParentPage($page);
-			$workspacePage = NULL;
-			$workspacePage = $this->getWorkspacePage($page);
-			if ($workspacePage) {
-				$page = $workspacePage;
-			}
-		};
-		if (empty($page['tx_fed_page_flexform'])) {
-			return NULL;
-		}
-		self::$cache[$cacheKey] = $page['tx_fed_page_flexform'];
-		return $page['tx_fed_page_flexform'];
+
+        $pageUid  = (int)$pageUid;
+        $wsId     = (int)$GLOBALS['BE_USER']->workspace;
+        $cacheKey = 'flexform_uid' . $pageUid . '_wsid' . $wsId;
+
+        if ( $pageUid < 1 ) {
+            return NULL;
+        }
+
+        if (TRUE === isset(self::$cache[$cacheKey])) {
+            return self::$cache[$cacheKey];
+        }
+
+        $page = $this->getPage($pageUid);
+
+        while ($page['uid'] != 0 && empty($page['tx_fed_page_flexform'])) {
+            $page = $this->getPageParent($page);
+        };
+
+        if (empty($page['tx_fed_page_flexform'])) {
+            self::$cache[$cacheKey] = NULL;
+            return NULL;
+        }
+
+        self::$cache[$cacheKey] = $page['tx_fed_page_flexform'];
+
+        return $page['tx_fed_page_flexform'];
+
 	}
 
 	/**
