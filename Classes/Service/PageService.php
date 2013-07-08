@@ -93,8 +93,9 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
         $wsId     = (int)$GLOBALS['BE_USER']->workspace;
         $cacheKey = 'page_uid' . $pageUid . '_wsid' . $wsId;
 
-        if ( $pageUid < 1 )
+        if ( $pageUid < 1 ) {
             return NULL;
+        }
 
         if (TRUE === isset(self::$cache[$cacheKey])) {
             return self::$cache[$cacheKey];
@@ -141,8 +142,9 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
         $wsId    = (int)$GLOBALS['BE_USER']->workspace;
         $pageUid = (int)$pageUid;
 
-        if ( $pageUid === 0 )
-            return false;
+        if ( $pageUid === 0 ) {
+            return FALSE;
+        }
 
         // check if active workspace is available
         if ( !$page = \TYPO3\CMS\Backend\Utility\BackendUtility::getWorkspaceVersionOfRecord($wsId, $table, $pageUid) ) {
@@ -163,7 +165,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
     protected function getPageParent($page) {
         // try to get the original page
         $live  = \TYPO3\CMS\Backend\Utility\BackendUtility::getLiveVersionOfRecord('pages', (int)$page['uid']);
-        $live  = $live === null ? $page : $live;
+        $live  = $live === NULL ? $page : $live;
         return $this->getPage( (int)$live['pid'] );
     }
 
@@ -233,8 +235,9 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
         $wsId     = (int)$GLOBALS['BE_USER']->workspace;
         $cacheKey = 'flexform_uid' . $pageUid . '_wsid' . $wsId;
 
-        if ( $pageUid < 1 )
+        if ( $pageUid < 1 ) {
             return NULL;
+        }
 
         if (TRUE === isset(self::$cache[$cacheKey])) {
             return self::$cache[$cacheKey];
