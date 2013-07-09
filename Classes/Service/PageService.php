@@ -88,33 +88,47 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @api
 	 */
 	public function getPageTemplateConfiguration($pageUid) {
-		if ($pageUid < 1) {
-			return NULL;
-		}
-		$cacheKey = 'page_' . $pageUid;
-		if (TRUE === isset(self::$cache[$cacheKey])) {
-			return self::$cache[$cacheKey];
-		}
-		$pageSelect = new t3lib_pageSelect();
-		$page = $pageSelect->getPage($pageUid);
-		if (strpos($page['tx_fed_page_controller_action'], '->')) {
-			return $page;
-		}
-		do {
-			$page = $this->getWorkspaceParentPage($page);
-			$workspacePage = NULL;
-			$workspacePage = $this->getWorkspacePage($page);
-			if ($workspacePage) {
-				$page = $workspacePage;
-			}
-		} while ($page && !strpos($page['tx_fed_page_controller_action_sub'], '->'));
-		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
-		if (TRUE === empty($page['tx_fed_page_controller_action'])) {
-			$page = NULL;
-		}
-		self::$cache[$cacheKey] = $page;
-		return $page;
-	}
+
+        $pageUid  = (int)$pageUid;
+        $wsId     = (int)$GLOBALS['BE_USER']->workspace;
+        $cacheKey = 'page_uid' . $pageUid . '_wsid' . $wsId;
+
+        if ( $pageUid < 1 ) {
+            return NULL;
+        }
+
+        if (TRUE === isset(self::$cache[$cacheKey])) {
+            return self::$cache[$cacheKey];
+        }
+
+        $page = $this->getPage($pageUid);
+
+        // if page has a controller action
+        if (strpos($page['tx_fed_page_controller_action'], '->')) {
+            return $page;
+        }
+
+        // if no controller action was found loop through rootline
+        do {
+            $page = $this->getPageParent($page);
+        } while ($page && !strpos($page['tx_fed_page_controller_action_sub'], '->'));
+
+        if ( !$page ) {
+            self::$cache[$cacheKey] = NULL;
+            return NULL;
+        }
+
+        $page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
+
+        if (TRUE === empty($page['tx_fed_page_controller_action'])) {
+            $page = NULL;
+        }
+
+        self::$cache[$cacheKey] = $page;
+
+        return $page;
+
+    }
 
     /**
      * Return the original or workspace page depending on workspace-mode
