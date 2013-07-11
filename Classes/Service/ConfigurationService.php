@@ -52,6 +52,17 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		if (TRUE === isset(self::$cache[$cacheKey])) {
 			return self::$cache[$cacheKey];
 		}
+		if (NULL !== $extensionName && TRUE === empty($extensionName)) {
+			// Note: a NULL extensionName means "fetch ALL defined collections" whereas
+			// an empty value that is not null indicates an incorrect caller. Instead
+			// of returning ALL paths here, an empty array is the proper return value.
+			// However, dispatch a debug message to inform integrators of the problem.
+			$this->message('Template paths have been attempted fetched using an empty value that is NOT NULL in ' . get_class(this) .
+				'. This indicates a potential problem with your TypoScript configuration - a value which is expected to be ' .
+			    'an array may be defined as a string. This error is not fatal but may prevent the affected collection (which cannot ' .
+				'be identified here) from showing up', t3lib_div::SYSLOG_SEVERITY_NOTICE);
+			return array();
+		}
 		if (TYPO3_MODE === 'BE') {
 			// Hack. This is no fun matter, but the TYPO3 BackendConfigurationManager
 			// is incapable of considering how to fetch a page UID from the "editconf"
