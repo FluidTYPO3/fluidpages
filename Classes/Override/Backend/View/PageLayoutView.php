@@ -74,6 +74,8 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 			$config = array();
 			$this->backendLayout->postProcessBackendLayout($this->id, $config);
 			$typoScriptArray = $config['__config'];
+			$typoScriptArray['colCount'] = $config['__config']['backend_layout.']['colCount'];
+			$typoScriptArray['rowCount'] = $config['__config']['backend_layout.']['rowCount'];
 			$typoScriptArray['rows.'] = $config['__config']['backend_layout.']['rows.'];
 			unset($typoScriptArray['backend_layout.']);
 			$config['config'] = $this->compactTypoScriptArray(array('backend_layout.' => $typoScriptArray));
