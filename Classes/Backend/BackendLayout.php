@@ -105,9 +105,9 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 		}
 
 		$config = array(
-			'colCount' => 0,
-			'rowCount' => 0,
 			'backend_layout.' => array(
+				'colCount' => 0,
+				'rowCount' => 0,
 				'rows.' => array()
 			)
 		);
@@ -122,7 +122,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 				$key = ($index + 1) . '.';
 				$columns[$key] = array(
 					'name' => $column['name'],
-					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['colCount'],
+					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['backend_layout.']['colCount']
 				);
 				if ($column['colspan']) {
 					$columns[$key]['colspan'] = $column['colspan'];
@@ -134,8 +134,8 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 				array_push($items, array($columns[$key]['name'], $columns[$key]['colPos'], NULL));
 				$colCount += $column['colspan'] ? $column['colspan'] : 1;
 			}
-			$config['colCount'] = max($config['colCount'], $colCount);
-			$config['rowCount']++;
+			$config['backend_layout.']['colCount'] = max($config['backend_layout.']['colCount'], $colCount);
+			$config['backend_layout.']['rowCount']++;
 			$config['backend_layout.']['rows.'][$rowKey] = array(
 				'columns.' => $columns
 			);
