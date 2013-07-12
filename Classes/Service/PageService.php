@@ -123,7 +123,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * Return the original or workspace page depending on workspace-mode
 	 *
 	 * @param integer $pageUid
-	 * @return array|bool
+	 * @return array|boolean
 	 */
 	protected function getPage($pageUid) {
 		$table = 'pages';
@@ -145,7 +145,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * Return parent page array
 	 *
 	 * @param array $page
-	 * @return array|bool
+	 * @return array|boolean
 	 */
 	protected function getPageParent($page) {
 		// try to get the original page
