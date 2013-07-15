@@ -64,36 +64,31 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	public function postProcessBackendLayout(&$pageUid, &$backendLayout) {
 		try {
 			$record = $this->pageService->getPageTemplateConfiguration($pageUid);
-			$variables = array();
-			list ($extensionName, $action) = explode('->', $record['tx_fed_page_controller_action']);
+			$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $record);
+			$action = $provider->getControllerActionFromRecord($record);
 			if (TRUE === empty($action)) {
 				$this->configurationService->message('No template selected - backend layout will not be rendered', t3lib_div::SYSLOG_SEVERITY_INFO);
 				return;
 			}
-			$paths = $this->configurationService->getPageConfiguration($extensionName);
-			if (0 === count($paths) && FALSE === (boolean) t3lib_div::_GET('redirected')) {
-				if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
-					// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
-					$get = t3lib_div::_GET();
-					unset($get['id']);
-					$get['redirected'] = 1;
-					$params = t3lib_div::implodeArrayForUrl('', $get);
-					header('Location: ?id=' . $pageUid . $params);
-					exit();
-				}
-				return;
-			}
+			$paths = $provider->getTemplatePaths($record);
 			if (0 === count($paths)) {
+				if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
+					if (FALSE === (boolean) t3lib_div::_GET('redirected')) {
+						// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
+						$get = t3lib_div::_GET();
+						unset($get['id']);
+						$get['redirected'] = 1;
+						$params = t3lib_div::implodeArrayForUrl('', $get);
+						header('Location: ?id=' . $pageUid . $params);
+						exit();
+					}
+					return;
+				}
 				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
 					. 'have included the TypoScript for the desired template collection.', t3lib_div::SYSLOG_SEVERITY_NOTICE);
 				return;
 			}
-			$flexFormSource = isset($record['tx_fed_page_flexform']) ? $record['tx_fed_page_flexform'] : NULL;
-			if ($flexFormSource !== NULL) {
-				$variables = $this->configurationService->convertFlexFormContentToArray($flexFormSource);
-			}
-			$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
-			$grid = $this->configurationService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths, $extensionName);
+			$grid = $provider->getGrid($record)->build();
 			if (is_array($grid) === FALSE) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior
 				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
@@ -113,12 +108,13 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 		);
 		$colPosList = array();
 		$items = array();
-
-		foreach ($grid as $rowIndex => $row) {
+		$rowIndex = 0;
+		foreach ($grid['rows'] as $row) {
+			$index = 0;
 			$colCount = 0;
 			$rowKey = ($rowIndex + 1) . '.';
 			$columns = array();
-			foreach ($row as $index => $column) {
+			foreach ($row['columns'] as $column) {
 				$key = ($index + 1) . '.';
 				$columns[$key] = array(
 					'name' => $column['name'],
@@ -133,12 +129,14 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 				array_push($colPosList, $columns[$key]['colPos']);
 				array_push($items, array($columns[$key]['name'], $columns[$key]['colPos'], NULL));
 				$colCount += $column['colspan'] ? $column['colspan'] : 1;
+				++ $index;
 			}
 			$config['backend_layout.']['colCount'] = max($config['backend_layout.']['colCount'], $colCount);
 			$config['backend_layout.']['rowCount']++;
 			$config['backend_layout.']['rows.'][$rowKey] = array(
 				'columns.' => $columns
 			);
+			++ $rowIndex;
 		}
 		unset($backendLayout['config']);
 		$backendLayout['__config'] = $config;
