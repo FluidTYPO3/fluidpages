@@ -120,10 +120,10 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 			$colCount = 0;
 			$rowKey = ($rowIndex + 1) . '.';
 			$columns = array();
-			foreach ($row['columns'] as $column) {
+			foreach ($row['columns'] as $name => $column) {
 				$key = ($index + 1) . '.';
 				$columns[$key] = array(
-					'name' => $column['name'],
+					'name' => $name,
 					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['backend_layout.']['colCount']
 				);
 				if ($column['colspan']) {
