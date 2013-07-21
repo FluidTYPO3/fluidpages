@@ -64,6 +64,12 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	public function postProcessBackendLayout(&$pageUid, &$backendLayout) {
 		try {
 			$record = $this->pageService->getPageTemplateConfiguration($pageUid);
+
+			// Stop processing if no fluidpages template configured in rootline
+			if (NULL === $record) {
+				return;
+			}
+
 			$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $record);
 			$action = $provider->getControllerActionFromRecord($record);
 			if (TRUE === empty($action)) {
