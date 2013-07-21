@@ -172,33 +172,6 @@ class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_
 	}
 
 	/**
-	 * @param array $row
-	 * @return array|NULL
-	 */
-	public function getTemplateVariables(array $row) {
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		$action = $configuration['tx_fed_page_controller_action'];
-		list ($extensionName, $action) = explode('->', $action);
-		$paths = Tx_Flux_Utility_Path::translatePath((array) $this->configurationService->getPageConfiguration($extensionName));
-		$templateRootPath = $paths['templateRootPath'];
-		if ('/' === substr($templateRootPath, -1)) {
-			$templateRootPath = substr($templateRootPath, 0, -1);
-		}
-		$templatePathAndFilename = $templateRootPath . '/Page/' . $action . '.html';
-		if (FALSE === file_exists($templatePathAndFilename)) {
-			return NULL;
-		}
-		$stored = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
-		if (NULL === $stored) {
-			$this->configurationService->message('A valid configuration could not be retrieved from file ' . $templatePathAndFilename .
-				' - processing aborted; see earlier errors', t3lib_div::SYSLOG_SEVERITY_FATAL);
-			return NULL;
-		}
-		$this->configurationService->message('Flux is able to read template variables from file ' . $templatePathAndFilename, t3lib_div::SYSLOG_SEVERITY_INFO);
-		return $stored;
-	}
-
-	/**
 	 * Gets an inheritance tree (ordered parent -> ... -> this record)
 	 * of record arrays containing raw values.
 	 *
