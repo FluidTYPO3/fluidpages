@@ -109,12 +109,16 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 						$this->configurationService->message('Missing template file: ' . $templatePathAndFilename);
 						continue;
 					}
-					$configuration = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $paths, $extensionName);
-					$thumbnail = $configuration['icon'];
-					if (FALSE === (boolean) $configuration['enabled']) {
+					$form = $this->configurationService->getFormFromTemplateFile($templatePathAndFilename, 'Configuration', 'form', $paths, $extensionName);
+					if (FALSE === $form instanceof Tx_Flux_Form) {
+						$this->configurationService->message('Template file ' . $templatePathAndFilename . ' contains an unparsable Form definition', t3lib_div::SYSLOG_SEVERITY_FATAL);
 						continue;
 					}
-					$label = $configuration['label'];
+					if (FALSE === $form->getEnabled()) {
+						continue;
+					}
+					$thumbnail = $form->getIcon();
+					$label = $form->getLabel();
 					if (NULL !== ($translatedLabel = Tx_Extbase_Utility_Localization::translate($label, $extensionName))) {
 						$label = $translatedLabel;
 					}
