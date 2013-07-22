@@ -125,7 +125,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @param integer $pageUid
 	 * @return array|boolean
 	 */
-	protected function getPage($pageUid) {
+	public function getPage($pageUid) {
 		$table = 'pages';
 		$wsId = intval($GLOBALS['BE_USER']->workspace);
 		$pageUid = intval($pageUid);
@@ -150,7 +150,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	protected function getPageParent($page) {
 		// try to get the original page
 		$live = t3lib_BEfunc::getLiveVersionIdOfRecord('pages', intval($page['uid']));
-		$live = ($live === NULL ? $page : $live);
+		$live = NULL === $live ? $page : $live;
 		return $this->getPage($live['pid']);
 	}
 
@@ -174,11 +174,12 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @return array
 	 */
 	protected function getWorkspacePage($page) {
-		if ($page) {
-			$wsid = $GLOBALS['BE_USER']->workspace ?: 0;
-			if ($wsid != 0 && $page['t3ver_wsid'] != $wsid) {
+		if (TRUE === is_array($page) && 0 < count($page)) {
+			$wsid = $GLOBALS['BE_USER']->workspace ? : 0;
+			$wsid = intval($wsid);
+			if (0 !== $wsid && intval($page['t3ver_wsid']) !== $wsid) {
 				$workspacePage = t3lib_BEfunc::getRecordRaw('pages', $where = sprintf('t3ver_oid=%d AND t3ver_wsid=%d', $page['uid'], $wsid), $fields = '*');
-				if ($workspacePage !== NULL) {
+				if (NULL !== $workspacePage) {
 					$page = $workspacePage;
 				}
 			}
@@ -193,13 +194,13 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @return array
 	 */
 	protected function getPositionPlaceholder($page) {
-		if ($page['pid'] != -1) {
+		if (-1 !== intval($page['pid'])) {
 			// original, dont do anything
 			return $page;
-		} elseif ($page['t3ver_state'] == 0) {
+		} elseif (0 === intval($page['t3ver_state'])) {
 			// page has changed, but not moved
 			$page = t3lib_BEfunc::getRecord('pages', $page['t3ver_oid']);
-		} elseif ($page['t3ver_state'] == 4) {
+		} elseif (4 === intval($page['t3ver_state'])) {
 			// page has moved. get placeholder for new position
 			$page = t3lib_BEfunc::getRecordRaw('pages', $where = sprintf('t3ver_move_id=%d AND t3ver_state=3', $page['t3ver_oid']), $fields = '*');
 		}
@@ -233,7 +234,6 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		}
 		self::$cache[$cacheKey] = $page['tx_fed_page_flexform'];
 		return $page['tx_fed_page_flexform'];
-
 	}
 
 	/**
@@ -276,11 +276,11 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	public function getAvailablePageTemplateFiles($format = 'html') {
 		$typoScript = $this->configurationService->getPageConfiguration();
 		$output = array();
-		if (is_array($typoScript) === FALSE) {
+		if (FALSE === is_array($typoScript)) {
 			return $output;
 		}
 		foreach ($typoScript as $extensionName=>$group) {
-			if (isset($group['enable']) === TRUE && $group['enable'] < 1) {
+			if (TRUE === isset($group['enable']) && 1 > $group['enable']) {
 				continue;
 			}
 			if (FALSE === isset($group['templateRootPath'])) {
@@ -297,13 +297,13 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			}
 			$files = scandir($path);
 			$output[$extensionName] = array();
-			foreach ($files as $k=>$file) {
+			foreach ($files as $key => $file) {
 				$pathinfo = pathinfo($path . $file);
 				$extension = $pathinfo['extension'];
-				if (substr($file, 0, 1) === '.') {
-					unset($files[$k]);
+				if ('.' === substr($file, 0, 1)) {
+					unset($files[$key]);
 				} else if (strtolower($extension) != strtolower($format)) {
-					unset($files[$k]);
+					unset($files[$key]);
 				} else {
 					try {
 						$this->getPageTemplateLabel($extensionName, $path . $file);
