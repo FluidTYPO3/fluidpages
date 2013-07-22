@@ -125,7 +125,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @param integer $pageUid
 	 * @return array|boolean
 	 */
-	protected function getPage($pageUid) {
+	public function getPage($pageUid) {
 		$table = 'pages';
 		$wsId = intval($GLOBALS['BE_USER']->workspace);
 		$pageUid = intval($pageUid);
