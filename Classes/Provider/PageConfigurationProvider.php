@@ -30,7 +30,7 @@
  * @package Fluidpages
  * @subpackage Provider
  */
-class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_AbstractConfigurationProvider implements Tx_Flux_Provider_ConfigurationProviderInterface {
+class Tx_Fluidpages_Provider_PageConfigurationProvider extends Tx_Flux_Provider_AbstractProvider implements Tx_Flux_Provider_ProviderInterface {
 
 	/**
 	 * @var string
