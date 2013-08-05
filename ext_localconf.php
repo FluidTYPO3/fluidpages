@@ -4,7 +4,7 @@ if (!defined ('TYPO3_MODE')) {
 }
 
 Tx_Flux_Core::unregisterConfigurationProvider('Tx_Fed_Provider_Configuration_PageConfigurationProvider');
-Tx_Flux_Core::registerConfigurationProvider('Tx_Fluidpages_Provider_PageConfigurationProvider');
+Tx_Flux_Core::registerConfigurationProvider('Tx_Fluidpages_Provider_PageProvider');
 
 Tx_Extbase_Utility_Extension::configurePlugin(
 	$_EXTKEY,
