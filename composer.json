@@ -1,0 +1,9 @@
+{
+    "name": "ft3/fluidpages",
+    "description": "The fluidpages package from FluidTYPO3",
+    "require": {
+        "composer/installers": "*",
+        "ft3/flux": "*"
+    },
+    "type": "typo3-cms-extension"
+}
