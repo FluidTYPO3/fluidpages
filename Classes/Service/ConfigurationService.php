@@ -57,7 +57,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 			// an empty value that is not null indicates an incorrect caller. Instead
 			// of returning ALL paths here, an empty array is the proper return value.
 			// However, dispatch a debug message to inform integrators of the problem.
-			$this->message('Template paths have been attempted fetched using an empty value that is NOT NULL in ' . get_class(this) .
+			$this->message('Template paths have been attempted fetched using an empty value that is NOT NULL in ' . get_class($this) .
 				'. This indicates a potential problem with your TypoScript configuration - a value which is expected to be ' .
 			    'an array may be defined as a string. This error is not fatal but may prevent the affected collection (which cannot ' .
 				'be identified here) from showing up', t3lib_div::SYSLOG_SEVERITY_NOTICE);
