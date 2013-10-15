@@ -53,7 +53,7 @@ class Tx_Fluidpages_Override_Backend_View_BackendLayoutView extends TYPO3\CMS\Ba
 		/** @var $backendLayout Tx_Fluidpages_Backend_BackendLayout */
 		$backendLayout = $objectManager->get('Tx_Fluidpages_Backend_BackendLayout');
 		$this->injectBackendLayout($backendLayout);
-		if (TRUE === method_exists($this, '__construct')) {
+		if (TRUE === in_array('__construct', get_class_methods('TYPO3\CMS\Backend\View\BackendLayoutView'))) {
 			parent::__construct();
 		}
 	}
