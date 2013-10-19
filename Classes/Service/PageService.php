@@ -333,4 +333,3 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	}
 
 }
-
