@@ -58,7 +58,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	protected $configurationSectionName = 'Configuration';
 
 	/**
-	 * @var t3lib_flexFormTools
+	 * @var t3lib_flexformtools
 	 */
 	protected $flexformTool;
 
@@ -81,7 +81,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
-		$this->flexformTool = t3lib_div::makeInstance('t3lib_flexFormTools');
+		$this->flexformTool = t3lib_div::makeInstance('t3lib_flexformtools');
 	}
 
 	/**
