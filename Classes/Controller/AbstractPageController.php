@@ -43,11 +43,6 @@ abstract class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_C
 	protected $fluxTableName = 'pages';
 
 	/**
-	 * @var string
-	 */
-	protected $fallbackExtensionKey = 'fluidpages';
-
-	/**
 	 * @var Tx_Fluidpages_Service_PageService
 	 */
 	protected $pageService;
