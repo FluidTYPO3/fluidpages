@@ -105,10 +105,6 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 * @return string
 	 */
 	public function getExtensionKey(array $row) {
-		$paths = $this->getTemplatePaths($row);
-		if (TRUE === isset($paths['extensionKey'])) {
-			return $paths['extensionKey'];
-		}
 		$controllerExtensionKey = $this->getControllerExtensionKeyFromRecord($row);
 		if (FALSE === empty($controllerExtensionKey)) {
 			return $controllerExtensionKey;
@@ -118,22 +114,16 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 
 	/**
 	 * @param array $row
-	 * @return array|NULL
+	 * @return array
 	 */
 	public function getTemplatePaths(array $row) {
-		$paths = NULL;
-		try {
-			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-			if ($configuration['tx_fed_page_controller_action']) {
-				$action = $configuration['tx_fed_page_controller_action'];
-				list ($extensionName, $action) = explode('->', $action);
-				$paths = $this->configurationService->getPageConfiguration($extensionName);
-			}
-		} catch (Exception $error) {
-			$this->configurationService->debug($error);
+		$extensionName = $this->getExtensionKey($row);
+		$paths = $this->configurationService->getPageConfiguration($extensionName);
+		if (TRUE === is_array($paths) && FALSE === empty($paths)) {
+			return $paths;
 		}
-		$paths = Tx_Flux_Utility_Path::translatePath($paths);
-		return $paths;
+
+		return parent::getTemplatePaths($row);
 	}
 
 	/**
@@ -222,9 +212,12 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	public function getControllerExtensionKeyFromRecord(array $row) {
 		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
 		$action = $configuration['tx_fed_page_controller_action'];
-		$extensionName = array_shift(explode('->', $action));
-		$extensionKey = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
-		return $extensionKey;
+		if (FALSE !== strpos($action, '->')) {
+			$extensionName = array_shift(explode('->', $action));
+			$extensionKey = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+			return $extensionKey;
+		}
+		return parent::getControllerExtensionKeyFromRecord($row);
 	}
 
 	/**
