@@ -71,7 +71,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		$name = $parameters['itemFormElName'];
 		$value = $parameters['itemFormElValue'];
 		$availableTemplates = $this->pageService->getAvailablePageTemplateFiles();
-		if (strpos($name, 'tx_fed_controller_action_sub') === FALSE) {
+		if (FALSE === strpos($name, 'tx_fed_controller_action_sub')) {
 			$onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
 		}
 		$selector = '<div>';
@@ -83,14 +83,14 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		if (FALSE === $pageIsSiteRoot || TRUE === $forceDisplayInheritSiteRoot || FALSE === $hideInheritFieldSiteRoot) {
 			if (FALSE === $forceHideInherit) {
 				$emptyLabel = Tx_Extbase_Utility_Localization::translate('pages.tx_fed_page_controller_action.default', 'Fluidpages');
-				$selected = (TRUE === empty($value) ? ' checked="checked" ' : NULL);
+				$selected = TRUE === empty($value) ? ' checked="checked" ' : NULL;
 				$selector .= '<label>';
 				$selector .= '<input type="radio" name="' . $name . '" ' . $onChange . '" value="" ' . $selected . '/> ' . $emptyLabel . LF;
 				$selector .= '</label>' . LF;
 			}
 		}
 		foreach ($availableTemplates as $extension=>$group) {
-			if (!t3lib_extMgm::isLoaded($extension)) {
+			if (FALSE === t3lib_extMgm::isLoaded($extension)) {
 				$groupTitle = ucfirst($extension);
 			} else {
 				$emConfigFile = t3lib_extMgm::extPath($extension, 'ext_emconf.php');
@@ -119,7 +119,8 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 					}
 					$thumbnail = $form->getIcon();
 					$label = $form->getLabel();
-					if (NULL !== ($translatedLabel = Tx_Extbase_Utility_Localization::translate($label, $extensionName))) {
+					$translatedLabel = Tx_Extbase_Utility_Localization::translate($label, $extensionName);
+					if (NULL !== $translatedLabel) {
 						$label = $translatedLabel;
 					}
 					$optionValue = $extension . '->' . $template;

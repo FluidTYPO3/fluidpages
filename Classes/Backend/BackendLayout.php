@@ -59,7 +59,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	 *
 	 * @param integer $pageUid Starting page UID in the rootline (this current page)
 	 * @param array $backendLayout The backend layout which was detected from page id
-	 * @return void
+	 * @return NULL|void
 	 */
 	public function postProcessBackendLayout(&$pageUid, &$backendLayout) {
 		try {
@@ -67,14 +67,14 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 
 			// Stop processing if no fluidpages template configured in rootline
 			if (NULL === $record) {
-				return;
+				return NULL;
 			}
 
 			$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $record);
 			$action = $provider->getControllerActionFromRecord($record);
 			if (TRUE === empty($action)) {
 				$this->configurationService->message('No template selected - backend layout will not be rendered', t3lib_div::SYSLOG_SEVERITY_INFO);
-				return;
+				return NULL;
 			}
 			$paths = $provider->getTemplatePaths($record);
 			if (0 === count($paths)) {
@@ -88,21 +88,21 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 						header('Location: ?id=' . $pageUid . $params);
 						exit();
 					}
-					return;
+					return NULL;
 				}
 				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
 					. 'have included the TypoScript for the desired template collection.', t3lib_div::SYSLOG_SEVERITY_NOTICE);
-				return;
+				return NULL;
 			}
 			$grid = $provider->getGrid($record)->build();
-			if (is_array($grid) === FALSE) {
+			if (FALSE === is_array($grid)) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior
 				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
-				return;
+				return NULL;
 			}
 		} catch (Exception $error) {
 			$this->configurationService->debug($error);
-			return;
+			return NULL;
 		}
 
 		$config = array(
