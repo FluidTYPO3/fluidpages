@@ -120,6 +120,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 		$extensionName = $this->getExtensionKey($row);
 		$paths = $this->configurationService->getPageConfiguration($extensionName);
 		if (TRUE === is_array($paths) && FALSE === empty($paths)) {
+			$paths = Tx_Flux_Utility_Path::translatePath($paths);
 			return $paths;
 		}
 
