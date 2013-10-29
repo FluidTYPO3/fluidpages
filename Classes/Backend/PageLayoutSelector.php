@@ -89,6 +89,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 				$selector .= '</label>' . LF;
 			}
 		}
+		$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $parameters['row']);
 		foreach ($availableTemplates as $extension=>$group) {
 			if (FALSE === t3lib_extMgm::isLoaded($extension)) {
 				$groupTitle = ucfirst($extension);
@@ -102,7 +103,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 			$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
 			foreach ($group as $template) {
 				try {
-					$paths = $this->configurationService->getPageConfiguration($extension);
+					$paths = $provider->getTemplatePaths($parameters['row']);
 					$extensionName = t3lib_div::underscoredToUpperCamelCase($extension);
 					$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
 					if (FALSE === file_exists($templatePathAndFilename)) {
