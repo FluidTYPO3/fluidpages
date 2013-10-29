@@ -122,8 +122,12 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 			$columns = array();
 			foreach ($row['columns'] as $name => $column) {
 				$key = ($index + 1) . '.';
+				$columnName = $GLOBALS['LANG']->sL($column['label']);
+				if (NULL === $columnName) {
+					$columnName = $column['label'];
+				}
 				$columns[$key] = array(
-					'name' => $column['label'],
+					'name' => $columnName,
 					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['backend_layout.']['colCount']
 				);
 				if ($column['colspan']) {
