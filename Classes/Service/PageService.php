@@ -327,6 +327,9 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		if (TRUE === file_exists($template)) {
 			$templatePathAndFilename = $template;
 		} else {
+			if (TRUE === is_array($paths) && FALSE === empty($paths)) {
+				$paths = Tx_Flux_Utility_Path::translatePath($paths);
+			}
 			$templatePathAndFilename = rtrim($paths['templateRootPath'], '/') . '/Page/' . $template . '.html';
 		}
 		return $templatePathAndFilename;
