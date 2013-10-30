@@ -197,10 +197,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	public function postProcessDataStructure(array &$row, &$dataStructure, array $conf) {
 		$selectedPageTemplate = $this->pageService->getPageTemplateConfiguration($row['uid']);
 		if (TRUE === empty($selectedPageTemplate['tx_fed_page_controller_action'])) {
-			$config['parameters'] = array(
-				'userFunction' => 'Tx_Flux_UserFunction_NoSelection->renderField'
-			);
-			$dataStructure = $this->objectManager->get('Tx_Flux_Provider_Structure_FallbackStructureProvider')->render($config);
+			$this->configurationService->message('No controller action was found for this page.', t3lib_div::SYSLOG_SEVERITY_WARNING);
 			return NULL;
 		}
 		parent::postProcessDataStructure($row, $dataStructure, $conf);
