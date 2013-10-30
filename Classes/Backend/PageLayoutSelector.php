@@ -106,7 +106,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 					$extensionName = t3lib_div::underscoredToUpperCamelCase($extension);
 					$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
 					if (FALSE === file_exists($templatePathAndFilename)) {
-						$this->configurationService->message('Missing template file: ' . $templatePathAndFilename);
+						$this->configurationService->message('Missing template file: ' . $templatePathAndFilename, t3lib_div::SYSLOG_SEVERITY_WARNING);
 						continue;
 					}
 					$form = $this->configurationService->getFormFromTemplateFile($templatePathAndFilename, 'Configuration', 'form', $paths, $extensionName);
