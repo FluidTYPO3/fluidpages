@@ -6,7 +6,7 @@ if (!defined ('TYPO3_MODE')) {
 Tx_Flux_Core::unregisterConfigurationProvider('Tx_Fed_Provider_Configuration_PageConfigurationProvider');
 Tx_Flux_Core::registerConfigurationProvider('Tx_Fluidpages_Provider_PageProvider');
 
-Tx_Extbase_Utility_Extension::configurePlugin(
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
 	$_EXTKEY,
 	'Page',
 	array(
@@ -14,7 +14,7 @@ Tx_Extbase_Utility_Extension::configurePlugin(
 	),
 	array(
 	),
-	Tx_Extbase_Utility_Extension::PLUGIN_TYPE_PLUGIN
+	\TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN
 );
 
 $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] .= ($GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] == '' ? '' : ',') . 'tx_fed_page_controller_action,tx_fed_page_controller_action_sub,tx_fed_page_flexform,';

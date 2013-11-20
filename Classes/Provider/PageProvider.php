@@ -81,7 +81,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
-		$this->flexformTool = t3lib_div::makeInstance('t3lib_flexformtools');
+		$this->flexformTool = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Configuration\\FlexForm\\FlexFormTools');
 	}
 
 	/**
@@ -148,7 +148,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 						if (TRUE === isset($possibleOverlayPaths['templateRootPath'])) {
 							$overlayTemplateRootPath = $possibleOverlayPaths['templateRootPath'];
 							$overlayTemplateRootPath = rtrim($overlayTemplateRootPath, '/');
-							$possibleOverlayFile = t3lib_div::getFileAbsFileName($overlayTemplateRootPath . '/Page/' . $action . '.html');
+							$possibleOverlayFile = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($overlayTemplateRootPath . '/Page/' . $action . '.html');
 							if (TRUE === file_exists($possibleOverlayFile)) {
 								$templatePathAndFilename = $possibleOverlayFile;
 								break;
@@ -158,7 +158,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 				}
 			}
 		}
-		$templatePathAndFilename = t3lib_div::getFileAbsFileName($templatePathAndFilename);
+		$templatePathAndFilename = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($templatePathAndFilename);
 		return $templatePathAndFilename;
 	}
 
@@ -197,7 +197,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	public function postProcessDataStructure(array &$row, &$dataStructure, array $conf) {
 		$selectedPageTemplate = $this->pageService->getPageTemplateConfiguration($row['uid']);
 		if (TRUE === empty($selectedPageTemplate['tx_fed_page_controller_action'])) {
-			$this->configurationService->message('No controller action was found for this page.', t3lib_div::SYSLOG_SEVERITY_WARNING);
+			$this->configurationService->message('No controller action was found for this page.', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_WARNING);
 			return NULL;
 		}
 		parent::postProcessDataStructure($row, $dataStructure, $conf);
@@ -212,7 +212,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 		$action = $configuration['tx_fed_page_controller_action'];
 		if (FALSE !== strpos($action, '->')) {
 			$extensionName = array_shift(explode('->', $action));
-			$extensionKey = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+			$extensionKey = \TYPO3\CMS\Core\Utility\GeneralUtility::camelCaseToLowerCaseUnderscored($extensionName);
 			return $extensionKey;
 		}
 		return parent::getControllerExtensionKeyFromRecord($row);

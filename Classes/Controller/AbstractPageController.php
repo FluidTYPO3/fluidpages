@@ -68,10 +68,10 @@ abstract class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_C
 	}
 
 	/**
-	 * @param Tx_Extbase_MVC_View_ViewInterface $view
+	 * @param \TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view
 	 * @return void
 	 */
-	public function initializeView(Tx_Extbase_MVC_View_ViewInterface $view) {
+	public function initializeView(\TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view) {
 		$this->configurationManager->getContentObject()->data = $GLOBALS['TSFE']->page;
 		parent::initializeView($view);
 	}
