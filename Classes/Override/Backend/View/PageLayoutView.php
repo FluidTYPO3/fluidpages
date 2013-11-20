@@ -56,8 +56,8 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 	 * Constructor
 	 */
 	public function __construct() {
-		/** @var $objectManager Tx_Extbase_Object_ObjectManager */
-		$objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
+		/** @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
+		$objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		/** @var $backendLayout Tx_Fluidpages_Backend_BackendLayout */
 		$backendLayout = $objectManager->get('Tx_Fluidpages_Backend_BackendLayout');
 		$this->injectBackendLayout($backendLayout);
@@ -131,7 +131,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 			return NULL;
 		}
 		$uid = 0;
-		$clipBoard = new t3lib_clipboard();
+		$clipBoard = new \TYPO3\CMS\Backend\Clipboard\Clipboard();
 		if (TRUE === $reference) {
 			$command = 'reference';
 			$label = 'Paste as reference in this position';
@@ -143,7 +143,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 		}
 		$relativeTo = $pid . '-' . $command . '-' . $relativeUid . '-' . $uid;
 		$relativeTo .= '--' . $colPos;
-		$icon = t3lib_iconWorks::getSpriteIcon($icon, array('title' => $label, 'class' => 't3-icon-actions t3-icon-document-new'));
+		$icon = \TYPO3\CMS\Backend\Utility\IconUtility::getSpriteIcon($icon, array('title' => $label, 'class' => 't3-icon-actions t3-icon-document-new'));
 		$uri = "javascript:top.content.list_frame.location.href=top.TS.PATH_typo3+'";
 		$uri .= $clipBoard->pasteUrl('tt_content', $relativeTo);
 		$uri .= "';";

@@ -32,7 +32,7 @@
  * @package Fluidpages
  * @subpackage Service
  */
-class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
+class Tx_Fluidpages_Service_PageService implements \TYPO3\CMS\Core\SingletonInterface {
 
 	/**
 	 * @var array
@@ -40,12 +40,12 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	private static $cache = array();
 
 	/**
-	 * @var Tx_Extbase_Object_ObjectManager
+	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
 	 */
 	protected $objectManager;
 
 	/**
-	 * @var Tx_Extbase_Configuration_ConfigurationManagerInterface
+	 * @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface
 	 */
 	protected $configurationManager;
 
@@ -55,18 +55,18 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	protected $configurationService;
 
 	/**
-	 * @param Tx_Extbase_Object_ObjectManager $objectManager
+	 * @param \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager
 	 * @return void
 	 */
-	public function injectObjectManager(Tx_Extbase_Object_ObjectManager $objectManager) {
+	public function injectObjectManager(\TYPO3\CMS\Extbase\Object\ObjectManager $objectManager) {
 		$this->objectManager = $objectManager;
 	}
 
 	/**
-	 * @param Tx_Extbase_Configuration_ConfigurationManagerInterface $configurationManager
+	 * @param \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager
 	 * @return void
 	 */
-	public function injectConfigurationManager(Tx_Extbase_Configuration_ConfigurationManagerInterface $configurationManager) {
+	public function injectConfigurationManager(\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager) {
 		$this->configurationManager = $configurationManager;
 	}
 
@@ -133,10 +133,10 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			return FALSE;
 		}
 		// check if active workspace is available
-		$page = t3lib_BEfunc::getWorkspaceVersionOfRecord($wsId, $table, $pageUid);
+		$page = TYPO3\CMS\Backend\Utility\BackendUtility::getWorkspaceVersionOfRecord($wsId, $table, $pageUid);
 		if (FALSE === $page) {
 			// no workspace available ... use original one
-			$page = t3lib_BEfunc::getRecord($table, $pageUid, '*');
+			$page = TYPO3\CMS\Backend\Utility\BackendUtility::getRecord($table, $pageUid, '*');
 		}
 		return $page;
 	}
@@ -149,7 +149,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 */
 	protected function getPageParent($page) {
 		// try to get the original page
-		$live = t3lib_BEfunc::getLiveVersionIdOfRecord('pages', intval($page['uid']));
+		$live = TYPO3\CMS\Backend\Utility\BackendUtility::getLiveVersionIdOfRecord('pages', intval($page['uid']));
 		$live = NULL === $live ? $page : $live;
 		return $this->getPage($live['pid']);
 	}
@@ -162,7 +162,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 */
 	protected function getWorkspaceParentPage($page) {
 		$page = $this->getPositionPlaceholder($page);
-		$page = t3lib_BEfunc::getRecord('pages', $page['pid']);
+		$page = TYPO3\CMS\Backend\Utility\BackendUtility::getRecord('pages', $page['pid']);
 		$page = $this->getPositionPlaceholder($page);
 		return $page;
 	}
@@ -178,7 +178,7 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			$wsid = $GLOBALS['BE_USER']->workspace ? : 0;
 			$wsid = intval($wsid);
 			if (0 !== $wsid && intval($page['t3ver_wsid']) !== $wsid) {
-				$workspacePage = t3lib_BEfunc::getRecordRaw('pages', $where = sprintf('t3ver_oid=%d AND t3ver_wsid=%d', $page['uid'], $wsid), $fields = '*');
+				$workspacePage = TYPO3\CMS\Backend\Utility\BackendUtility::getRecordRaw('pages', $where = sprintf('t3ver_oid=%d AND t3ver_wsid=%d', $page['uid'], $wsid), $fields = '*');
 				if (NULL !== $workspacePage) {
 					$page = $workspacePage;
 				}
@@ -199,10 +199,10 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			return $page;
 		} elseif (0 === intval($page['t3ver_state'])) {
 			// page has changed, but not moved
-			$page = t3lib_BEfunc::getRecord('pages', $page['t3ver_oid']);
+			$page = TYPO3\CMS\Backend\Utility\BackendUtility::getRecord('pages', $page['t3ver_oid']);
 		} elseif (4 === intval($page['t3ver_state'])) {
 			// page has moved. get placeholder for new position
-			$page = t3lib_BEfunc::getRecordRaw('pages', $where = sprintf('t3ver_move_id=%d AND t3ver_state=3', $page['t3ver_oid']), $fields = '*');
+			$page = TYPO3\CMS\Backend\Utility\BackendUtility::getRecordRaw('pages', $where = sprintf('t3ver_move_id=%d AND t3ver_state=3', $page['t3ver_oid']), $fields = '*');
 		}
 		return $page;
 	}
@@ -285,14 +285,14 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 			}
 			if (FALSE === isset($group['templateRootPath'])) {
 				$this->configurationService->message('The template group "' . $extensionName . '" does not define a set of template containing at least a templateRootPath' .
-					'paths. This indicates a problem with your TypoScript configuration - most likely a static template is not loaded', t3lib_div::SYSLOG_SEVERITY_WARNING);
+					'paths. This indicates a problem with your TypoScript configuration - most likely a static template is not loaded', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_WARNING);
 				continue;
 			}
 			$configuredPath = rtrim($group['templateRootPath'], '/') . '/Page/';
-			$path = t3lib_div::getFileAbsFileName($configuredPath);
+			$path = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($configuredPath);
 			if (FALSE === is_dir($path)) {
 				$this->configurationService->message('The template group "' . $extensionName . '" has been configured to use the templateRootPath "' .
-					$configuredPath . '" but this directory does not exist.', t3lib_div::SYSLOG_SEVERITY_FATAL);
+					$configuredPath . '" but this directory does not exist.', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_FATAL);
 				continue;
 			}
 			$files = scandir($path);

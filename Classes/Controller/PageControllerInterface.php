@@ -33,6 +33,6 @@
  * @subpackage Controller
  * @route off
  */
-interface Tx_Fluidpages_Controller_PageControllerInterface extends Tx_Extbase_MVC_Controller_ControllerInterface {
+interface Tx_Fluidpages_Controller_PageControllerInterface extends \TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface {
 
 }

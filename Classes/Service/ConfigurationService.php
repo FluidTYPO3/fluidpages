@@ -33,7 +33,7 @@
  * @package Fluidpages
  * @subpackage Service
  */
-class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxService implements t3lib_Singleton {
+class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxService implements \TYPO3\CMS\Core\SingletonInterface {
 
 	/**
 	 * Get definitions of paths for Page Templates defined in TypoScript
@@ -55,7 +55,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 			$this->message('Template paths have been attempted fetched using an empty value that is NOT NULL in ' . get_class($this) .
 				'. This indicates a potential problem with your TypoScript configuration - a value which is expected to be ' .
 			    'an array may be defined as a string. This error is not fatal but may prevent the affected collection (which cannot ' .
-				'be identified here) from showing up', t3lib_div::SYSLOG_SEVERITY_NOTICE);
+				'be identified here) from showing up', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_NOTICE);
 			return array();
 		}
 		if (TYPO3_MODE === 'BE') {
@@ -75,7 +75,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		}
 		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', 'fluidpages');
 		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', 'fed');
-		$merged = (array) t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
+		$merged = (array) \TYPO3\CMS\Core\Utility\GeneralUtility::array_merge_recursive_overrule($oldLocation, $newLocation);
 		if (NULL === $extensionName) {
 			$registeredExtensionKeys = Tx_Flux_Core::getRegisteredProviderExtensionKeys('Page');
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
@@ -94,10 +94,10 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		} else {
 			$nativeViewLocation = $this->getViewConfigurationForExtensionName($extensionName);
 			if (TRUE === is_array($nativeViewLocation)) {
-				$merged = t3lib_div::array_merge_recursive_overrule($nativeViewLocation, $merged);
+				$merged = \TYPO3\CMS\Core\Utility\GeneralUtility::array_merge_recursive_overrule($nativeViewLocation, $merged);
 			}
 			if (FALSE === isset($nativeViewLocation['extensionKey'])) {
-				$merged['extensionKey'] = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+				$merged['extensionKey'] = \TYPO3\CMS\Core\Utility\GeneralUtility::camelCaseToLowerCaseUnderscored($extensionName);
 			}
 			if (FALSE === isset($merged['templateRootPath'])) {
 				$this->sendWarningAboutMissingTemplatePath($extensionName);
@@ -114,7 +114,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 	protected function sendWarningAboutMissingTemplatePath($extensionName) {
 		$this->message('The configuration for extension "' . $extensionName . '" does not contain ' .
 			'at least a templateRootPath. This indicates that the static TypoScript for the extension is not loaded or ' .
-			'it uses constants which are either not defined, cleared or set to an empty value', t3lib_div::SYSLOG_SEVERITY_FATAL);
+			'it uses constants which are either not defined, cleared or set to an empty value', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_FATAL);
 	}
 
 }

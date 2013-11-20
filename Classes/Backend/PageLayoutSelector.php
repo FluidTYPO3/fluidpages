@@ -31,7 +31,7 @@
 class Tx_Fluidpages_Backend_PageLayoutSelector {
 
 	/**
-	 * @var Tx_Extbase_Configuration_BackendConfigurationManager
+	 * @var \TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager
 	 */
 	protected $configurationManager;
 
@@ -54,8 +54,8 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
-		$objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
-		$this->configurationManager = $objectManager->get('Tx_Extbase_Configuration_BackendConfigurationManager');
+		$objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		$this->configurationManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Configuration\\BackendConfigurationManager');
 		$this->configurationService = $objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
 		$this->pageService = $objectManager->get('Tx_Fluidpages_Service_PageService');
 	}
@@ -82,7 +82,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		$forceHideInherit = (boolean) (0 === intval($parameters['row']['pid']));
 		if (FALSE === $pageIsSiteRoot || TRUE === $forceDisplayInheritSiteRoot || FALSE === $hideInheritFieldSiteRoot) {
 			if (FALSE === $forceHideInherit) {
-				$emptyLabel = Tx_Extbase_Utility_Localization::translate('pages.tx_fed_page_controller_action.default', 'Fluidpages');
+				$emptyLabel = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate('pages.tx_fed_page_controller_action.default', 'Fluidpages');
 				$selected = TRUE === empty($value) ? ' checked="checked" ' : NULL;
 				$selector .= '<label>';
 				$selector .= '<input type="radio" name="' . $name . '" ' . $onChange . '" value="" ' . $selected . '/> ' . $emptyLabel . LF;
@@ -90,28 +90,28 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 			}
 		}
 		foreach ($availableTemplates as $extension=>$group) {
-			if (FALSE === t3lib_extMgm::isLoaded($extension)) {
+			if (FALSE === \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded($extension)) {
 				$groupTitle = ucfirst($extension);
 			} else {
-				$emConfigFile = t3lib_extMgm::extPath($extension, 'ext_emconf.php');
+				$emConfigFile = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($extension, 'ext_emconf.php');
 				require $emConfigFile;
 				$groupTitle = $EM_CONF['']['title'];
 			}
 
-			$packageLabel = Tx_Extbase_Utility_Localization::translate('pages.tx_fed_page_package', 'Fluidpages');
+			$packageLabel = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate('pages.tx_fed_page_package', 'Fluidpages');
 			$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
 			foreach ($group as $template) {
 				try {
 					$paths = $this->configurationService->getPageConfiguration($extension);
-					$extensionName = t3lib_div::underscoredToUpperCamelCase($extension);
+					$extensionName = \TYPO3\CMS\Core\Utility\GeneralUtility::underscoredToUpperCamelCase($extension);
 					$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
 					if (FALSE === file_exists($templatePathAndFilename)) {
-						$this->configurationService->message('Missing template file: ' . $templatePathAndFilename, t3lib_div::SYSLOG_SEVERITY_WARNING);
+						$this->configurationService->message('Missing template file: ' . $templatePathAndFilename, \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_WARNING);
 						continue;
 					}
 					$form = $this->configurationService->getFormFromTemplateFile($templatePathAndFilename, 'Configuration', 'form', $paths, $extensionName);
 					if (FALSE === $form instanceof Tx_Flux_Form) {
-						$this->configurationService->message('Template file ' . $templatePathAndFilename . ' contains an unparsable Form definition', t3lib_div::SYSLOG_SEVERITY_FATAL);
+						$this->configurationService->message('Template file ' . $templatePathAndFilename . ' contains an unparsable Form definition', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_FATAL);
 						continue;
 					}
 					if (FALSE === $form->getEnabled()) {
@@ -119,7 +119,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 					}
 					$thumbnail = $form->getIcon();
 					$label = $form->getLabel();
-					$translatedLabel = Tx_Extbase_Utility_Localization::translate($label, $extensionName);
+					$translatedLabel = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($label, $extensionName);
 					if (NULL !== $translatedLabel) {
 						$label = $translatedLabel;
 					}
