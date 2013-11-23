@@ -136,6 +136,7 @@ TYPO3.Components.PageModule = {
 
 				// Hide create new element button
 				this.el.findParent('td.t3-page-column', null, true).removeClass('active');
+				// Disable highlighting
 				TYPO3.Components.PageModule.disableHighlighting();
 
 				// Cache the original XY Coordinates of the element, we'll use this later.
@@ -193,6 +194,9 @@ TYPO3.Components.PageModule = {
 							this.el.dom.style.top = '';
 							this.el.dom.style.left = '';
 							this.el.dom.style.width = '';
+
+							// Enable Highlighting
+							TYPO3.Components.PageModule.enableHighlighting();
 						}
 					};
 
@@ -214,7 +218,6 @@ TYPO3.Components.PageModule = {
 
 				// Show create new element button
 				this.el.findParent('td.t3-page-column', null, true).addClass('active');
-				TYPO3.Components.PageModule.enableHighlighting();
 			},
 
 			// Called upon successful drop of an element on a DDTarget with the same
@@ -228,6 +231,9 @@ TYPO3.Components.PageModule = {
 					// Remove the drag invitation
 					this.onDragOut(evtObj, targetElId);
 
+					// Set to new width
+					this.el.setWidth(dropEl.parent().getWidth());
+
 					// Add height to drop zone
 					var oldHeight = dropEl.getHeight();
 					dropEl.setHeight(oldHeight + this.el.getHeight(), {duration: 0.3});
@@ -235,11 +241,6 @@ TYPO3.Components.PageModule = {
 					// Calculate new y position for element
 					var dropElStyle = dropEl.dom.currentStyle || window.getComputedStyle(dropEl.dom);
 					var elementNewY = dropEl.getY() + oldHeight + parseInt(dropElStyle.marginBottom);
-
-					// If the previous drop zone is above the target drop zone adjust for height change
-					if (this.previousDropZone.getY() < dropEl.getY()) {
-						elementNewY = elementNewY - this.previousDropZone.getHeight() + this.previousDropZoneOldHeight;
-					}console.log(this.el.dom.style.padding);
 
 					// Create the animation configuration object
 					var animCfgObj = {
@@ -259,15 +260,17 @@ TYPO3.Components.PageModule = {
 							this.el.dom.style.top = '';
 							this.el.dom.style.left = '';
 							this.el.dom.style.width = '';
+
+							// Restore height of previous drop zone
+							this.previousDropZone.setHeight(this.previousDropZoneOldHeight, {duration: 0.3, callback: function () {
+								// Enable Highlighting
+								TYPO3.Components.PageModule.enableHighlighting();
+							}});
 						}
 					};
 
 					// Animate to new position and width
 					this.el.moveTo(dropEl.parent().getX(), elementNewY, animCfgObj);
-					this.el.setWidth(dropEl.parent().getWidth(), {duration: 0.3});
-
-					// Restore height of previous drop zone
-					this.previousDropZone.setHeight(this.previousDropZoneOldHeight, {duration: 0.3});
 
 					// Try to save changes to the backend
 					// There is no feedback from the server side functions, just hope for the best
