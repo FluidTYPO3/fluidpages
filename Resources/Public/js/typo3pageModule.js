@@ -154,6 +154,7 @@ TYPO3.Components.PageModule = {
 				this.previousDropZone.setHeight(this.el.getBottom() - this.previousDropZone.getY());
 				this.el.setWidth(this.el.getWidth());
 				this.el.dom.style.position = 'absolute';
+				this.el.dom.style.zIndex = '9999';
 
 				// Go through all drop zones and make them available if not invalid
 				var dropZones = Ext.select('.t3-page-ce-dropzone');
@@ -188,6 +189,7 @@ TYPO3.Components.PageModule = {
 							// Restore previous drop zone height
 							this.previousDropZone.setHeight(this.previousDropZoneOldHeight);
 							this.el.dom.style.position = '';
+							this.el.dom.style.zIndex = '';
 							this.el.dom.style.top = '';
 							this.el.dom.style.left = '';
 							this.el.dom.style.width = '';
@@ -253,6 +255,7 @@ TYPO3.Components.PageModule = {
 
 							// Clear the styles
 							this.el.dom.style.position = '';
+							this.el.dom.style.zIndex = '';
 							this.el.dom.style.top = '';
 							this.el.dom.style.left = '';
 							this.el.dom.style.width = '';
