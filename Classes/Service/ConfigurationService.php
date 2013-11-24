@@ -36,11 +36,6 @@
 class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxService implements t3lib_Singleton {
 
 	/**
-	 * @var array
-	 */
-	private static $cache = array();
-
-	/**
 	 * Get definitions of paths for Page Templates defined in TypoScript
 	 *
 	 * @param string $extensionName
