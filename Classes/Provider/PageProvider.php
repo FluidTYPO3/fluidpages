@@ -50,6 +50,16 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	/**
 	 * @var string
 	 */
+	protected $subFieldName = 'tx_fed_page_flexform_sub';
+
+	/**
+	 * @var string
+	 */
+	protected $currentFieldName = NULL;
+
+	/**
+	 * @var string
+	 */
 	protected $extensionKey = 'fluidpages';
 
 	/**
@@ -76,6 +86,16 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 * @var integer
 	 */
 	protected $priority = 100;
+
+	/**
+	 * @var string
+	 */
+	protected $mainAction = 'tx_fed_page_controller_action';
+
+	/**
+	 * @var string
+	 */
+	protected $subAction = 'tx_fed_page_controller_action_sub';
 
 	/**
 	 * CONSTRUCTOR
@@ -132,10 +152,9 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 * @return string
 	 */
 	public function getTemplatePathAndFilename(array $row) {
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		$action = $this->getControllerActionReferenceFromRecord($row);
 		$paths = $this->getTemplatePaths($row);
-		if ($configuration['tx_fed_page_controller_action']) {
-			$action = $configuration['tx_fed_page_controller_action'];
+		if (FALSE === empty($action)) {
 			list ($extensionName, $action) = explode('->', $action);
 			if (is_array($paths)) {
 				$templateRootPath = $paths['templateRootPath'];
@@ -170,15 +189,16 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 * @return array
 	 */
 	public function getInheritanceTree(array $row) {
-		$main = 'tx_fed_page_controller_action';
-		$sub = 'tx_fed_page_controller_action_sub';
+		if (TRUE === $this->isUsingSubFieldName()) {
+			return array();
+		}
 		$records = parent::getInheritanceTree($row);
 		if (0 === count($records)) {
 			return $records;
 		}
-		$template = $records[0][$sub];
+		$template = $records[0][$this->subAction];
 		foreach ($records as $index => $record) {
-			if ((FALSE === empty($record[$main]) && $template !== $record[$main]) || (FALSE === empty($record[$sub]) && $template !== $record[$sub])) {
+			if ((FALSE === empty($record[$this->mainAction]) && $template !== $record[$this->mainAction]) || (FALSE === empty($record[$this->subAction]) && $template !== $record[$this->subAction])) {
 				return array_slice($records, $index);
 			}
 		}
@@ -195,8 +215,8 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 * @return NULL
 	 */
 	public function postProcessDataStructure(array &$row, &$dataStructure, array $conf) {
-		$selectedPageTemplate = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		if (TRUE === empty($selectedPageTemplate['tx_fed_page_controller_action'])) {
+		$action = $this->getControllerActionReferenceFromRecord($row);
+		if (TRUE === empty($action)) {
 			$this->configurationService->message('No controller action was found for this page.', t3lib_div::SYSLOG_SEVERITY_WARNING);
 			return NULL;
 		}
@@ -208,8 +228,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 * @return string
 	 */
 	public function getControllerExtensionKeyFromRecord(array $row) {
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		$action = $configuration['tx_fed_page_controller_action'];
+		$action = $this->getControllerActionReferenceFromRecord($row);
 		if (FALSE !== strpos($action, '->')) {
 			$extensionName = array_shift(explode('->', $action));
 			$extensionKey = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
@@ -235,7 +254,83 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 */
 	public function getControllerActionReferenceFromRecord(array $row) {
 		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		return $configuration['tx_fed_page_controller_action'];
+		if (TRUE === $this->isUsingSubFieldName()) {
+			return $configuration[$this->subAction];
+		}
+		return $configuration[$this->mainAction];
+	}
+
+	/**
+	 * @param array $row The record row which triggered processing
+	 * @return string|NULL
+	 */
+	public function getFieldName(array $row) {
+		if (TRUE === $this->isUsingSubFieldName()) {
+			return $this->subFieldName;
+		}
+		return $this->fieldName;
+	}
+
+	/**
+	 * @param array $row
+	 * @param string $table
+	 * @param string $field
+	 * @param string $extensionKey
+	 * @return boolean
+	 */
+	public function trigger(array $row, $table, $field, $extensionKey = NULL) {
+		$this->currentFieldName = $field;
+		return parent::trigger($row, $table, $field, $extensionKey);
+	}
+
+	/**
+	 * @param array $row
+	 * @return Tx_Flux_Form|NULL
+	 */
+	public function getForm(array $row) {
+		if (TRUE === $this->isUsingSubFieldName()) {
+			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+			if ($configuration[$this->mainAction] === $configuration[$this->subAction]) {
+				$form = Tx_Flux_Form::create();
+				$form->createField('UserFunction', '')->setFunction('Tx_Fluidpages_UserFunction_NoSubPageConfiguration->renderField');
+				return $form;
+			}
+		}
+		return parent::getForm($row);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isUsingSubFieldName() {
+		return $this->currentFieldName === $this->subFieldName;
+	}
+
+	/**
+	 * @param array $tree
+	 * @param string $cacheKey Overrides the cache key
+	 * @param boolean $mergeToCache Merges the configuration of $tree to the current $cacheKey
+	 * @return array
+	 */
+	protected function getMergedConfiguration(array $tree, $cacheKey = NULL, $mergeToCache = FALSE) {
+		$cacheKey = $this->getCacheKeyForMergedConfiguration($tree);
+		if (TRUE === $this->hasCacheForMergedConfiguration($cacheKey)) {
+			return parent::getMergedConfiguration($tree, $cacheKey);
+		}
+
+		if (FALSE === $this->isUsingSubFieldName()) {
+			$branch = reset($tree);
+			if (FALSE === empty($branch[$this->mainAction]) && FALSE === empty($branch[$this->subAction]) &&
+				$branch[$this->mainAction] !== $branch[$this->subAction] &&
+				FALSE === empty($branch[$this->subFieldName])) {
+
+				$branch = array_shift($tree);
+				$this->currentFieldName = $this->subFieldName;
+				parent::getMergedConfiguration(array($branch), $cacheKey);
+				$this->currentFieldName = $this->fieldName;
+			}
+		}
+		return parent::getMergedConfiguration($tree, $cacheKey, TRUE);
 	}
 
 }
