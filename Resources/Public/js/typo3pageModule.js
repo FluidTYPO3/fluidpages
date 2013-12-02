@@ -41,7 +41,8 @@ TYPO3.Components.PageModule = {
 	 * to the mouseover event and the "setElementInactive" to the mouseout event.
 	 */
 	enableHighlighting: function() {
-		Ext.select('div.t3-page-ce')
+		Ext.select('div.t3-page-ce').removeClass('active');
+		Ext.select('div.t3-page-ce-dragitem')
 			.on('mouseover',this.setElementActive, this)
 			.on('mouseout',this.setElementInactive, this);
 		Ext.select('td.t3-page-column')
@@ -57,7 +58,7 @@ TYPO3.Components.PageModule = {
 	 * from the mouseover event and the "setElementInactive" from the mouseout event.
 	 */
 	disableHighlighting: function() {
-		Ext.select('div.t3-page-ce')
+		Ext.select('div.t3-page-ce-dragitem')
 			.un('mouseover', this.setElementActive, this)
 			.un('mouseout', this.setElementInactive, this);
 		Ext.select('td.t3-page-column')
@@ -70,7 +71,7 @@ TYPO3.Components.PageModule = {
 	 * user hovers the a content element.
 	 */
 	setElementActive: function(event, target) {
-		Ext.get(target).findParent('div.t3-page-ce', null, true).addClass('active');
+		Ext.get(target).findParent('div.t3-page-ce-dragitem', null, true).findParent('div.t3-page-ce', null, true).addClass('active');
 	},
 
 	/**
@@ -79,7 +80,7 @@ TYPO3.Components.PageModule = {
 	 * content element.
 	 */
 	setElementInactive: function(event, target) {
-		Ext.get(target).findParent('div.t3-page-ce', null, true).removeClass('active');
+		Ext.get(target).findParent('div.t3-page-ce-dragitem', null, true).findParent('div.t3-page-ce', null, true).removeClass('active');
 
 	},
 
