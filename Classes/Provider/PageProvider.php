@@ -30,6 +30,7 @@ use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Provider\AbstractProvider;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Utility\PathUtility;
+use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -136,7 +137,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	public function getExtensionKey(array $row) {
 		$controllerExtensionKey = $this->getControllerExtensionKeyFromRecord($row);
 		if (FALSE === empty($controllerExtensionKey)) {
-			return $controllerExtensionKey;
+			return ExtensionNamingUtility::getExtensionKey($controllerExtensionKey);
 		}
 		return parent::getExtensionKey($row);
 	}
@@ -240,8 +241,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		if (FALSE !== strpos($action, '->')) {
 			$extensionName = array_shift(explode('->', $action));
-			$extensionKey = GeneralUtility::camelCaseToLowerCaseUnderscored($extensionName);
-			return $extensionKey;
+			return $extensionName;
 		}
 		return parent::getControllerExtensionKeyFromRecord($row);
 	}
