@@ -28,10 +28,10 @@
  * @package	Fluidpages
  * @subpackage Backend
  */
-class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
+class Tx_Fluidpages_Backend_BackendLayout implements \TYPO3\CMS\Core\SingletonInterface {
 
 	/**
-	 * @var Tx_Extbase_Object_ObjectManager
+	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
 	 */
 	protected $objectManager;
 
@@ -49,7 +49,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
+		$this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		$this->configurationService = $this->objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
 		$this->pageService = $this->objectManager->get('Tx_Fluidpages_Service_PageService');
 	}
@@ -73,25 +73,25 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 			$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $record);
 			$action = $provider->getControllerActionFromRecord($record);
 			if (TRUE === empty($action)) {
-				$this->configurationService->message('No template selected - backend layout will not be rendered', t3lib_div::SYSLOG_SEVERITY_INFO);
+				$this->configurationService->message('No template selected - backend layout will not be rendered', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_INFO);
 				return NULL;
 			}
 			$paths = $provider->getTemplatePaths($record);
 			if (0 === count($paths)) {
 				if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
-					if (FALSE === (boolean) t3lib_div::_GET('redirected')) {
+					if (FALSE === (boolean) \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('redirected')) {
 						// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
-						$get = t3lib_div::_GET();
+						$get = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET();
 						unset($get['id']);
 						$get['redirected'] = 1;
-						$params = t3lib_div::implodeArrayForUrl('', $get);
+						$params = \TYPO3\CMS\Core\Utility\GeneralUtility::implodeArrayForUrl('', $get);
 						header('Location: ?id=' . $pageUid . $params);
 						exit();
 					}
 					return NULL;
 				}
 				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
-					. 'have included the TypoScript for the desired template collection.', t3lib_div::SYSLOG_SEVERITY_NOTICE);
+					. 'have included the TypoScript for the desired template collection.', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_NOTICE);
 				return NULL;
 			}
 			$grid = $provider->getGrid($record)->build();

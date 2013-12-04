@@ -7,11 +7,11 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EX
 if (TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['autoRender']) {
 	Tx_Flux_Core::addGlobalTypoScript('EXT:fluidpages/Configuration/TypoScript');
 } else {
-	t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Fluid Pages: PAGE');
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Fluid Pages: PAGE');
 }
 
-t3lib_div::loadTCA('pages');
-t3lib_extMgm::addTCAcolumns('pages', array(
+\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA('pages');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', array(
 	'tx_fed_page_controller_action' => array (
 		'exclude' => 1,
 		'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_controller_action',
@@ -50,13 +50,13 @@ if (FALSE === empty($additionalDoktypes)) {
 	$doktypes .= ',' . $additionalDoktypes;
 }
 
-t3lib_extMgm::addToAllTCAtypes(
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
 	'pages',
 	'--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_layoutselect,tx_fed_page_controller_action,tx_fed_page_controller_action_sub',
 	$doktypes
 );
 
-t3lib_extMgm::addToAllTCAtypes(
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
 	'pages',
 	'--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_configuration,tx_fed_page_flexform,tx_fed_page_flexform_sub',
 	$doktypes
