@@ -5,7 +5,7 @@ if (!defined ('TYPO3_MODE')) {
 
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EXTCONF);
 if (TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['autoRender']) {
-	Tx_Flux_Core::addGlobalTypoScript('EXT:fluidpages/Configuration/TypoScript');
+	\FluidTYPO3\Flux\Core::addGlobalTypoScript('EXT:fluidpages/Configuration/TypoScript');
 } else {
 	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Fluid Pages: PAGE');
 }
@@ -17,7 +17,7 @@ if (TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['set
 		'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_controller_action',
 		'config' => array (
 			'type' => 'user',
-			'userFunc' => 'Tx_Fluidpages_Backend_PageLayoutSelector->renderField'
+			'userFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutSelector->renderField'
 		)
 	),
 	'tx_fed_page_controller_action_sub' => array (
@@ -25,7 +25,7 @@ if (TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['set
 		'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.tx_fed_page_controller_action_sub',
 		'config' => array (
 			'type' => 'user',
-			'userFunc' => 'Tx_Fluidpages_Backend_PageLayoutSelector->renderField'
+			'userFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutSelector->renderField'
 		)
 	),
 	'tx_fed_page_flexform' => Array (

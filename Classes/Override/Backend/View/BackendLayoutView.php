@@ -1,4 +1,5 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Override\Backend\View;
 /***************************************************************
  *  Copyright notice
  *
@@ -24,23 +25,27 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
+use FluidTYPO3\Fluidpages\Backend\BackendLayout;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Backend layout for CMS
  *
  * @author GridView Team
  */
-class Tx_Fluidpages_Override_Backend_View_BackendLayoutView extends TYPO3\CMS\Backend\View\BackendLayoutView {
+class BackendLayoutView extends \TYPO3\CMS\Backend\View\BackendLayoutView {
 
 	/**
-	 * @var Tx_Fluidpages_Backend_BackendLayout
+	 * @var \FluidTYPO3\Fluidpages\Backend\BackendLayout
 	 */
 	protected $backendLayout;
 
 	/**
-	 * @param Tx_Fluidpages_Backend_BackendLayout $backendLayout
+	 * @param \FluidTYPO3\Fluidpages\Backend\BackendLayout $backendLayout
 	 * @return void
 	 */
-	public function injectBackendLayout(Tx_Fluidpages_Backend_BackendLayout $backendLayout) {
+	public function injectBackendLayout(BackendLayout $backendLayout) {
 		$this->backendLayout = $backendLayout;
 	}
 
@@ -48,12 +53,12 @@ class Tx_Fluidpages_Override_Backend_View_BackendLayoutView extends TYPO3\CMS\Ba
 	 * Constructor
 	 */
 	public function __construct() {
-		/** @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
-		$objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-		/** @var $backendLayout Tx_Fluidpages_Backend_BackendLayout */
-		$backendLayout = $objectManager->get('Tx_Fluidpages_Backend_BackendLayout');
+		/** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		/** @var \FluidTYPO3\Fluidpages\Backend\BackendLayout $backendLayout */
+		$backendLayout = $objectManager->get('FluidTYPO3\\Fluidpages\\Backend\\BackendLayout');
 		$this->injectBackendLayout($backendLayout);
-		if (TRUE === in_array('__construct', get_class_methods('TYPO3\CMS\Backend\View\BackendLayoutView'))) {
+		if (TRUE === in_array('__construct', get_class_methods('TYPO3\\CMS\\Backend\\View\\BackendLayoutView'))) {
 			parent::__construct();
 		}
 	}

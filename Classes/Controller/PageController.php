@@ -1,4 +1,5 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Controller;
 /***************************************************************
  *  Copyright notice
  *
@@ -30,6 +31,6 @@
  * @subpackage Controller
  * @route off
  */
-class Tx_Fluidpages_Controller_PageController extends Tx_Fluidpages_Controller_AbstractPageController implements Tx_Fluidpages_Controller_PageControllerInterface {
+class PageController extends AbstractPageController implements PageControllerInterface {
 
 }

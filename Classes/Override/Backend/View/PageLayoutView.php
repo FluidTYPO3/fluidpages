@@ -1,4 +1,5 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Override\Backend\View;
 /***************************************************************
  *  Copyright notice
  *
@@ -32,23 +33,26 @@
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
+
+use FluidTYPO3\Fluidpages\Backend\BackendLayout;
+
 /**
  * Child class for the Web > Page module
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
-class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backend\View\PageLayoutView {
+class PageLayoutView extends \TYPO3\CMS\Backend\View\PageLayoutView {
 
 	/**
-	 * @var Tx_Fluidpages_Backend_BackendLayout
+	 * @var \FluidTYPO3\Fluidpages\Backend\BackendLayout
 	 */
 	protected $backendLayout;
 
 	/**
-	 * @param Tx_Fluidpages_Backend_BackendLayout $backendLayout
+	 * @param \FluidTYPO3\Fluidpages\Backend\BackendLayout $backendLayout
 	 * @return void
 	 */
-	public function injectBackendLayout(Tx_Fluidpages_Backend_BackendLayout $backendLayout) {
+	public function injectBackendLayout(BackendLayout $backendLayout) {
 		$this->backendLayout = $backendLayout;
 	}
 
@@ -58,8 +62,8 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 	public function __construct() {
 		/** @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
 		$objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-		/** @var $backendLayout Tx_Fluidpages_Backend_BackendLayout */
-		$backendLayout = $objectManager->get('Tx_Fluidpages_Backend_BackendLayout');
+		/** @var \FluidTYPO3\Fluidpages\Backend\BackendLayout $backendLayout */
+		$backendLayout = $objectManager->get('FluidTYPO3\\Fluidpages\\Backend\\BackendLayout');
 		$this->injectBackendLayout($backendLayout);
 	}
 
@@ -165,7 +169,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 		$showHidden = $this->tt_contentConfig['showHidden'] ? '' : \TYPO3\CMS\Backend\Utility\BackendUtility::BEenableFields('tt_content');
 		$pageTitleParamForAltDoc = '&recTitle=' . rawurlencode(\TYPO3\CMS\Backend\Utility\BackendUtility::getRecordTitle('pages', \TYPO3\CMS\Backend\Utility\BackendUtility::getRecordWSOL('pages', $id), TRUE));
 		$GLOBALS['SOBE']->doc->getPageRenderer()->loadExtJs();
-		$GLOBALS['SOBE']->doc->getPageRenderer()->addJsFile(t3lib_extMgm::siteRelPath('fluidpages') . 'Resources/Public/js/typo3pageModule.js');
+		$GLOBALS['SOBE']->doc->getPageRenderer()->addJsFile(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('fluidpages') . 'Resources/Public/js/typo3pageModule.js');
 		// Get labels for CTypes and tt_content element fields in general:
 		$this->CType_labels = array();
 		foreach ($GLOBALS['TCA']['tt_content']['columns']['CType']['config']['items'] as $val) {
