@@ -143,7 +143,7 @@ EXT:myextension/Resources/Private/Templates/Page/FrontPage.html):
 			label="Main menu entry level override for this page only"
 			eval="int,trim" minimum="0" maximum="6"
 			default="{v:var.typoscript(path: 'lib.menu.main.entryLevel')}">
-			<flux:field.wizard.slider hideParent="TRUE" step="1" width="100" />
+			<flux:wizard.slider hideParent="TRUE" step="1" width="100" />
 		</flux:field.input>
 	</flux:form>
 	<flux:grid>
@@ -182,7 +182,7 @@ Some facts about the above sample template:
 	* A `<flux:form>` node with the minimum allowed configuration: an ID unique to this file (among files in this same
 	  extension) and a human-readable label presented to content editors when selecting page templates.
 	* A `<flux:field.input>` field allowing the menu's entry level to be defined in each page's properties
-	* A `<flux:field.wizard.slider>` which replaces the `<flux:field.input>` with a slider to select the
+	* A `<flux:wizard.slider>` which replaces the `<flux:field.input>` with a slider to select the
 	  menu's entry level between 1 and 6.
 	* A `<flux:grid>` which defines a Backend Layout to be used if no other Backend Layout is selected in TYPO3. __Note
 	  that this particular feature only works on TYPO3 6.0 and above.__
