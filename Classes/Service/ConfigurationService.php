@@ -26,6 +26,7 @@ namespace FluidTYPO3\Fluidpages\Service;
 
 use FluidTYPO3\Flux\Core;
 use FluidTYPO3\Flux\Service\FluxService;
+use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -87,7 +88,7 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$extensionViewPaths = $this->getPageConfiguration($registeredExtensionKey);
 				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
-					$extensionViewPaths['extensionKey'] = $registeredExtensionKey;
+					$extensionViewPaths['extensionKey'] = ExtensionNamingUtility::getExtensionKey($registeredExtensionKey);
 				}
 				// preemptive caching; once read here, the cached value is returned when asking for specific extensions later
 				if (FALSE === isset($extensionViewPaths['templateRootPath'])) {
@@ -103,7 +104,7 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 				$merged = GeneralUtility::array_merge_recursive_overrule($nativeViewLocation, $merged);
 			}
 			if (FALSE === isset($nativeViewLocation['extensionKey'])) {
-				$merged['extensionKey'] = GeneralUtility::camelCaseToLowerCaseUnderscored($extensionName);
+				$merged['extensionKey'] = ExtensionNamingUtility::getExtensionKey($extensionName);
 			}
 			if (FALSE === isset($merged['templateRootPath'])) {
 				$this->sendWarningAboutMissingTemplatePath($extensionName);

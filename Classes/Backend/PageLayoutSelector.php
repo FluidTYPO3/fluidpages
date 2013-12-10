@@ -24,6 +24,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
  ***************************************************************/
 
 use FluidTYPO3\Flux\Form;
+use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
@@ -109,7 +110,7 @@ class PageLayoutSelector {
 			foreach ($group as $template) {
 				try {
 					$paths = $this->configurationService->getPageConfiguration($extension);
-					$extensionName = GeneralUtility::underscoredToUpperCamelCase($extension);
+					$extensionName = ExtensionNamingUtility::getExtensionName($extension);
 					$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
 					if (FALSE === file_exists($templatePathAndFilename)) {
 						$this->configurationService->message('Missing template file: ' . $templatePathAndFilename, GeneralUtility::SYSLOG_SEVERITY_WARNING);
