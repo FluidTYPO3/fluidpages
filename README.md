@@ -138,25 +138,25 @@ EXT:myextension/Resources/Private/Templates/Page/FrontPage.html):
      xmlns:f="http://typo3.org/ns/fluid/ViewHelpers">
 
 <f:section name="Configuration">
-	<flux:flexform id="sample-page" label="Sample Fluid page">
-		<flux:flexform.field.input name="settings.entryLevel"
+	<flux:form id="sample-page" label="Sample Fluid page">
+		<flux:field.input name="settings.entryLevel"
 			label="Main menu entry level override for this page only"
 			eval="int,trim" minimum="0" maximum="6"
 			default="{v:var.typoscript(path: 'lib.menu.main.entryLevel')}">
-			<flux:flexform.field.wizard.slider hideParent="TRUE" step="1" width="100" />
-		</flux:flexform.field.input>
-	</flux:flexform>
-	<flux:flexform.grid>
-        <flux:flexform.grid.row>
-            <flux:flexform.grid.column colPos="1" name="Hero Unit" />
-        </flux:flexform.grid.row>
-        <flux:flexform.grid.row>
-            <flux:flexform.grid.column colPos="0" name="Main Content" />
-        </flux:flexform.grid.row>
-        <flux:flexform.grid.row>
-            <flux:flexform.grid.column colPos="2" name="Footer Content" />
-        </flux:flexform.grid.row>
-    </flux:flexform.grid>
+			<flux:field.wizard.slider hideParent="TRUE" step="1" width="100" />
+		</flux:field.input>
+	</flux:form>
+	<flux:grid>
+        <flux:grid.row>
+            <flux:grid.column colPos="1" name="Hero Unit" />
+        </flux:grid.row>
+        <flux:grid.row>
+            <flux:grid.column colPos="0" name="Main Content" />
+        </flux:grid.row>
+        <flux:grid.row>
+            <flux:grid.column colPos="2" name="Footer Content" />
+        </flux:grid.row>
+    </flux:grid>
 </f:section>
 
 <f:section name="Content">
@@ -179,12 +179,12 @@ Some facts about the above sample template:
   namespace - see https://github.com/FluidTYPO3/schemaker for more information about this feature).
 * The `Page.html`  Layout file is used. It is allowed to render any section **except for the `Configuration` section**
 * The `Configuration` section contains:
-	* A `<flux:flexform>` node with the minimum allowed configuration: an ID unique to this file (among files in this same
+	* A `<flux:form>` node with the minimum allowed configuration: an ID unique to this file (among files in this same
 	  extension) and a human-readable label presented to content editors when selecting page templates.
-	* A `<flux:flexform.field.input>` field allowing the menu's entry level to be defined in each page's properties
-	* A `<flux:flexform.field.wizard.slider>` which replaces the `<flux:flexform.field.input>` with a slider to select the
+	* A `<flux:field.input>` field allowing the menu's entry level to be defined in each page's properties
+	* A `<flux:field.wizard.slider>` which replaces the `<flux:field.input>` with a slider to select the
 	  menu's entry level between 1 and 6.
-	* A `<flux:flexform.grid>` which defines a Backend Layout to be used if no other Backend Layout is selected in TYPO3. __Note
+	* A `<flux:grid>` which defines a Backend Layout to be used if no other Backend Layout is selected in TYPO3. __Note
 	  that this particular feature only works on TYPO3 6.0 and above.__
 
 The template does not contain an example of rendering a menu - you can find a more detailed example by viewing the files in
