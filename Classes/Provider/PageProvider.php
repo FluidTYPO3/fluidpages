@@ -1,4 +1,5 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Provider;
 /*****************************************************************
  *  Copyright notice
  *
@@ -23,6 +24,14 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  *****************************************************************/
 
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Flux\Form;
+use FluidTYPO3\Flux\Provider\AbstractProvider;
+use FluidTYPO3\Flux\Provider\ProviderInterface;
+use FluidTYPO3\Flux\Utility\PathUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Page Configuration Provider
  *
@@ -30,7 +39,7 @@
  * @package Fluidpages
  * @subpackage Provider
  */
-class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvider implements Tx_Flux_Provider_ProviderInterface {
+class PageProvider extends AbstractProvider implements ProviderInterface {
 
 	/**
 	 * @var string
@@ -68,17 +77,17 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	protected $configurationSectionName = 'Configuration';
 
 	/**
-	 * @var t3lib_flexformtools
+	 * @var \TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools
 	 */
 	protected $flexformTool;
 
 	/**
-	 * @var Tx_Fluidpages_Service_PageService
+	 * @var \FluidTYPO3\Fluidpages\Service\PageService
 	 */
 	protected $pageService;
 
 	/**
-	 * @var Tx_Fluidpages_Service_ConfigurationService
+	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
 	 */
 	protected $configurationService;
 
@@ -101,22 +110,22 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
-		$this->flexformTool = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Configuration\\FlexForm\\FlexFormTools');
+		$this->flexformTool = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Configuration\\FlexForm\\FlexFormTools');
 	}
 
 	/**
-	 * @param Tx_Fluidpages_Service_PageService $pageService
+	 * @param \FluidTYPO3\Fluidpages\Service\PageService $pageService
 	 * @return void
 	 */
-	public function injectPageService(Tx_Fluidpages_Service_PageService $pageService) {
+	public function injectPageService(PageService $pageService) {
 		$this->pageService = $pageService;
 	}
 
 	/**
-	 * @param Tx_Fluidpages_Service_ConfigurationService $configurationService
+	 * @param \FluidTYPO3\Fluidpages\Service\ConfigurationService $configurationService
 	 * @return void
 	 */
-	public function injectConfigurationService(Tx_Fluidpages_Service_ConfigurationService $configurationService) {
+	public function injectConfigurationService(ConfigurationService $configurationService) {
 		$this->configurationService = $configurationService;
 	}
 
@@ -140,7 +149,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 		$extensionName = $this->getExtensionKey($row);
 		$paths = $this->configurationService->getPageConfiguration($extensionName);
 		if (TRUE === is_array($paths) && FALSE === empty($paths)) {
-			$paths = Tx_Flux_Utility_Path::translatePath($paths);
+			$paths = PathUtility::translatePath($paths);
 			return $paths;
 		}
 
@@ -167,7 +176,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 						if (TRUE === isset($possibleOverlayPaths['templateRootPath'])) {
 							$overlayTemplateRootPath = $possibleOverlayPaths['templateRootPath'];
 							$overlayTemplateRootPath = rtrim($overlayTemplateRootPath, '/');
-							$possibleOverlayFile = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($overlayTemplateRootPath . '/Page/' . $action . '.html');
+							$possibleOverlayFile = GeneralUtility::getFileAbsFileName($overlayTemplateRootPath . '/Page/' . $action . '.html');
 							if (TRUE === file_exists($possibleOverlayFile)) {
 								$templatePathAndFilename = $possibleOverlayFile;
 								break;
@@ -177,7 +186,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 				}
 			}
 		}
-		$templatePathAndFilename = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($templatePathAndFilename);
+		$templatePathAndFilename = GeneralUtility::getFileAbsFileName($templatePathAndFilename);
 		return $templatePathAndFilename;
 	}
 
@@ -217,7 +226,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 	public function postProcessDataStructure(array &$row, &$dataStructure, array $conf) {
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		if (TRUE === empty($action)) {
-			$this->configurationService->message('No controller action was found for this page.', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_WARNING);
+			$this->configurationService->message('No controller action was found for this page.', GeneralUtility::SYSLOG_SEVERITY_WARNING);
 			return NULL;
 		}
 		parent::postProcessDataStructure($row, $dataStructure, $conf);
@@ -231,7 +240,7 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		if (FALSE !== strpos($action, '->')) {
 			$extensionName = array_shift(explode('->', $action));
-			$extensionKey = \TYPO3\CMS\Core\Utility\GeneralUtility::camelCaseToLowerCaseUnderscored($extensionName);
+			$extensionKey = GeneralUtility::camelCaseToLowerCaseUnderscored($extensionName);
 			return $extensionKey;
 		}
 		return parent::getControllerExtensionKeyFromRecord($row);
@@ -291,8 +300,8 @@ class Tx_Fluidpages_Provider_PageProvider extends Tx_Flux_Provider_AbstractProvi
 		if (TRUE === $this->isUsingSubFieldName()) {
 			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
 			if ($configuration[$this->mainAction] === $configuration[$this->subAction]) {
-				$form = Tx_Flux_Form::create();
-				$form->createField('UserFunction', '')->setFunction('Tx_Fluidpages_UserFunction_NoSubPageConfiguration->renderField');
+				$form = Form::create();
+				$form->createField('UserFunction', '')->setFunction('FluidTYPO3\\Fluidpages\\UserFunction\\NoSubPageConfiguration->renderField');
 				return $form;
 			}
 		}

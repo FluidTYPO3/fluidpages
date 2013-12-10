@@ -1,4 +1,5 @@
 <?php
+namespace FluidTYPO3\Fluidpages\UserFunction;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,12 +24,14 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+
 /**
  * @author Danilo Bürger <danilo.buerger@hmspl.de>, Heimspiel GmbH
  * @package	Fluidpages
  * @subpackage UserFunction
  */
-class Tx_Fluidpages_UserFunction_NoSubPageConfiguration {
+class NoSubPageConfiguration {
 
 	/**
 	 * @param array $parameters Not used
@@ -37,6 +40,6 @@ class Tx_Fluidpages_UserFunction_NoSubPageConfiguration {
 	 */
 	public function renderField(&$parameters, &$pObj) {
 		unset($pObj, $parameters);
-		return Tx_Extbase_Utility_Localization::translate('pages.tx_fed_page_no_sub_page_configuration', 'Fluidpages');
+		return LocalizationUtility::translate('pages.tx_fed_page_no_sub_page_configuration', 'Fluidpages');
 	}
 }

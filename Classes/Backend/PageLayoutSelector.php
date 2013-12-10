@@ -1,4 +1,5 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Backend;
 /***************************************************************
  *  Copyright notice
  *
@@ -22,13 +23,18 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use FluidTYPO3\Flux\Form;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+
 /**
  * Class that renders a Page template selection field.
  *
  * @package	Fluidpages
  * @subpackage Backend
  */
-class Tx_Fluidpages_Backend_PageLayoutSelector {
+class PageLayoutSelector {
 
 	/**
 	 * @var \TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager
@@ -36,7 +42,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 	protected $configurationManager;
 
 	/**
-	 * @var Tx_Fluidpages_Service_ConfigurationService
+	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
 	 */
 	protected $configurationService;
 
@@ -46,7 +52,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 	protected $recognizedFormats = array('html', 'xml', 'txt', 'json', 'js', 'css');
 
 	/**
-	 * @var Tx_Fluidpages_Service_PageService
+	 * @var \FluidTYPO3\Fluidpages\Service\PageService
 	 */
 	protected $pageService;
 
@@ -54,10 +60,10 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
-		$objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		$this->configurationManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Configuration\\BackendConfigurationManager');
-		$this->configurationService = $objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
-		$this->pageService = $objectManager->get('Tx_Fluidpages_Service_PageService');
+		$this->configurationService = $objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService');
+		$this->pageService = $objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService');
 	}
 
 	/**
@@ -82,7 +88,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 		$forceHideInherit = (boolean) (0 === intval($parameters['row']['pid']));
 		if (FALSE === $pageIsSiteRoot || TRUE === $forceDisplayInheritSiteRoot || FALSE === $hideInheritFieldSiteRoot) {
 			if (FALSE === $forceHideInherit) {
-				$emptyLabel = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate('pages.tx_fed_page_controller_action.default', 'Fluidpages');
+				$emptyLabel = LocalizationUtility::translate('pages.tx_fed_page_controller_action.default', 'Fluidpages');
 				$selected = TRUE === empty($value) ? ' checked="checked" ' : NULL;
 				$selector .= '<label>';
 				$selector .= '<input type="radio" name="' . $name . '" ' . $onChange . '" value="" ' . $selected . '/> ' . $emptyLabel . LF;
@@ -90,28 +96,28 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 			}
 		}
 		foreach ($availableTemplates as $extension=>$group) {
-			if (FALSE === \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded($extension)) {
+			if (FALSE === ExtensionManagementUtility::isLoaded($extension)) {
 				$groupTitle = ucfirst($extension);
 			} else {
-				$emConfigFile = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($extension, 'ext_emconf.php');
+				$emConfigFile = ExtensionManagementUtility::extPath($extension, 'ext_emconf.php');
 				require $emConfigFile;
 				$groupTitle = $EM_CONF['']['title'];
 			}
 
-			$packageLabel = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate('pages.tx_fed_page_package', 'Fluidpages');
+			$packageLabel = LocalizationUtility::translate('pages.tx_fed_page_package', 'Fluidpages');
 			$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
 			foreach ($group as $template) {
 				try {
 					$paths = $this->configurationService->getPageConfiguration($extension);
-					$extensionName = \TYPO3\CMS\Core\Utility\GeneralUtility::underscoredToUpperCamelCase($extension);
+					$extensionName = GeneralUtility::underscoredToUpperCamelCase($extension);
 					$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
 					if (FALSE === file_exists($templatePathAndFilename)) {
-						$this->configurationService->message('Missing template file: ' . $templatePathAndFilename, \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_WARNING);
+						$this->configurationService->message('Missing template file: ' . $templatePathAndFilename, GeneralUtility::SYSLOG_SEVERITY_WARNING);
 						continue;
 					}
 					$form = $this->configurationService->getFormFromTemplateFile($templatePathAndFilename, 'Configuration', 'form', $paths, $extensionName);
-					if (FALSE === $form instanceof Tx_Flux_Form) {
-						$this->configurationService->message('Template file ' . $templatePathAndFilename . ' contains an unparsable Form definition', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_FATAL);
+					if (FALSE === $form instanceof Form) {
+						$this->configurationService->message('Template file ' . $templatePathAndFilename . ' contains an unparsable Form definition', GeneralUtility::SYSLOG_SEVERITY_FATAL);
 						continue;
 					}
 					if (FALSE === $form->getEnabled()) {
@@ -119,7 +125,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 					}
 					$thumbnail = $form->getIcon();
 					$label = $form->getLabel();
-					$translatedLabel = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($label, $extensionName);
+					$translatedLabel = LocalizationUtility::translate($label, $extensionName);
 					if (NULL !== $translatedLabel) {
 						$label = $translatedLabel;
 					}
@@ -130,7 +136,7 @@ class Tx_Fluidpages_Backend_PageLayoutSelector {
 					$option .= '<input type="radio" value="' . $optionValue . '"' . $selected . ' name="' . $name . '" ' . $onChange . ' /> ' . $label;
 					$option .= '</label>';
 					$selector .= $option . LF;
-				} catch (Exception $error) {
+				} catch (\Exception $error) {
 					$this->configurationService->debug($error);
 				}
 			}

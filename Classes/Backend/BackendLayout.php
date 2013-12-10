@@ -1,4 +1,5 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Backend;
 /***************************************************************
  *  Copyright notice
  *
@@ -22,13 +23,17 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use FluidTYPO3\Flux\Utility\VersionUtility;
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Class for backend layouts
  *
  * @package	Fluidpages
  * @subpackage Backend
  */
-class Tx_Fluidpages_Backend_BackendLayout implements \TYPO3\CMS\Core\SingletonInterface {
+class BackendLayout implements SingletonInterface {
 
 	/**
 	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
@@ -36,12 +41,12 @@ class Tx_Fluidpages_Backend_BackendLayout implements \TYPO3\CMS\Core\SingletonIn
 	protected $objectManager;
 
 	/**
-	 * @var Tx_Fluidpages_Service_ConfigurationService
+	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
 	 */
 	protected $configurationService;
 
 	/**
-	 * @var Tx_Fluidpages_Service_PageService
+	 * @var \FluidTYPO3\Fluidpages\Service\PageService
 	 */
 	protected $pageService;
 
@@ -49,9 +54,9 @@ class Tx_Fluidpages_Backend_BackendLayout implements \TYPO3\CMS\Core\SingletonIn
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-		$this->configurationService = $this->objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
-		$this->pageService = $this->objectManager->get('Tx_Fluidpages_Service_PageService');
+		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		$this->configurationService = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService');
+		$this->pageService = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService');
 	}
 
 	/**
@@ -73,25 +78,25 @@ class Tx_Fluidpages_Backend_BackendLayout implements \TYPO3\CMS\Core\SingletonIn
 			$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $record);
 			$action = $provider->getControllerActionFromRecord($record);
 			if (TRUE === empty($action)) {
-				$this->configurationService->message('No template selected - backend layout will not be rendered', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_INFO);
+				$this->configurationService->message('No template selected - backend layout will not be rendered', GeneralUtility::SYSLOG_SEVERITY_INFO);
 				return NULL;
 			}
 			$paths = $provider->getTemplatePaths($record);
 			if (0 === count($paths)) {
-				if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
-					if (FALSE === (boolean) \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('redirected')) {
+				if (VersionUtility::assertCoreVersionIsAtLeastSixPointZero()) {
+					if (FALSE === (boolean) GeneralUtility::_GET('redirected')) {
 						// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
-						$get = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET();
+						$get = GeneralUtility::_GET();
 						unset($get['id']);
 						$get['redirected'] = 1;
-						$params = \TYPO3\CMS\Core\Utility\GeneralUtility::implodeArrayForUrl('', $get);
+						$params = GeneralUtility::implodeArrayForUrl('', $get);
 						header('Location: ?id=' . $pageUid . $params);
 						exit();
 					}
 					return NULL;
 				}
 				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
-					. 'have included the TypoScript for the desired template collection.', \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_NOTICE);
+					. 'have included the TypoScript for the desired template collection.', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
 				return NULL;
 			}
 			$grid = $provider->getGrid($record)->build();
@@ -100,7 +105,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements \TYPO3\CMS\Core\SingletonIn
 				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
 				return NULL;
 			}
-		} catch (Exception $error) {
+		} catch (\Exception $error) {
 			$this->configurationService->debug($error);
 			return NULL;
 		}
