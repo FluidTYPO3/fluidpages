@@ -227,7 +227,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	public function postProcessDataStructure(array &$row, &$dataStructure, array $conf) {
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		if (TRUE === empty($action)) {
-			$this->configurationService->message('No controller action was found for this page.', GeneralUtility::SYSLOG_SEVERITY_WARNING);
+			if (FALSE === $this->isUsingSubFieldName()) {
+				$this->configurationService->message('No controller action was found for this page.', GeneralUtility::SYSLOG_SEVERITY_WARNING);
+			}
 			return NULL;
 		}
 		parent::postProcessDataStructure($row, $dataStructure, $conf);
