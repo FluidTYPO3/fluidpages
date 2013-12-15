@@ -1,4 +1,4 @@
-[GLOBAL]
+
 page = PAGE
 page.typeNum = 0
 page.5 = USER

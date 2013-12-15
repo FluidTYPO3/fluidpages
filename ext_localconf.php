@@ -5,6 +5,7 @@ if (!defined ('TYPO3_MODE')) {
 
 \FluidTYPO3\Flux\Core::unregisterConfigurationProvider('Tx_Fed_Provider_Configuration_PageConfigurationProvider');
 \FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\PageProvider');
+\FluidTYPO3\Flux\Core::addStaticTypoScript('EXT:fluidpages/Configuration/TypoScript/');
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
 	$_EXTKEY,
