@@ -23,6 +23,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use FluidTYPO3\Flux\Service\ContentService;
 use FluidTYPO3\Flux\Utility\VersionUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -186,7 +187,7 @@ class BackendLayout implements SingletonInterface {
 	 * @return void
 	 */
 	public function postProcessColPosProcFuncItems(array &$params) {
-		array_push($params['items'], array('Fluid Content Area', -42, NULL));
+		array_push($params['items'], array('Fluid Content Area', ContentService::COLPOS_FLUXCONTENT, NULL));
 	}
 
 }
