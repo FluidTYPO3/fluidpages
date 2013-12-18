@@ -126,11 +126,11 @@ class BackendLayout implements SingletonInterface {
 			$colCount = 0;
 			$rowKey = ($rowIndex + 1) . '.';
 			$columns = array();
-			foreach ($row['columns'] as $name => $column) {
+			foreach ($row['columns'] as $column) {
 				$key = ($index + 1) . '.';
 				$columnName = $GLOBALS['LANG']->sL($column['label']);
-				if (NULL === $columnName) {
-					$columnName = $column['label'];
+				if (TRUE === empty($columnName)) {
+					$columnName = $column['name'];
 				}
 				$columns[$key] = array(
 					'name' => $columnName,
