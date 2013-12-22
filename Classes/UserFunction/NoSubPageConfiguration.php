@@ -1,9 +1,9 @@
 <?php
-namespace FluidTYPO3\Fluidpages\Controller;
+namespace FluidTYPO3\Fluidpages\UserFunction;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2013 Claus Due <claus@wildside.dk>, Wildside A/S
+ *  (c) 2013 Danilo Bürger <danilo.buerger@hmspl.de>, Heimspiel GmbH
  *
  *  All rights reserved
  *
@@ -24,18 +24,22 @@ namespace FluidTYPO3\Fluidpages\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
- * Page Controller Interface
- *
- * Implement in custom controllers which must be located at
- * <PackageName>/Classes/Controller/PageController by convention.
- *
- * @package Fluidpages
- * @subpackage Controller
- * @route off
+ * @author Danilo Bürger <danilo.buerger@hmspl.de>, Heimspiel GmbH
+ * @package	Fluidpages
+ * @subpackage UserFunction
  */
-interface PageControllerInterface extends ControllerInterface {
+class NoSubPageConfiguration {
 
+	/**
+	 * @param array $parameters Not used
+	 * @param object $pObj Not used
+	 * @return string
+	 */
+	public function renderField(&$parameters, &$pObj) {
+		unset($pObj, $parameters);
+		return LocalizationUtility::translate('pages.tx_fed_page_no_sub_page_configuration', 'Fluidpages');
+	}
 }
