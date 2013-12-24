@@ -169,9 +169,7 @@ class PageLayoutView extends \TYPO3\CMS\Backend\View\PageLayoutView {
 		$showHidden = $this->tt_contentConfig['showHidden'] ? '' : \TYPO3\CMS\Backend\Utility\BackendUtility::BEenableFields('tt_content');
 		$pageTitleParamForAltDoc = '&recTitle=' . rawurlencode(\TYPO3\CMS\Backend\Utility\BackendUtility::getRecordTitle('pages', \TYPO3\CMS\Backend\Utility\BackendUtility::getRecordWSOL('pages', $id), TRUE));
 		$GLOBALS['SOBE']->doc->getPageRenderer()->loadExtJs();
-		$siteUrl = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
-		$jsPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('fluidpages') . 'Resources/Public/js/typo3pageModule.js';
-		$GLOBALS['SOBE']->doc->getPageRenderer()->addJsFile($siteUrl . $jsPath);
+		$GLOBALS['SOBE']->doc->getPageRenderer()->addJsFile(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('fluidpages') . 'Resources/Public/js/typo3pageModule.js');
 		// Get labels for CTypes and tt_content element fields in general:
 		$this->CType_labels = array();
 		foreach ($GLOBALS['TCA']['tt_content']['columns']['CType']['config']['items'] as $val) {
