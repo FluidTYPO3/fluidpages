@@ -74,7 +74,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 			$registeredExtensionKeys = Tx_Flux_Core::getRegisteredProviderExtensionKeys('Page');
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$extensionViewPaths = $this->getPageConfiguration($registeredExtensionKey);
-				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+				if (FALSE === isset($extensionViewPaths['extensionKey'])) {
 					$extensionViewPaths['extensionKey'] = $registeredExtensionKey;
 				}
 				// preemptive caching; once read here, the cached value is returned when asking for specific extensions later
