@@ -101,7 +101,7 @@ class BackendLayout implements SingletonInterface {
 				return NULL;
 			}
 			$grid = $provider->getGrid($record)->build();
-			if (FALSE === is_array($grid)) {
+			if (FALSE === is_array($grid) || 0 === count($grid['rows'])) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior
 				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
 				return NULL;
