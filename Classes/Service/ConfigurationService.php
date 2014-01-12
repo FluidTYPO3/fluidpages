@@ -87,7 +87,7 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 			$registeredExtensionKeys = Core::getRegisteredProviderExtensionKeys('Page');
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$extensionViewPaths = $this->getPageConfiguration($registeredExtensionKey);
-				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+				if (FALSE === isset($extensionViewPaths['extensionKey'])) {
 					$extensionViewPaths['extensionKey'] = ExtensionNamingUtility::getExtensionKey($registeredExtensionKey);
 				}
 				// preemptive caching; once read here, the cached value is returned when asking for specific extensions later
