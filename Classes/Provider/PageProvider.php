@@ -296,7 +296,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 
 	/**
 	 * @param array $row
-	 * @return Tx_Flux_Form|NULL
+	 * @return \FluidTYPO3\Flux\Form|NULL
 	 */
 	public function getForm(array $row) {
 		if (TRUE === $this->isUsingSubFieldName()) {
