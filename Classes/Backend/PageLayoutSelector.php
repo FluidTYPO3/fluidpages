@@ -97,10 +97,11 @@ class PageLayoutSelector {
 			}
 		}
 		foreach ($availableTemplates as $extension=>$group) {
-			if (FALSE === ExtensionManagementUtility::isLoaded($extension)) {
+			$extensionKey = ExtensionNamingUtility::getExtensionKey($extension);
+			if (FALSE === ExtensionManagementUtility::isLoaded($extensionKey)) {
 				$groupTitle = ucfirst($extension);
 			} else {
-				$emConfigFile = ExtensionManagementUtility::extPath($extension, 'ext_emconf.php');
+				$emConfigFile = ExtensionManagementUtility::extPath($extensionKey, 'ext_emconf.php');
 				require $emConfigFile;
 				$groupTitle = $EM_CONF['']['title'];
 			}
