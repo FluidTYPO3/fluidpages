@@ -173,7 +173,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	 * @return void
 	 */
 	public function postProcessColPosProcFuncItems(array &$params) {
-		array_push($params['items'], array('Fluid Content Area', -42, NULL));
+		array_push($params['items'], array('Fluid Content Area', 18181, NULL));
 	}
 
 }
