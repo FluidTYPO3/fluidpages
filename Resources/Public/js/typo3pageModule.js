@@ -1,8 +1,8 @@
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2010 Steffen Gebert <steffen@steffen-gebert.de>
- *  (c) 2013 Danilo Bürger <danilo.buerger@hmspl.de>, Heimspiel GmbH
+ *  (c) 2014 Steffen Gebert <steffen@steffen-gebert.de>
+ *  (c) 2014 Danilo Bürger <danilo.buerger@hmspl.de>, Heimspiel GmbH
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is

@@ -3,7 +3,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2011 Claus Due <claus@wildside.dk>, Wildside A/S
+ *  (c) 2014 Claus Due <claus@namelesscoder.net>
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -97,10 +97,11 @@ class PageLayoutSelector {
 			}
 		}
 		foreach ($availableTemplates as $extension=>$group) {
-			if (FALSE === ExtensionManagementUtility::isLoaded($extension)) {
+			$extensionKey = ExtensionNamingUtility::getExtensionKey($extension);
+			if (FALSE === ExtensionManagementUtility::isLoaded($extensionKey)) {
 				$groupTitle = ucfirst($extension);
 			} else {
-				$emConfigFile = ExtensionManagementUtility::extPath($extension, 'ext_emconf.php');
+				$emConfigFile = ExtensionManagementUtility::extPath($extensionKey, 'ext_emconf.php');
 				require $emConfigFile;
 				$groupTitle = $EM_CONF['']['title'];
 			}

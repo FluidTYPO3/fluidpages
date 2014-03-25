@@ -3,7 +3,7 @@ namespace FluidTYPO3\Fluidpages\Service;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2012 Claus Due <claus@wildside.dk>, Wildside A/S
+ *  (c) 2014 Claus Due <claus@namelesscoder.net>
  *
  *  All rights reserved
  *
@@ -36,7 +36,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Provides methods to read various configuration related
  * to Fluid Content Elements.
  *
- * @author Claus Due, Wildside A/S
+ * @author Claus Due
  * @package Fluidpages
  * @subpackage Service
  */
@@ -87,7 +87,7 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 			$registeredExtensionKeys = Core::getRegisteredProviderExtensionKeys('Page');
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$extensionViewPaths = $this->getPageConfiguration($registeredExtensionKey);
-				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
+				if (FALSE === isset($extensionViewPaths['extensionKey'])) {
 					$extensionViewPaths['extensionKey'] = ExtensionNamingUtility::getExtensionKey($registeredExtensionKey);
 				}
 				// preemptive caching; once read here, the cached value is returned when asking for specific extensions later

@@ -3,7 +3,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2011 Claus Due <claus@wildside.dk>, Wildside A/S
+ *  (c) 2014 Claus Due <claus@namelesscoder.net>
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -101,7 +101,7 @@ class BackendLayout implements SingletonInterface {
 				return NULL;
 			}
 			$grid = $provider->getGrid($record)->build();
-			if (FALSE === is_array($grid)) {
+			if (FALSE === is_array($grid) || 0 === count($grid['rows'])) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior
 				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
 				return NULL;

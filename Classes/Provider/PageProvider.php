@@ -3,7 +3,7 @@ namespace FluidTYPO3\Fluidpages\Provider;
 /*****************************************************************
  *  Copyright notice
  *
- *  (c) 2012 Claus Due <claus@wildside.dk>, Wildside A/S
+ *  (c) 2014 Claus Due <claus@namelesscoder.net>
  *
  *  All rights reserved
  *
@@ -36,7 +36,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Page Configuration Provider
  *
- * @author Claus Due <claus@wildside.dk>, Wildside A/S
+ * @author Claus Due <claus@namelesscoder.net>
  * @package Fluidpages
  * @subpackage Provider
  */
@@ -296,7 +296,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 
 	/**
 	 * @param array $row
-	 * @return Tx_Flux_Form|NULL
+	 * @return \FluidTYPO3\Flux\Form|NULL
 	 */
 	public function getForm(array $row) {
 		if (TRUE === $this->isUsingSubFieldName()) {
