@@ -1,4 +1,5 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Override\Backend\View;
 /***************************************************************
  *  Copyright notice
  *
@@ -32,23 +33,26 @@
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
+
+use FluidTYPO3\Fluidpages\Backend\BackendLayout;
+
 /**
  * Child class for the Web > Page module
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
-class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backend\View\PageLayoutView {
+class PageLayoutView extends \TYPO3\CMS\Backend\View\PageLayoutView {
 
 	/**
-	 * @var Tx_Fluidpages_Backend_BackendLayout
+	 * @var \FluidTYPO3\Fluidpages\Backend\BackendLayout
 	 */
 	protected $backendLayout;
 
 	/**
-	 * @param Tx_Fluidpages_Backend_BackendLayout $backendLayout
+	 * @param \FluidTYPO3\Fluidpages\Backend\BackendLayout $backendLayout
 	 * @return void
 	 */
-	public function injectBackendLayout(Tx_Fluidpages_Backend_BackendLayout $backendLayout) {
+	public function injectBackendLayout(BackendLayout $backendLayout) {
 		$this->backendLayout = $backendLayout;
 	}
 
@@ -56,10 +60,10 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 	 * Constructor
 	 */
 	public function __construct() {
-		/** @var $objectManager Tx_Extbase_Object_ObjectManager */
-		$objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
-		/** @var $backendLayout Tx_Fluidpages_Backend_BackendLayout */
-		$backendLayout = $objectManager->get('Tx_Fluidpages_Backend_BackendLayout');
+		/** @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
+		$objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		/** @var \FluidTYPO3\Fluidpages\Backend\BackendLayout $backendLayout */
+		$backendLayout = $objectManager->get('FluidTYPO3\\Fluidpages\\Backend\\BackendLayout');
 		$this->injectBackendLayout($backendLayout);
 	}
 
@@ -74,6 +78,8 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 			$config = array();
 			$this->backendLayout->postProcessBackendLayout($this->id, $config);
 			$typoScriptArray = $config['__config'];
+			$typoScriptArray['colCount'] = $config['__config']['backend_layout.']['colCount'];
+			$typoScriptArray['rowCount'] = $config['__config']['backend_layout.']['rowCount'];
 			$typoScriptArray['rows.'] = $config['__config']['backend_layout.']['rows.'];
 			unset($typoScriptArray['backend_layout.']);
 			$config['config'] = $this->compactTypoScriptArray(array('backend_layout.' => $typoScriptArray));
@@ -129,7 +135,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 			return NULL;
 		}
 		$uid = 0;
-		$clipBoard = new t3lib_clipboard();
+		$clipBoard = new \TYPO3\CMS\Backend\Clipboard\Clipboard();
 		if (TRUE === $reference) {
 			$command = 'reference';
 			$label = 'Paste as reference in this position';
@@ -141,7 +147,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 		}
 		$relativeTo = $pid . '-' . $command . '-' . $relativeUid . '-' . $uid;
 		$relativeTo .= '--' . $colPos;
-		$icon = t3lib_iconWorks::getSpriteIcon($icon, array('title' => $label, 'class' => 't3-icon-actions t3-icon-document-new'));
+		$icon = \TYPO3\CMS\Backend\Utility\IconUtility::getSpriteIcon($icon, array('title' => $label, 'class' => 't3-icon-actions t3-icon-document-new'));
 		$uri = "javascript:top.content.list_frame.location.href=top.TS.PATH_typo3+'";
 		$uri .= $clipBoard->pasteUrl('tt_content', $relativeTo);
 		$uri .= "';";
@@ -163,7 +169,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 		$showHidden = $this->tt_contentConfig['showHidden'] ? '' : \TYPO3\CMS\Backend\Utility\BackendUtility::BEenableFields('tt_content');
 		$pageTitleParamForAltDoc = '&recTitle=' . rawurlencode(\TYPO3\CMS\Backend\Utility\BackendUtility::getRecordTitle('pages', \TYPO3\CMS\Backend\Utility\BackendUtility::getRecordWSOL('pages', $id), TRUE));
 		$GLOBALS['SOBE']->doc->getPageRenderer()->loadExtJs();
-		$GLOBALS['SOBE']->doc->getPageRenderer()->addJsFile($GLOBALS['BACK_PATH'] . 'sysext/cms/layout/js/typo3pageModule.js');
+		$GLOBALS['SOBE']->doc->getPageRenderer()->addJsFile('/' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('fluidpages') . 'Resources/Public/js/typo3pageModule.js');
 		// Get labels for CTypes and tt_content element fields in general:
 		$this->CType_labels = array();
 		foreach ($GLOBALS['TCA']['tt_content']['columns']['CType']['config']['items'] as $val) {
@@ -395,7 +401,7 @@ class Tx_Fluidpages_Override_Backend_View_PageLayoutView extends TYPO3\CMS\Backe
 				foreach ($languageColumn as $cKey => $cCont) {
 					$out .= '
 					<tr>
-						<td valign="top" class="t3-gridCell t3-page-lang-column"">' . implode(('</td>' . '
+						<td valign="top" class="t3-gridCell t3-page-lang-column">' . implode(('</td>' . '
 						<td valign="top" class="t3-gridCell t3-page-lang-column">'), $cCont) . '</td>
 					</tr>';
 					if ($this->defLangBinding) {

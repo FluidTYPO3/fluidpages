@@ -1,8 +1,9 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Controller;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2013 Claus Due <claus@wildside.dk>, Wildside A/S
+ *  (c) 2014 Claus Due <claus@namelesscoder.net>
  *
  *  All rights reserved
  *
@@ -23,6 +24,11 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Flux\Controller\AbstractFluxController;
+use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
+
 /**
  * Page Controller
  *
@@ -30,7 +36,7 @@
  * @subpackage Controller
  * @route off
  */
-abstract class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_Controller_AbstractFluxController implements Tx_Fluidpages_Controller_PageControllerInterface {
+abstract class AbstractPageController extends AbstractFluxController implements PageControllerInterface {
 
 	/**
 	 * @var string
@@ -43,46 +49,37 @@ abstract class Tx_Fluidpages_Controller_AbstractPageController extends Tx_Flux_C
 	protected $fluxTableName = 'pages';
 
 	/**
-	 * @var string
-	 */
-	protected $fallbackExtensionKey = 'fluidpages';
-
-	/**
-	 * @var Tx_Fluidpages_Service_PageService
+	 * @var \FluidTYPO3\Fluidpages\Service\PageService
 	 */
 	protected $pageService;
 
 	/**
-	 * @var Tx_Fluidpages_Service_ConfigurationService
+	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
 	 */
 	protected $configurationService;
 
 	/**
-	 * @param Tx_Fluidpages_Service_PageService $pageService
+	 * @param \FluidTYPO3\Fluidpages\Service\PageService $pageService
 	 */
-	public function injectPageService(Tx_Fluidpages_Service_PageService $pageService) {
+	public function injectPageService(PageService $pageService) {
 		$this->pageService = $pageService;
 	}
 
 	/**
-	 * @param Tx_Fluidpages_Service_ConfigurationService $configurationService
+	 * @param \FluidTYPO3\Fluidpages\Service\ConfigurationService $configurationService
 	 * @return void
 	 */
-	public function injectConfigurationService(Tx_Fluidpages_Service_ConfigurationService $configurationService) {
+	public function injectConfigurationService(ConfigurationService $configurationService) {
 		$this->configurationService = $configurationService;
 	}
 
 	/**
-	 * @param Tx_Extbase_MVC_View_ViewInterface $view
+	 * @param \TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view
 	 * @return void
 	 */
-	public function initializeView(Tx_Extbase_MVC_View_ViewInterface $view) {
+	public function initializeView(ViewInterface $view) {
 		$this->configurationManager->getContentObject()->data = $GLOBALS['TSFE']->page;
 		parent::initializeView($view);
-		$view->assign('page', $GLOBALS['TSFE']->page);
-		$view->assign('user', $GLOBALS['TSFE']->fe_user->user);
-		$view->assign('cookies', $_COOKIE);
-		$view->assign('session', $_SESSION);
 	}
 
 	/**

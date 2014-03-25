@@ -1,8 +1,9 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Backend;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2011 Claus Due <claus@wildside.dk>, Wildside A/S
+ *  (c) 2014 Claus Due <claus@namelesscoder.net>
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -22,26 +23,31 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use FluidTYPO3\Flux\Service\ContentService;
+use FluidTYPO3\Flux\Utility\VersionUtility;
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Class for backend layouts
  *
  * @package	Fluidpages
  * @subpackage Backend
  */
-class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
+class BackendLayout implements SingletonInterface {
 
 	/**
-	 * @var Tx_Extbase_Object_ObjectManager
+	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
 	 */
 	protected $objectManager;
 
 	/**
-	 * @var Tx_Fluidpages_Service_ConfigurationService
+	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
 	 */
 	protected $configurationService;
 
 	/**
-	 * @var Tx_Fluidpages_Service_PageService
+	 * @var \FluidTYPO3\Fluidpages\Service\PageService
 	 */
 	protected $pageService;
 
@@ -49,9 +55,9 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
-		$this->configurationService = $this->objectManager->get('Tx_Fluidpages_Service_ConfigurationService');
-		$this->pageService = $this->objectManager->get('Tx_Fluidpages_Service_PageService');
+		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		$this->configurationService = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService');
+		$this->pageService = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService');
 	}
 
 	/**
@@ -59,70 +65,76 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	 *
 	 * @param integer $pageUid Starting page UID in the rootline (this current page)
 	 * @param array $backendLayout The backend layout which was detected from page id
-	 * @return void
+	 * @return NULL|void
 	 */
 	public function postProcessBackendLayout(&$pageUid, &$backendLayout) {
 		try {
-			$record = $this->pageService->getPageTemplateConfiguration($pageUid);
-			$variables = array();
-			list ($extensionName, $action) = explode('->', $record['tx_fed_page_controller_action']);
+			$record = $this->pageService->getPage($pageUid);
+
+			// Stop processing if no fluidpages template configured in rootline
+			if (NULL === $record) {
+				return NULL;
+			}
+
+			$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $record);
+			$action = $provider->getControllerActionFromRecord($record);
 			if (TRUE === empty($action)) {
-				$this->configurationService->message('No template selected - backend layout will not be rendered', t3lib_div::SYSLOG_SEVERITY_INFO);
-				return;
+				$this->configurationService->message('No template selected - backend layout will not be rendered', GeneralUtility::SYSLOG_SEVERITY_INFO);
+				return NULL;
 			}
-			$paths = $this->configurationService->getPageConfiguration($extensionName);
-			if (0 === count($paths) && FALSE === (boolean) t3lib_div::_GET('redirected')) {
-				if (Tx_Flux_Utility_Version::assertCoreVersionIsAtLeastSixPointZero()) {
-					// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
-					$get = t3lib_div::_GET();
-					unset($get['id']);
-					$get['redirected'] = 1;
-					$params = t3lib_div::implodeArrayForUrl('', $get);
-					header('Location: ?id=' . $pageUid . $params);
-					exit();
-				}
-				return;
-			}
+			$paths = $provider->getTemplatePaths($record);
 			if (0 === count($paths)) {
+				if (VersionUtility::assertCoreVersionIsAtLeastSixPointZero()) {
+					if (FALSE === (boolean) GeneralUtility::_GET('redirected')) {
+						// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
+						$get = GeneralUtility::_GET();
+						unset($get['id']);
+						$get['redirected'] = 1;
+						$params = GeneralUtility::implodeArrayForUrl('', $get);
+						header('Location: ?id=' . $pageUid . $params);
+						exit();
+					}
+					return NULL;
+				}
 				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
-					. 'have included the TypoScript for the desired template collection.', t3lib_div::SYSLOG_SEVERITY_NOTICE);
-				return;
+					. 'have included the TypoScript for the desired template collection.', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
+				return NULL;
 			}
-			$flexFormSource = isset($record['tx_fed_page_flexform']) ? $record['tx_fed_page_flexform'] : NULL;
-			if ($flexFormSource !== NULL) {
-				$variables = $this->configurationService->convertFlexFormContentToArray($flexFormSource);
-			}
-			$templatePathAndFileName = $paths['templateRootPath'] . 'Page/' . $action . '.html';
-			$grid = $this->configurationService->getGridFromTemplateFile($templatePathAndFileName, $variables, 'Configuration', $paths, $extensionName);
-			if (is_array($grid) === FALSE) {
+			$grid = $provider->getGrid($record)->build();
+			if (FALSE === is_array($grid) || 0 === count($grid['rows'])) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior
 				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
-				return;
+				return NULL;
 			}
-		} catch (Exception $error) {
+		} catch (\Exception $error) {
 			$this->configurationService->debug($error);
-			return;
+			return NULL;
 		}
 
 		$config = array(
-			'colCount' => 0,
-			'rowCount' => 0,
 			'backend_layout.' => array(
+				'colCount' => 0,
+				'rowCount' => 0,
 				'rows.' => array()
 			)
 		);
 		$colPosList = array();
 		$items = array();
-
-		foreach ($grid as $rowIndex => $row) {
+		$rowIndex = 0;
+		foreach ($grid['rows'] as $row) {
+			$index = 0;
 			$colCount = 0;
 			$rowKey = ($rowIndex + 1) . '.';
 			$columns = array();
-			foreach ($row as $index => $column) {
+			foreach ($row['columns'] as $column) {
 				$key = ($index + 1) . '.';
+				$columnName = $GLOBALS['LANG']->sL($column['label']);
+				if (TRUE === empty($columnName)) {
+					$columnName = $column['name'];
+				}
 				$columns[$key] = array(
-					'name' => $column['name'],
-					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['colCount'],
+					'name' => $columnName,
+					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['backend_layout.']['colCount']
 				);
 				if ($column['colspan']) {
 					$columns[$key]['colspan'] = $column['colspan'];
@@ -133,12 +145,14 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 				array_push($colPosList, $columns[$key]['colPos']);
 				array_push($items, array($columns[$key]['name'], $columns[$key]['colPos'], NULL));
 				$colCount += $column['colspan'] ? $column['colspan'] : 1;
+				++ $index;
 			}
-			$config['colCount'] = max($config['colCount'], $colCount);
-			$config['rowCount']++;
+			$config['backend_layout.']['colCount'] = max($config['backend_layout.']['colCount'], $colCount);
+			$config['backend_layout.']['rowCount']++;
 			$config['backend_layout.']['rows.'][$rowKey] = array(
 				'columns.' => $columns
 			);
+			++ $rowIndex;
 		}
 		unset($backendLayout['config']);
 		$backendLayout['__config'] = $config;
@@ -173,7 +187,7 @@ class Tx_Fluidpages_Backend_BackendLayout implements t3lib_Singleton {
 	 * @return void
 	 */
 	public function postProcessColPosProcFuncItems(array &$params) {
-		array_push($params['items'], array('Fluid Content Area', 18181, NULL));
+		array_push($params['items'], array('Fluid Content Area', ContentService::COLPOS_FLUXCONTENT, NULL));
 	}
 
 }

@@ -1,8 +1,9 @@
 <?php
+namespace FluidTYPO3\Fluidpages\Service;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2012 Claus Due <claus@wildside.dk>, Wildside A/S
+ *  (c) 2014 Claus Due <claus@namelesscoder.net>
  *
  *  All rights reserved
  *
@@ -23,22 +24,23 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use FluidTYPO3\Flux\Core;
+use FluidTYPO3\Flux\Service\FluxService;
+use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Configuration Service
  *
  * Provides methods to read various configuration related
  * to Fluid Content Elements.
  *
- * @author Claus Due, Wildside A/S
+ * @author Claus Due
  * @package Fluidpages
  * @subpackage Service
  */
-class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxService implements t3lib_Singleton {
-
-	/**
-	 * @var array
-	 */
-	private static $cache = array();
+class ConfigurationService extends FluxService implements SingletonInterface {
 
 	/**
 	 * Get definitions of paths for Page Templates defined in TypoScript
@@ -51,6 +53,17 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		$cacheKey = NULL === $extensionName ? 'pages_global' : 'pages_' . $extensionName;
 		if (TRUE === isset(self::$cache[$cacheKey])) {
 			return self::$cache[$cacheKey];
+		}
+		if (NULL !== $extensionName && TRUE === empty($extensionName)) {
+			// Note: a NULL extensionName means "fetch ALL defined collections" whereas
+			// an empty value that is not null indicates an incorrect caller. Instead
+			// of returning ALL paths here, an empty array is the proper return value.
+			// However, dispatch a debug message to inform integrators of the problem.
+			$this->message('Template paths have been attempted fetched using an empty value that is NOT NULL in ' . get_class($this) .
+				'. This indicates a potential problem with your TypoScript configuration - a value which is expected to be ' .
+			    'an array may be defined as a string. This error is not fatal but may prevent the affected collection (which cannot ' .
+				'be identified here) from showing up', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
+			return array();
 		}
 		if (TYPO3_MODE === 'BE') {
 			// Hack. This is no fun matter, but the TYPO3 BackendConfigurationManager
@@ -69,13 +82,13 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		}
 		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', 'fluidpages');
 		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', 'fed');
-		$merged = (array) t3lib_div::array_merge_recursive_overrule($oldLocation, $newLocation);
+		$merged = (array) GeneralUtility::array_merge_recursive_overrule($oldLocation, $newLocation);
 		if (NULL === $extensionName) {
-			$registeredExtensionKeys = Tx_Flux_Core::getRegisteredProviderExtensionKeys('Page');
+			$registeredExtensionKeys = Core::getRegisteredProviderExtensionKeys('Page');
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 				$extensionViewPaths = $this->getPageConfiguration($registeredExtensionKey);
-				if (FALSE === isset($nativeViewLocation['extensionKey'])) {
-					$extensionViewPaths['extensionKey'] = $registeredExtensionKey;
+				if (FALSE === isset($extensionViewPaths['extensionKey'])) {
+					$extensionViewPaths['extensionKey'] = ExtensionNamingUtility::getExtensionKey($registeredExtensionKey);
 				}
 				// preemptive caching; once read here, the cached value is returned when asking for specific extensions later
 				if (FALSE === isset($extensionViewPaths['templateRootPath'])) {
@@ -88,10 +101,10 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 		} else {
 			$nativeViewLocation = $this->getViewConfigurationForExtensionName($extensionName);
 			if (TRUE === is_array($nativeViewLocation)) {
-				$merged = t3lib_div::array_merge_recursive_overrule($nativeViewLocation, $merged);
+				$merged = GeneralUtility::array_merge_recursive_overrule($nativeViewLocation, $merged);
 			}
 			if (FALSE === isset($nativeViewLocation['extensionKey'])) {
-				$merged['extensionKey'] = t3lib_div::camelCaseToLowerCaseUnderscored($extensionName);
+				$merged['extensionKey'] = ExtensionNamingUtility::getExtensionKey($extensionName);
 			}
 			if (FALSE === isset($merged['templateRootPath'])) {
 				$this->sendWarningAboutMissingTemplatePath($extensionName);
@@ -108,7 +121,7 @@ class Tx_Fluidpages_Service_ConfigurationService extends Tx_Flux_Service_FluxSer
 	protected function sendWarningAboutMissingTemplatePath($extensionName) {
 		$this->message('The configuration for extension "' . $extensionName . '" does not contain ' .
 			'at least a templateRootPath. This indicates that the static TypoScript for the extension is not loaded or ' .
-			'it uses constants which are either not defined, cleared or set to an empty value', t3lib_div::SYSLOG_SEVERITY_FATAL);
+			'it uses constants which are either not defined, cleared or set to an empty value', GeneralUtility::SYSLOG_SEVERITY_FATAL);
 	}
 
 }
