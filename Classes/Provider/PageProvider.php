@@ -228,7 +228,8 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		if (TRUE === empty($action)) {
 			if (FALSE === $this->isUsingSubFieldName()) {
-				$this->configurationService->message('No controller action was found for this page.', GeneralUtility::SYSLOG_SEVERITY_WARNING);
+				$this->configurationService->message('Page Layout not selected and no Layout was inherited. To fix this, select a
+					page Layout on this or any parent page', GeneralUtility::SYSLOG_SEVERITY_WARNING);
 			}
 			return NULL;
 		}
