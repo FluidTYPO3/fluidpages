@@ -10,3 +10,19 @@ page.10 >
 plugin.tx_fluidpages {
 	siteRootInheritance = {$plugin.tx_fluidpages.siteRootInheritance}
 }
+
+fluidpagesRawTemplate = PAGE
+fluidpagesRawTemplate {
+	typeNum = 235
+	headerData >
+	config {
+		disableAllHeaderCode = 1
+		additionalHeaders = Content-type:text/html
+	}
+	10 = USER
+	10 {
+		userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+		extensionName = Fluidpages
+		pluginName = Page
+	}
+}

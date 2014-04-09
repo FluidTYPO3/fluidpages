@@ -83,6 +83,21 @@ abstract class AbstractPageController extends AbstractFluxController implements 
 	}
 
 	/**
+	 * @return string
+	 */
+	public function rawAction() {
+		$record = $this->getRecord();
+		$templateFileReference = $record['tx_fluidpages_templatefile'];
+		$templatePathAndFilename = $this->configurationService->convertFileReferenceToTemplatePathAndFilename($templateFileReference);
+		$paths = $this->configurationService->getViewConfigurationByFileReference($templateFileReference);
+		$this->provider->setTemplatePathAndFilename($templatePathAndFilename);
+		$this->view->setTemplatePathAndFilename($templatePathAndFilename);
+		$this->view->setTemplateRootPath($paths['templateRootPath']);
+		$this->view->setPartialRootPath($paths['partialRootPath']);
+		$this->view->setLayoutRootPath($paths['layoutRootPath']);
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getRecord() {
