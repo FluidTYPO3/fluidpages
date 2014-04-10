@@ -1,0 +1,23 @@
+{
+  "name": "fluidtypo3-fluidpages",
+  "homepage": "http://fluidtypo3.org",
+  "description": "The fluidpages package from FluidTYPO3",
+  "dependencies": {
+    "flux": "fluidtypo3-flux#latest"
+  },
+  "keywords": [
+    "TYPO3",
+    "CMS",
+    "extension",
+    "templating",
+    "bootstrap",
+    "flux",
+    "fluidpages",
+    "fedext",
+    "fluid"
+  ],
+  "authors": [
+    "FluidTYPO3 Team"
+  ],
+  "license": "GPL-2.0+"
+}
