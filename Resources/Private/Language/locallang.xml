@@ -27,5 +27,16 @@
 			<label index="pages.tx_fed_page_configuration">Seitenkonfiguration</label>
 			<label index="pages.tx_fed_page_no_sub_page_configuration">Es gibt keine Optionen zum konfigurieren, da das "Seitenlayout - Unterseiten" das gleiche wie "Seitenlayout - diese Seite" ist.</label>
 		</languageKey>
+		<languageKey index="pl" type="array">
+			<label index="pages.tx_fed_page_controller_action">Układ strony - ta strona</label>
+			<label index="pages.tx_fed_page_controller_action.default">Rodzic decyduje</label>
+			<label index="pages.tx_fed_page_controller_action_sub">Układ strony - podstrony</label>
+			<label index="pages.tx_fed_page_flexform">Konfiguracja strony</label>
+			<label index="pages.tx_fed_page_flexform_sub">Konfiguracja strony - podstrony</label>
+			<label index="pages.tx_fed_page_package">Pakiet</label>
+			<label index="pages.tx_fed_page_layoutselect">Układy strony</label>
+			<label index="pages.tx_fed_page_configuration">Konfiguracja strony</label>
+			<label index="pages.tx_fed_page_no_sub_page_configuration">Brak opcji do konfigurowania ponieważ "Układ strony - podstrony" jest taki sam jak "Układ strony - ta strona".</label>
+		</languageKey>		
 	</data>
 </T3locallang>
