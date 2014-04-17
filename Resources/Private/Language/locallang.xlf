@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" product-name="fluidpages" date="2014-04-17T12:00:00+01:00">
+		<header/>
+		<body>
+			<trans-unit id="pages.tx_fed_page_controller_action">
+				<source>Page Layout - this page</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fed_page_controller_action.default">
+				<source>Parent decides</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fed_page_controller_action_sub">
+				<source>Page Layout - subpages</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fed_page_flexform">
+				<source>Page Configuration</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fed_page_flexform_sub">
+				<source>Page Configuration - subpages</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fed_page_package">
+				<source>Package</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fed_page_layoutselect">
+				<source>Page Layouts</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fed_page_configuration">
+				<source>Page Configuration</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fed_page_no_sub_page_configuration">
+				<source>There are no options to configure as your "Page Layout - subpages" is the same as your "Page Layout - this page".</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
