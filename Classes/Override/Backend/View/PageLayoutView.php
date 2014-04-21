@@ -35,6 +35,7 @@ namespace FluidTYPO3\Fluidpages\Override\Backend\View;
  */
 
 use FluidTYPO3\Fluidpages\Backend\BackendLayout;
+use FluidTYPO3\Flux\Utility\ClipBoardUtility;
 
 /**
  * Child class for the Web > Page module
@@ -109,15 +110,6 @@ class PageLayoutView extends \TYPO3\CMS\Backend\View\PageLayoutView {
 	}
 
 	/**
-	 * @param string $inner
-	 * @param string $uri
-	 * @return string
-	 */
-	protected function wrapLink($inner, $uri) {
-		return '<a href="' . $uri . '">' . $inner . '</a>' . LF;
-	}
-
-	/**
 	 * @param integer $pid
 	 * @param integer $colPos
 	 * @param integer $relativeUid
@@ -125,33 +117,18 @@ class PageLayoutView extends \TYPO3\CMS\Backend\View\PageLayoutView {
 	 * @return string
 	 */
 	protected function getPasteIcon($pid, $colPos, $relativeUid = 0, $reference = FALSE) {
-		$clipData = $GLOBALS['BE_USER']->getModuleData('clipboard', $GLOBALS['BE_USER']->getTSConfigVal('options.saveClipboard') ? '' : 'ses');
-		$mode = TRUE === isset($clipData['current']) ? $clipData['current'] : 'normal';
-		$hasClip = TRUE === isset($clipData[$mode]['el']) && 0 < count($clipData[$mode]['el']);
-		if (FALSE === $hasClip) {
-			return NULL;
-		}
-		if (FALSE === isset($clipData[$mode]['mode']) && TRUE === $reference) {
-			return NULL;
-		}
 		$uid = 0;
-		$clipBoard = new \TYPO3\CMS\Backend\Clipboard\Clipboard();
-		if (TRUE === $reference) {
+
+		if (TRUE === (boolean) $reference) {
 			$command = 'reference';
-			$label = 'Paste as reference in this position';
-			$icon = 'actions-insert-reference';
 		} else {
 			$command = 'paste';
-			$label = 'Paste in this position';
-			$icon = 'actions-document-paste-after';
 		}
+
 		$relativeTo = $pid . '-' . $command . '-' . $relativeUid . '-' . $uid;
 		$relativeTo .= '--' . $colPos;
-		$icon = \TYPO3\CMS\Backend\Utility\IconUtility::getSpriteIcon($icon, array('title' => $label, 'class' => 't3-icon-actions t3-icon-document-new'));
-		$uri = "javascript:top.content.list_frame.location.href=top.TS.PATH_typo3+'";
-		$uri .= $clipBoard->pasteUrl('tt_content', $relativeTo);
-		$uri .= "';";
-		return $this->wrapLink($icon, $uri);
+
+		return ClipBoardUtility::createIconWithUrl($relativeTo, $reference);
 	}
 
 	/**
