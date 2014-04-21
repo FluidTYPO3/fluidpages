@@ -168,8 +168,16 @@ class PageLayoutView extends \TYPO3\CMS\Backend\View\PageLayoutView {
 		$lMarg = 1;
 		$showHidden = $this->tt_contentConfig['showHidden'] ? '' : \TYPO3\CMS\Backend\Utility\BackendUtility::BEenableFields('tt_content');
 		$pageTitleParamForAltDoc = '&recTitle=' . rawurlencode(\TYPO3\CMS\Backend\Utility\BackendUtility::getRecordTitle('pages', \TYPO3\CMS\Backend\Utility\BackendUtility::getRecordWSOL('pages', $id), TRUE));
-		$GLOBALS['SOBE']->doc->getPageRenderer()->loadExtJs();
-		$GLOBALS['SOBE']->doc->getPageRenderer()->addJsFile($GLOBALS['BACK_PATH'] . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('fluidpages') . 'Resources/Public/js/typo3pageModule.js');
+
+		/** @var $pageRenderer \TYPO3\CMS\Core\Page\PageRenderer */
+		$pageRenderer = $GLOBALS['SOBE']->doc->getPageRenderer();
+		$pageRenderer->loadExtJs();
+		if (FALSE === (boolean) $this->tt_contentConfig['languageMode']) {
+			$pageRenderer->addJsFile($GLOBALS['BACK_PATH'] . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('fluidpages') . 'Resources/Public/js/typo3pageModule.js');
+		} else {
+			$pageRenderer->addJsFile($GLOBALS['BACK_PATH'] . 'sysext/cms/layout/js/typo3pageModule.js');
+		}
+
 		// Get labels for CTypes and tt_content element fields in general:
 		$this->CType_labels = array();
 		foreach ($GLOBALS['TCA']['tt_content']['columns']['CType']['config']['items'] as $val) {
@@ -254,6 +262,9 @@ class PageLayoutView extends \TYPO3\CMS\Backend\View\PageLayoutView {
 							$singleElementHTML .= '</div>';
 							$statusHidden = $this->isDisabled('tt_content', $row) ? ' t3-page-ce-hidden' : '';
 							$singleElementHTML = '<div class="t3-page-ce' . $statusHidden . '" id="element-tt_content-' . $row['uid'] . '">' . $singleElementHTML . '</div>';
+							if (TRUE === (boolean) $this->tt_contentConfig['languageMode']) {
+								$singleElementHTML .= '<div class="t3-page-ce">';
+							}
 							$singleElementHTML .= '<div class="t3-page-ce-dropzone" id="colpos-' . $key . '-' . 'page-' . $id .
 								'-' . uniqid() . '">';
 							// Add icon "new content element below"
@@ -274,12 +285,7 @@ class PageLayoutView extends \TYPO3\CMS\Backend\View\PageLayoutView {
 									</div>
 								';
 							}
-							if (!$this->tt_contentConfig['languageMode']) {
-								$singleElementHTML .= '
-								</div>';
-							}
-							$singleElementHTML .= '
-							</div>';
+							$singleElementHTML .= '</div></div>';
 							if ($this->defLangBinding && $this->tt_contentConfig['languageMode']) {
 								$defLangBinding[$key][$lP][$row[$lP ? 'l18n_parent' : 'uid']] = $singleElementHTML;
 							} else {
