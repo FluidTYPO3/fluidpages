@@ -30,6 +30,18 @@
 			<trans-unit id="pages.tx_fed_page_no_sub_page_configuration">
 				<source>There are no options to configure as your "Page Layout - subpages" is the same as your "Page Layout - this page".</source>
 			</trans-unit>
+			<trans-unit id="pages.doktype.187">
+				<source>Raw Fluid template</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fluidpages_templatefile">
+				<source>Template file reference</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fluidpages_templatefile.placeholder">
+				<source>EXT:... or site-relative path</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_fluidpages_layout">
+				<source>Layout to use for rendering</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

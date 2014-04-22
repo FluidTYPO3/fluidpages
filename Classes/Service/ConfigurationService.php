@@ -27,8 +27,10 @@ namespace FluidTYPO3\Fluidpages\Service;
 use FluidTYPO3\Flux\Core;
 use FluidTYPO3\Flux\Service\FluxService;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\ResourceUtility;
 
 /**
  * Configuration Service
@@ -41,6 +43,45 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @subpackage Service
  */
 class ConfigurationService extends FluxService implements SingletonInterface {
+
+	/**
+	 * @var ResourceFactory
+	 */
+	protected $resourceFactory;
+
+	/**
+	 * @param ResourceFactory $resourceFactory
+	 * @return void
+	 */
+	public function injectResourceFactory(ResourceFactory $resourceFactory) {
+		$this->resourceFactory = $resourceFactory;
+	}
+
+	/**
+	 * @param string $reference
+	 * @return string
+	 */
+	public function convertFileReferenceToTemplatePathAndFilename($reference) {
+		$filename = array_pop(explode(':', $reference));
+		if (TRUE === ctype_digit($filename)) {
+			return $this->resourceFactory->getFileObjectFromCombinedIdentifier($reference);
+		}
+		$reference = GeneralUtility::getFileAbsFileName($reference);
+		return $reference;
+	}
+
+	/**
+	 * @param string $reference
+	 * @return array
+	 */
+	public function getViewConfigurationByFileReference($reference) {
+		$extensionKey = 'fluidpages';
+		if (0 === strpos($reference, 'EXT:')) {
+			$extensionKey = substr($reference, 4, strpos($reference, '/') - 4);
+		}
+		$configuration = $this->getViewConfigurationForExtensionName($extensionKey);
+		return $configuration;
+	}
 
 	/**
 	 * Get definitions of paths for Page Templates defined in TypoScript

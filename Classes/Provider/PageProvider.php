@@ -254,6 +254,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return string
 	 */
 	public function getControllerActionFromRecord(array $row) {
+		if (187 === intval($row['doktype'])) {
+			return 'raw';
+		}
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		$controllerActionName = array_pop(explode('->', $action));
 		$controllerActionName{0} = strtolower($controllerActionName{0});
