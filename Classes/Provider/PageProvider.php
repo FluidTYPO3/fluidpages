@@ -165,27 +165,8 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		$paths = $this->getTemplatePaths($row);
 		if (FALSE === empty($action)) {
-			list ($extensionName, $action) = explode('->', $action);
-			if (is_array($paths)) {
-				$templateRootPath = $paths['templateRootPath'];
-				if ('/' === substr($templateRootPath, -1)) {
-					$templateRootPath = substr($templateRootPath, 0, -1);
-				}
-				$templatePathAndFilename = $templateRootPath . '/Page/' . $action . '.html';
-				if (TRUE === isset($paths['overlays']) && TRUE === is_array($paths['overlays'])) {
-					foreach ($paths['overlays'] as $possibleOverlayPaths) {
-						if (TRUE === isset($possibleOverlayPaths['templateRootPath'])) {
-							$overlayTemplateRootPath = $possibleOverlayPaths['templateRootPath'];
-							$overlayTemplateRootPath = rtrim($overlayTemplateRootPath, '/');
-							$possibleOverlayFile = GeneralUtility::getFileAbsFileName($overlayTemplateRootPath . '/Page/' . $action . '.html');
-							if (TRUE === file_exists($possibleOverlayFile)) {
-								$templatePathAndFilename = $possibleOverlayFile;
-								break;
-							}
-						}
-					}
-				}
-			}
+			list (, $action) = explode('->', $action);
+			$templatePathAndFilename = \FluidTYPO3\Flux\Utility\ResolveUtility::resolveTemplatePathAndFilenameByPathAndControllerNameAndActionAndFormat($paths, 'Page', $action);
 		}
 		$templatePathAndFilename = GeneralUtility::getFileAbsFileName($templatePathAndFilename);
 		return $templatePathAndFilename;
