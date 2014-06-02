@@ -11,8 +11,8 @@ begin
 end;;
 call jhgkfhbchdjnscfghdcbdjksjgcfhbdsjcgefwj();;
 
-ALTER TABLE `pages` ADD `tx_fed_page_flexform` text DEFAULT '' NOT NULL;
-ALTER TABLE `pages` ADD `tx_fed_page_flexform_sub` text DEFAULT '' NOT NULL;
+ALTER TABLE `pages` ADD `tx_fed_page_flexform` text NOT NULL;
+ALTER TABLE `pages` ADD `tx_fed_page_flexform_sub` text NOT NULL;
 ALTER TABLE `pages` ADD `tx_fed_page_controller_action` varchar(255) DEFAULT '' NOT NULL;
 ALTER TABLE `pages` ADD `tx_fed_page_controller_action_sub` varchar(255) DEFAULT '' NOT NULL;
 
