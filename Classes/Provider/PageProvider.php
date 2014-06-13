@@ -197,27 +197,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * Post-process the TCEforms DataStructure for a record associated
-	 * with this ConfigurationProvider
-	 *
-	 * @param array $row
-	 * @param mixed $dataStructure
-	 * @param array $conf
-	 * @return NULL
-	 */
-	public function postProcessDataStructure(array &$row, &$dataStructure, array $conf) {
-		$action = $this->getControllerActionReferenceFromRecord($row);
-		if (TRUE === empty($action)) {
-			if (FALSE === $this->isUsingSubFieldName()) {
-				$this->configurationService->message('Page Layout not selected and no Layout was inherited. To fix this, select a
-					page Layout on this or any parent page', GeneralUtility::SYSLOG_SEVERITY_WARNING);
-			}
-			return NULL;
-		}
-		parent::postProcessDataStructure($row, $dataStructure, $conf);
-	}
-
-	/**
 	 * @param array $row
 	 * @return string
 	 */
@@ -283,22 +262,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * @param array $row
-	 * @return \FluidTYPO3\Flux\Form|NULL
-	 */
-	public function getForm(array $row) {
-		if (TRUE === $this->isUsingSubFieldName()) {
-			$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-			if ($configuration[$this->mainAction] === $configuration[$this->subAction]) {
-				$form = Form::create();
-				$form->createField('UserFunction', '')->setFunction('FluidTYPO3\\Fluidpages\\UserFunction\\NoSubPageConfiguration->renderField');
-				return $form;
-			}
-		}
-		return parent::getForm($row);
-	}
-
-	/**
 	 * @return boolean
 	 */
 	public function isUsingSubFieldName() {
@@ -319,10 +282,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 
 		if (FALSE === $this->isUsingSubFieldName()) {
 			$branch = reset($tree);
-			if (FALSE === empty($branch[$this->mainAction]) && FALSE === empty($branch[$this->subAction]) &&
-				$branch[$this->mainAction] !== $branch[$this->subAction] &&
-				FALSE === empty($branch[$this->subFieldName])) {
-
+			$hasMainAction = FALSE === empty($branch[$this->mainAction]);
+			$hasSubAction = FALSE === empty($branch[$this->subAction]);
+			$hasSubActionValue = FALSE === empty($branch[$this->subFieldName]);
+			$mainAndSubActionsDiffer = $branch[$this->mainAction] !== $branch[$this->subAction];
+			if (TRUE === $hasMainAction && TRUE === $hasSubAction && TRUE === $mainAndSubActionsDiffer && TRUE === $hasSubActionValue) {
 				$branch = array_shift($tree);
 				$this->currentFieldName = $this->subFieldName;
 				parent::getMergedConfiguration(array($branch), $cacheKey);
