@@ -97,6 +97,8 @@ class PageService implements SingletonInterface {
 	 */
 	public function getPageTemplateConfiguration($pageUid) {
 		$pageUid = intval($pageUid);
+		$actionMain = NULL;
+		$actionSub = NULL;
 		$workspaceId = intval($GLOBALS['BE_USER']->workspace);
 		$cacheKey = 'page_uid' . $pageUid . '_wsid' . $workspaceId;
 		if (1 > $pageUid) {
@@ -113,17 +115,15 @@ class PageService implements SingletonInterface {
 		// if no controller action was found loop through rootline
 		do {
 			$page = $this->getPageParent($page);
-		} while (FALSE !== $page && FALSE === strpos($page['tx_fed_page_controller_action_sub'], '->'));
-		if (FALSE === $page) {
-			self::$cache[$cacheKey] = NULL;
-			return NULL;
+			$actionMain = TRUE === empty($actionMain) ? : $page['tx_fed_page_controller_action'];
+			$actionSub = TRUE === empty($actionSub) ? : $page['tx_fed_page_controller_sub'];
+		} while (FALSE !== $page);
+		if (TRUE === empty($actionMain) && FALSE === empty($actionSub)) {
+			$actionMain = $actionSub;
 		}
-		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
-		if (TRUE === empty($page['tx_fed_page_controller_action'])) {
-			$page = NULL;
-		}
-		self::$cache[$cacheKey] = $page;
-		return $page;
+		$actions = array('tx_fed_page_controller_action' => $actionMain, 'tx_fed_page_controller_action_sub' => $actionSub);
+		self::$cache[$cacheKey] = $actions;
+		return $actions;
 
 	}
 
