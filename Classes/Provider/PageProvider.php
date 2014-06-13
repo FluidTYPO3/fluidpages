@@ -239,6 +239,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 			return 'raw';
 		}
 		$action = $this->getControllerActionReferenceFromRecord($row);
+		if (TRUE === empty($action)) {
+			throw new \RuntimeException('No page template selected and no template was inherited from parent page(s)', 1402663428);
+		}
 		$controllerActionName = array_pop(explode('->', $action));
 		$controllerActionName{0} = strtolower($controllerActionName{0});
 		return $controllerActionName;
