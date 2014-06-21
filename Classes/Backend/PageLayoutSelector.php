@@ -61,10 +61,10 @@ class PageLayoutSelector {
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
-		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-		$this->configurationManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Configuration\\BackendConfigurationManager');
-		$this->configurationService = $objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService');
-		$this->pageService = $objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService');
+		$objectManager = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+		$this->configurationManager = $objectManager->get('TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager');
+		$this->configurationService = $objectManager->get('FluidTYPO3\Fluidpages\Service\ConfigurationService');
+		$this->pageService = $objectManager->get('FluidTYPO3\Fluidpages\Service\PageService');
 	}
 
 	/**

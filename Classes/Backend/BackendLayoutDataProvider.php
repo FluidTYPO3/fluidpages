@@ -23,10 +23,12 @@ namespace FluidTYPO3\Fluidpages\Backend;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use FluidTYPO3\Flux\Service\ContentService;
-use FluidTYPO3\Flux\Utility\VersionUtility;
-use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Backend\View\BackendLayout\BackendLayout;
+use TYPO3\CMS\Backend\View\BackendLayout\BackendLayoutCollection;
+use TYPO3\CMS\Backend\View\BackendLayout\DataProviderContext;
+use TYPO3\CMS\Backend\View\BackendLayout\DataProviderInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Class for backend layouts
@@ -34,7 +36,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @package	Fluidpages
  * @subpackage Backend
  */
-class BackendLayout implements SingletonInterface {
+class BackendLayoutDataProvider implements DataProviderInterface {
 
 	/**
 	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
@@ -55,19 +57,77 @@ class BackendLayout implements SingletonInterface {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-		$this->configurationService = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService');
-		$this->pageService = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService');
+		$this->objectManager = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+		$this->configurationService = $this->objectManager->get('FluidTYPO3\Fluidpages\Service\ConfigurationService');
+		$this->pageService = $this->objectManager->get('FluidTYPO3\Fluidpages\Service\PageService');
 	}
 
 	/**
-	 * Postprocesses a selected backend layout
+	 * Adds backend layouts to the given backend layout collection.
 	 *
+	 * @param DataProviderContext $dataProviderContext
+	 * @param BackendLayoutCollection $backendLayoutCollection
+	 * @return void
+	 */
+	public function addBackendLayouts(DataProviderContext $dataProviderContext, BackendLayoutCollection $backendLayoutCollection) {
+		$pageUid = $dataProviderContext->getPageId();
+		$config = $this->getBackendLayoutConfiguration($pageUid);
+		$configString = $this->encodeTypoScriptArray($config);
+		$backendLayout = new BackendLayout('fluidpages', 'Fluidpages', $configString);
+		$backendLayoutCollection->add($backendLayout);
+	}
+
+	/**
+	 * Gets a backend layout by (regular) identifier.
+	 *
+	 * @param string $identifier
+	 * @param integer $pageUid
+	 * @return NULL|BackendLayout
+	 */
+	public function getBackendLayout($identifier, $pageUid) {
+		$configuration = $this->getBackendLayoutConfiguration($pageUid);
+		$configuration = $this->ensureDottedKeys($configuration);
+		$configString = $this->encodeTypoScriptArray($configuration);
+		$backendLayout = new BackendLayout($identifier, 'Fluidpages', $configString);
+		return $backendLayout;
+	}
+
+	/**
+	 * @param array $configuration
+	 * @return string
+	 */
+	protected function encodeTypoScriptArray(array $configuration) {
+		$configuration = $this->ensureDottedKeys($configuration);
+		$typoScriptParser = new \TYPO3\CMS\Core\TypoScript\ExtendedTemplateService();
+		$typoScriptParser->flattenSetup($configuration, 'backend_layout.', FALSE);
+		$string = '';
+		foreach ($typoScriptParser->flatSetup as $name => $value) {
+			$string .= $name . ' = ' . $value . LF;
+		}
+		return $string;
+	}
+
+	/**
+	 * @param array $configuration
+	 * @return array
+	 */
+	protected function ensureDottedKeys(array $configuration) {
+		$converted = array();
+		foreach ($configuration as $key => $value) {
+			if (TRUE === is_array($value)) {
+				$key = rtrim($key, '.') . '.';
+				$value = $this->ensureDottedKeys($value);
+			}
+			$converted[$key] = $value;
+		}
+		return $converted;
+	}
+
+	/**
 	 * @param integer $pageUid Starting page UID in the rootline (this current page)
-	 * @param array $backendLayout The backend layout which was detected from page id
 	 * @return NULL|void
 	 */
-	public function postProcessBackendLayout(&$pageUid, &$backendLayout) {
+	protected function getBackendLayoutConfiguration($pageUid) {
 		try {
 			$record = $this->pageService->getPage($pageUid);
 
@@ -84,18 +144,6 @@ class BackendLayout implements SingletonInterface {
 			}
 			$paths = $provider->getTemplatePaths($record);
 			if (0 === count($paths)) {
-				if (VersionUtility::assertCoreVersionIsAtLeastSixPointZero()) {
-					if (FALSE === (boolean) GeneralUtility::_GET('redirected')) {
-						// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
-						$get = GeneralUtility::_GET();
-						unset($get['id']);
-						$get['redirected'] = 1;
-						$params = GeneralUtility::implodeArrayForUrl('', $get);
-						header('Location: ?id=' . $pageUid . $params);
-						exit();
-					}
-					return NULL;
-				}
 				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
 					. 'have included the TypoScript for the desired template collection.', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
 				return NULL;
@@ -112,14 +160,10 @@ class BackendLayout implements SingletonInterface {
 		}
 
 		$config = array(
-			'backend_layout.' => array(
-				'colCount' => 0,
-				'rowCount' => 0,
-				'rows.' => array()
-			)
+			'colCount' => 0,
+			'rowCount' => 0,
+			'rows.' => array()
 		);
-		$colPosList = array();
-		$items = array();
 		$rowIndex = 0;
 		foreach ($grid['rows'] as $row) {
 			$index = 0;
@@ -134,7 +178,7 @@ class BackendLayout implements SingletonInterface {
 				}
 				$columns[$key] = array(
 					'name' => $columnName,
-					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['backend_layout.']['colCount']
+					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['colCount']
 				);
 				if ($column['colspan']) {
 					$columns[$key]['colspan'] = $column['colspan'];
@@ -142,52 +186,17 @@ class BackendLayout implements SingletonInterface {
 				if ($column['rowspan']) {
 					$columns[$key]['rowspan'] = $column['rowspan'];
 				}
-				array_push($colPosList, $columns[$key]['colPos']);
-				array_push($items, array($columns[$key]['name'], $columns[$key]['colPos'], NULL));
 				$colCount += $column['colspan'] ? $column['colspan'] : 1;
 				++ $index;
 			}
-			$config['backend_layout.']['colCount'] = max($config['backend_layout.']['colCount'], $colCount);
-			$config['backend_layout.']['rowCount']++;
-			$config['backend_layout.']['rows.'][$rowKey] = array(
+			$config['colCount'] = max($config['colCount'], $colCount);
+			$config['rowCount']++;
+			$config['rows.'][$rowKey] = array(
 				'columns.' => $columns
 			);
 			++ $rowIndex;
 		}
-		unset($backendLayout['config']);
-		$backendLayout['__config'] = $config;
-		$backendLayout['__colPosList'] = $colPosList;
-		$backendLayout['__items'] = $items;
-	}
-
-	/**
-	 * Preprocesses the page id used to detect the backend layout record
-	 *
-	 * @param integer $id Starting page id when parsing the rootline
-	 * @return void
-	 */
-	public function preProcessBackendLayoutPageUid(&$id) {
-	}
-
-	/**
-	 * Postprocesses the colpos list
-	 *
-	 * @param integer $id Starting page id when parsing he rootline
-	 * @param array $tcaItems The current set of colpos TCA items
-	 * @param t3lib_TCEForms $tceForms A back reference to the TCEforms object which generated the item list
-	 * @return void
-	 */
-	public function postProcessColPosListItemsParsed(&$id, array &$tcaItems, &$tceForms) {
-	}
-
-	/**
-	 * Allows manipulation of the colPos selector option values
-	 *
-	 * @param array $params Parameters for the selector
-	 * @return void
-	 */
-	public function postProcessColPosProcFuncItems(array &$params) {
-		array_push($params['items'], array('Fluid Content Area', ContentService::COLPOS_FLUXCONTENT, NULL));
+		return $config;
 	}
 
 }
