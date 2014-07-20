@@ -157,9 +157,9 @@ class PageService implements SingletonInterface {
 	 */
 	protected function getPageParent($page) {
 		// try to get the original page
-		$live = BackendUtility::getLiveVersionIdOfRecord('pages', intval($page['uid']));
-		$live = NULL === $live ? $page : $live;
-		return $this->getPage($live['pid']);
+		$liveUid = BackendUtility::getLiveVersionIdOfRecord('pages', intval($page['uid']));
+		$page = NULL !== $liveUid ? BackendUtility::getRecord('pages', $liveUid, '*') : $page;
+		return $this->getPage($page['pid']);
 	}
 
 	/**
