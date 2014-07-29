@@ -27,6 +27,7 @@ namespace FluidTYPO3\Fluidpages\Controller;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Controller\AbstractFluxController;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 
 /**
@@ -49,24 +50,29 @@ abstract class AbstractPageController extends AbstractFluxController implements 
 	protected $fluxTableName = 'pages';
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\PageService
+	 * @var PageService
 	 */
 	protected $pageService;
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
+	 * @var ConfigurationService
 	 */
 	protected $configurationService;
 
 	/**
-	 * @param \FluidTYPO3\Fluidpages\Service\PageService $pageService
+	 * @var WorkspacesAwareRecordService
+	 */
+	protected $workspacesAwareRecordService;
+
+	/**
+	 * @param PageService $pageService
 	 */
 	public function injectPageService(PageService $pageService) {
 		$this->pageService = $pageService;
 	}
 
 	/**
-	 * @param \FluidTYPO3\Fluidpages\Service\ConfigurationService $configurationService
+	 * @param ConfigurationService $configurationService
 	 * @return void
 	 */
 	public function injectConfigurationService(ConfigurationService $configurationService) {
@@ -74,11 +80,19 @@ abstract class AbstractPageController extends AbstractFluxController implements 
 	}
 
 	/**
-	 * @param \TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view
+	 * @param WorkspacesAwareRecordService $workspacesAwareRecordService
+	 * @return void
+	 */
+	public function injectWorkspacesAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
+		$this->workspacesAwareRecordService = $workspacesAwareRecordService;
+	}
+
+	/**
+	 * @param ViewInterface $view
 	 * @return void
 	 */
 	public function initializeView(ViewInterface $view) {
-		$this->configurationManager->getContentObject()->data = $GLOBALS['TSFE']->page;
+		$this->configurationManager->getContentObject()->data = $this->getRecord();
 		parent::initializeView($view);
 	}
 
@@ -101,7 +115,7 @@ abstract class AbstractPageController extends AbstractFluxController implements 
 	 * @return array
 	 */
 	public function getRecord() {
-		return $GLOBALS['TSFE']->page;
+		return $this->workspacesAwareRecordService->getSingle($this->fluxTableName, '*', $GLOBALS['TSFE']->id);
 	}
 
 }
