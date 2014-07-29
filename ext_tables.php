@@ -39,25 +39,25 @@ if (!defined ('TYPO3_MODE')) {
 
 $doktypeIcon = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('fluidpages') . 'doktype_icon.png';
 
-$GLOBALS['PAGES_TYPES']['187'] = array(
+$GLOBALS['PAGES_TYPES'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = array(
 	'type' => 'web',
 	'icon' => $doktypeIcon,
 	'allowedTables' => '*'
 );
 
 $GLOBALS['TCA']['pages']['columns']['doktype']['config']['items'][] = array(
-	'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.doktype.187',
-	'187',
+	'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xml:pages.doktype.' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
+	\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
 	$doktypeIcon
 );
 
 $GLOBALS['TCA']['pages_language_overlay']['columns']['doktype']['config']['items'][] = array(
-	'LLL:EXT:examples/Resources/Private/Language/locallang.xml:pages.doktype.187',
-	'187',
+	'LLL:EXT:examples/Resources/Private/Language/locallang.xml:pages.doktype.' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
+	\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
 	$doktypeIcon
 );
 
-$GLOBALS['TCA']['pages']['types']['187']['showitem'] = '--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.standard;standard,
+$GLOBALS['TCA']['pages']['types'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW]['showitem'] = '--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.standard;standard,
 	--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.title;title,
 	--div--;LLL:EXT:cms/locallang_tca.xlf:pages.tabs.access,
 	--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.visibility;visibility,
@@ -77,10 +77,10 @@ $GLOBALS['TCA']['pages']['types']['187']['showitem'] = '--palette--;LLL:EXT:cms/
 	--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.storage;storage,
 	--div--;LLL:EXT:lang/locallang_tca.xlf:sys_category.tabs.category, categories';
 
-\TYPO3\CMS\Backend\Sprite\SpriteManager::addTcaTypeIcon('pages', '187', $doktypeIcon);
+\TYPO3\CMS\Backend\Sprite\SpriteManager::addTcaTypeIcon('pages', \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW, $doktypeIcon);
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig(
-	'options.pageTree.doktypesToShowInNewPageDragArea := addToList(187)'
+	'options.pageTree.doktypesToShowInNewPageDragArea := addToList(' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW . ')'
 );
 
 $doktypes = '0,1,4';
@@ -134,7 +134,7 @@ if (FALSE === empty($additionalDoktypes)) {
 		)
 	),
 ));
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('pages', 'tx_fluidpages_templatefile, tx_fluidpages_layout', '187', 'before:title');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('pages', 'tx_fluidpages_templatefile, tx_fluidpages_layout', \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW, 'before:title');
 $GLOBALS['TCA']['pages']['ctrl']['requestUpdate'] .= ',tx_fluidpages_templatefile';
 
 unset($doktypes, $additionalDoktypes, $doktypeIcon);

@@ -60,11 +60,6 @@ abstract class AbstractPageController extends AbstractFluxController implements 
 	protected $configurationService;
 
 	/**
-	 * @var WorkspacesAwareRecordService
-	 */
-	protected $workspacesAwareRecordService;
-
-	/**
 	 * @param PageService $pageService
 	 */
 	public function injectPageService(PageService $pageService) {
@@ -77,14 +72,6 @@ abstract class AbstractPageController extends AbstractFluxController implements 
 	 */
 	public function injectConfigurationService(ConfigurationService $configurationService) {
 		$this->configurationService = $configurationService;
-	}
-
-	/**
-	 * @param WorkspacesAwareRecordService $workspacesAwareRecordService
-	 * @return void
-	 */
-	public function injectWorkspacesAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
-		$this->workspacesAwareRecordService = $workspacesAwareRecordService;
 	}
 
 	/**

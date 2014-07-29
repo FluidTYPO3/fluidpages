@@ -24,6 +24,7 @@ namespace FluidTYPO3\Fluidpages\Provider;
  *  This copyright notice MUST APPEAR in all copies of the script!
  *****************************************************************/
 
+use FluidTYPO3\Fluidpages\Controller\PageControllerInterface;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
@@ -211,10 +212,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 
 	/**
 	 * @param array $row
+	 * @throws \RuntimeException
 	 * @return string
 	 */
 	public function getControllerActionFromRecord(array $row) {
-		if (187 === intval($row['doktype'])) {
+		if (PageControllerInterface::DOKTYPE_RAW === intval($row['doktype'])) {
 			return 'raw';
 		}
 		$action = $this->getControllerActionReferenceFromRecord($row);
