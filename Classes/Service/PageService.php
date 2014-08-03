@@ -117,7 +117,7 @@ class PageService implements SingletonInterface {
 		// if no controller action was found loop through rootline
 		do {
 			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', (integer) $page['pid']);
-		} while (FALSE !== $page && FALSE === strpos($page['tx_fed_page_controller_action_sub'], '->'));
+		} while (NULL !== $page && FALSE === strpos($page['tx_fed_page_controller_action_sub'], '->'));
 		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
 		if (TRUE === empty($page['tx_fed_page_controller_action'])) {
 			$page = NULL;
