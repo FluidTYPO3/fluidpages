@@ -114,9 +114,11 @@ class PageService implements SingletonInterface {
 		if (strpos($page['tx_fed_page_controller_action'], '->')) {
 			return $page;
 		}
-		// if no controller action was found loop through rootline
+		// if no controller action was found loop through rootline. Note: 't3ver_oid' is analysed in order
+		// to make versioned records inherit the original record's configuration as an emulated first parent page.
 		do {
-			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', (integer) $page['pid']);
+			$resolveParentPageUid = 0 > (integer) $page['pid'] ? $page['t3ver_oid'] : $page['pid'];
+			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', (integer) $resolveParentPageUid);
 		} while (NULL !== $page && FALSE === strpos($page['tx_fed_page_controller_action_sub'], '->'));
 		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
 		if (TRUE === empty($page['tx_fed_page_controller_action'])) {
@@ -139,8 +141,9 @@ class PageService implements SingletonInterface {
 			return NULL;
 		}
 		$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $pageUid);
-		while (0 !== intval($page['uid']) && TRUE === empty($page['tx_fed_page_flexform'])) {
-			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $page['pid']);
+		while (NULL !== $page && 0 !== intval($page['uid']) && TRUE === empty($page['tx_fed_page_flexform'])) {
+			$resolveParentPageUid = 0 > (integer) $page['pid'] ? $page['t3ver_oid'] : $page['pid'];
+			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', (integer) $resolveParentPageUid);
 		};
 		return $page['tx_fed_page_flexform'];
 	}
