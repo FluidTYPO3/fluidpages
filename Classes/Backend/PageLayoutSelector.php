@@ -123,6 +123,7 @@ class PageLayoutSelector {
 						continue;
 					}
 					if (FALSE === $form->getEnabled()) {
+						$this->configurationService->message('Template file ' . $templatePathAndFilename . ' is disabled by configuration', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
 						continue;
 					}
 					$thumbnail = $form->getIcon();

@@ -23,10 +23,13 @@ namespace FluidTYPO3\Fluidpages\Backend;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Service\ContentService;
 use FluidTYPO3\Flux\Utility\VersionUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
  * Class for backend layouts
@@ -37,19 +40,19 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class BackendLayout implements SingletonInterface {
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
+	 * @var ObjectManagerInterface
 	 */
 	protected $objectManager;
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
+	 * @var ConfigurationService
 	 */
 	protected $configurationService;
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\PageService
+	 * @var WorkspacesAwareRecordService
 	 */
-	protected $pageService;
+	protected $workspacesAwareRecordService;
 
 	/**
 	 * Constructor
@@ -57,7 +60,7 @@ class BackendLayout implements SingletonInterface {
 	public function __construct() {
 		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		$this->configurationService = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService');
-		$this->pageService = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService');
+		$this->workspacesAwareRecordService = $this->objectManager->get('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService');
 	}
 
 	/**
@@ -69,7 +72,7 @@ class BackendLayout implements SingletonInterface {
 	 */
 	public function postProcessBackendLayout(&$pageUid, &$backendLayout) {
 		try {
-			$record = $this->pageService->getPage($pageUid);
+			$record = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
 
 			// Stop processing if no fluidpages template configured in rootline
 			if (NULL === $record) {
@@ -83,23 +86,6 @@ class BackendLayout implements SingletonInterface {
 				return NULL;
 			}
 			$paths = $provider->getTemplatePaths($record);
-			if (0 === count($paths)) {
-				if (VersionUtility::assertCoreVersionIsAtLeastSixPointZero()) {
-					if (FALSE === (boolean) GeneralUtility::_GET('redirected')) {
-						// BUG: TYPO3 6.0 exhibits an odd behavior in some circumstances; reloading the page seems to completely avoid problems
-						$get = GeneralUtility::_GET();
-						unset($get['id']);
-						$get['redirected'] = 1;
-						$params = GeneralUtility::implodeArrayForUrl('', $get);
-						header('Location: ?id=' . $pageUid . $params);
-						exit();
-					}
-					return NULL;
-				}
-				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
-					. 'have included the TypoScript for the desired template collection.', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
-				return NULL;
-			}
 			$grid = $provider->getGrid($record)->build();
 			if (FALSE === is_array($grid) || 0 === count($grid['rows'])) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior

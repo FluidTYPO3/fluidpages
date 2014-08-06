@@ -24,6 +24,7 @@ namespace FluidTYPO3\Fluidpages\Service;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Utility\PathUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -43,27 +44,27 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
 class PageService implements SingletonInterface {
 
 	/**
-	 * @var array
-	 */
-	private static $cache = array();
-
-	/**
-	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
+	 * @var ObjectManager
 	 */
 	protected $objectManager;
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface
+	 * @var ConfigurationManagerInterface
 	 */
 	protected $configurationManager;
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
+	 * @var ConfigurationService
 	 */
 	protected $configurationService;
 
 	/**
-	 * @param \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager
+	 * @var WorkspacesAwareRecordService
+	 */
+	protected $workspaceAwareRecordService;
+
+	/**
+	 * @param ObjectManager $objectManager
 	 * @return void
 	 */
 	public function injectObjectManager(ObjectManager $objectManager) {
@@ -71,7 +72,7 @@ class PageService implements SingletonInterface {
 	}
 
 	/**
-	 * @param \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager
+	 * @param ConfigurationManagerInterface $configurationManager
 	 * @return void
 	 */
 	public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager) {
@@ -79,11 +80,19 @@ class PageService implements SingletonInterface {
 	}
 
 	/**
-	 * @param \FluidTYPO3\Fluidpages\Service\ConfigurationService $configurationService
+	 * @param ConfigurationService $configurationService
 	 * @return void
 	 */
 	public function injectConfigurationService(ConfigurationService $configurationService) {
 		$this->configurationService = $configurationService;
+	}
+
+	/**
+	 * @param WorkspacesAwareRecordService $workspacesAwareRecordService
+	 * @return void
+	 */
+	public function injectWorkspaceAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
+		$this->workspaceAwareRecordService = $workspacesAwareRecordService;
 	}
 
 	/**
@@ -97,122 +106,26 @@ class PageService implements SingletonInterface {
 	 */
 	public function getPageTemplateConfiguration($pageUid) {
 		$pageUid = intval($pageUid);
-		$workspaceId = intval($GLOBALS['BE_USER']->workspace);
-		$cacheKey = 'page_uid' . $pageUid . '_wsid' . $workspaceId;
 		if (1 > $pageUid) {
 			return NULL;
 		}
-		if (TRUE === isset(self::$cache[$cacheKey])) {
-			return self::$cache[$cacheKey];
-		}
-		$page = $this->getPage($pageUid);
+		$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $pageUid);
 		// if page has a controller action
 		if (strpos($page['tx_fed_page_controller_action'], '->')) {
 			return $page;
 		}
-		// if no controller action was found loop through rootline
+		// if no controller action was found loop through rootline. Note: 't3ver_oid' is analysed in order
+		// to make versioned records inherit the original record's configuration as an emulated first parent page.
 		do {
-			$page = $this->getPageParent($page);
-		} while (FALSE !== $page && FALSE === strpos($page['tx_fed_page_controller_action_sub'], '->'));
-		if (FALSE === $page) {
-			self::$cache[$cacheKey] = NULL;
-			return NULL;
-		}
+			$resolveParentPageUid = 0 > (integer) $page['pid'] ? $page['t3ver_oid'] : $page['pid'];
+			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', (integer) $resolveParentPageUid);
+		} while (NULL !== $page && FALSE === strpos($page['tx_fed_page_controller_action_sub'], '->'));
 		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
 		if (TRUE === empty($page['tx_fed_page_controller_action'])) {
 			$page = NULL;
 		}
-		self::$cache[$cacheKey] = $page;
 		return $page;
 
-	}
-
-	/**
-	 * Return the original or workspace page depending on workspace-mode
-	 *
-	 * @param integer $pageUid
-	 * @return array|boolean
-	 */
-	public function getPage($pageUid) {
-		$table = 'pages';
-		$wsId = intval($GLOBALS['BE_USER']->workspace);
-		$pageUid = intval($pageUid);
-		if (1 > $pageUid) {
-			return FALSE;
-		}
-		// check if active workspace is available
-		$page = BackendUtility::getWorkspaceVersionOfRecord($wsId, $table, $pageUid);
-		if (FALSE === $page) {
-			// no workspace available ... use original one
-			$page = BackendUtility::getRecord($table, $pageUid, '*');
-		}
-		return $page;
-	}
-
-	/**
-	 * Return parent page array
-	 *
-	 * @param array $page
-	 * @return array|boolean
-	 */
-	protected function getPageParent($page) {
-		// try to get the original page
-		$live = BackendUtility::getLiveVersionIdOfRecord('pages', intval($page['uid']));
-		$live = NULL === $live ? $page : $live;
-		return $this->getPage($live['pid']);
-	}
-
-	/**
-	 * Gets the workspace parent for a given page
-	 *
-	 * @param array $page
-	 * @return array
-	 */
-	protected function getWorkspaceParentPage($page) {
-		$page = $this->getPositionPlaceholder($page);
-		$page = BackendUtility::getRecord('pages', $page['pid']);
-		$page = $this->getPositionPlaceholder($page);
-		return $page;
-	}
-
-	/**
-	 * Gets the workspace version of a given page
-	 *
-	 * @param array $page
-	 * @return array
-	 */
-	protected function getWorkspacePage($page) {
-		if (TRUE === is_array($page) && 0 < count($page)) {
-			$wsid = $GLOBALS['BE_USER']->workspace ? : 0;
-			$wsid = intval($wsid);
-			if (0 !== $wsid && intval($page['t3ver_wsid']) !== $wsid) {
-				$workspacePage = BackendUtility::getRecordRaw('pages', $where = sprintf('t3ver_oid=%d AND t3ver_wsid=%d', $page['uid'], $wsid), $fields = '*');
-				if (NULL !== $workspacePage) {
-					$page = $workspacePage;
-				}
-			}
-		}
-		return $page;
-	}
-
-	/**
-	 * Gets a placeholder for a given page
-	 *
-	 * @param array $page
-	 * @return array
-	 */
-	protected function getPositionPlaceholder($page) {
-		if (-1 !== intval($page['pid'])) {
-			// original, dont do anything
-			return $page;
-		} elseif (0 === intval($page['t3ver_state'])) {
-			// page has changed, but not moved
-			$page = BackendUtility::getRecord('pages', $page['t3ver_oid']);
-		} elseif (4 === intval($page['t3ver_state'])) {
-			// page has moved. get placeholder for new position
-			$page = BackendUtility::getRecordRaw('pages', $where = sprintf('t3ver_move_id=%d AND t3ver_state=3', $page['t3ver_oid']), $fields = '*');
-		}
-		return $page;
 	}
 
 	/**
@@ -227,20 +140,11 @@ class PageService implements SingletonInterface {
 		if (1 > $pageUid) {
 			return NULL;
 		}
-		$workspaceId = intval($GLOBALS['BE_USER']->workspace);
-		$cacheKey = 'flexform_uid' . $pageUid . '_wsid' . $workspaceId;
-		if (TRUE === isset(self::$cache[$cacheKey])) {
-			return self::$cache[$cacheKey];
-		}
-		$page = $this->getPage($pageUid);
-		while (0 !== intval($page['uid']) && TRUE === empty($page['tx_fed_page_flexform'])) {
-			$page = $this->getPageParent($page);
+		$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $pageUid);
+		while (NULL !== $page && 0 !== intval($page['uid']) && TRUE === empty($page['tx_fed_page_flexform'])) {
+			$resolveParentPageUid = 0 > (integer) $page['pid'] ? $page['t3ver_oid'] : $page['pid'];
+			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', (integer) $resolveParentPageUid);
 		};
-		if (empty($page['tx_fed_page_flexform'])) {
-			self::$cache[$cacheKey] = NULL;
-			return NULL;
-		}
-		self::$cache[$cacheKey] = $page['tx_fed_page_flexform'];
 		return $page['tx_fed_page_flexform'];
 	}
 
@@ -313,13 +217,8 @@ class PageService implements SingletonInterface {
 				} else if (strtolower($extension) != strtolower($format)) {
 					unset($files[$key]);
 				} else {
-					try {
-						$this->getPageTemplateLabel($extensionName, $path . $file);
-						$output[$extensionName][] = $pathinfo['filename'];
-					} catch (\Exception $error) {
-						$this->configurationService->debug($error);
-						continue;
-					}
+					$this->getPageTemplateLabel($extensionName, $path . $file);
+					$output[$extensionName][] = $pathinfo['filename'];
 				}
 			}
 		}
