@@ -105,26 +105,36 @@ class PageService implements SingletonInterface {
 	 * @api
 	 */
 	public function getPageTemplateConfiguration($pageUid) {
-		$pageUid = intval($pageUid);
+		$pageUid = (integer) $pageUid;
 		if (1 > $pageUid) {
 			return NULL;
 		}
 		$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $pageUid);
-		// if page has a controller action
-		if (strpos($page['tx_fed_page_controller_action'], '->')) {
-			return $page;
-		}
-		// if no controller action was found loop through rootline. Note: 't3ver_oid' is analysed in order
-		// to make versioned records inherit the original record's configuration as an emulated first parent page.
+
+		// Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
+		// configuration as an emulated first parent page.
+		$resolvedMainTemplateIdentity = NULL;
+		$resolvedSubTemplateIdentity = NULL;
 		do {
-			$resolveParentPageUid = 0 > (integer) $page['pid'] ? $page['t3ver_oid'] : $page['pid'];
-			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', (integer) $resolveParentPageUid);
-		} while (NULL !== $page && FALSE === strpos($page['tx_fed_page_controller_action_sub'], '->'));
-		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
-		if (TRUE === empty($page['tx_fed_page_controller_action'])) {
-			$page = NULL;
+			if (NULL === $resolvedMainTemplateIdentity && FALSE !== strpos($page['tx_fed_page_controller_action'], '->')) {
+				$resolvedMainTemplateIdentity = $page['tx_fed_page_controller_action'];
+			}
+			if (NULL === $resolvedSubTemplateIdentity && FALSE !== strpos($page['tx_fed_page_controller_action_sub'], '->')) {
+				$resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
+			}
+			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
+			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
+		} while (NULL !== $page && (NULL === $resolvedMainTemplateIdentity || NULL === $resolvedSubTemplateIdentity));
+		if (NULL === $resolvedMainTemplateIdentity && NULL === $resolvedSubTemplateIdentity) {
+			return NULL;
 		}
-		return $page;
+		if (NULL === $resolvedMainTemplateIdentity && NULL !== $resolvedSubTemplateIdentity) {
+			$resolvedMainTemplateIdentity = $resolvedSubTemplateIdentity;
+		}
+		return array(
+			'tx_fed_page_controller_action' => 	$resolvedMainTemplateIdentity,
+			'tx_fed_page_controller_action_sub' => 	$resolvedSubTemplateIdentity
+		);
 
 	}
 
@@ -136,14 +146,14 @@ class PageService implements SingletonInterface {
 	 * @api
 	 */
 	public function getPageFlexFormSource($pageUid) {
-		$pageUid = intval($pageUid);
+		$pageUid = (integer) $pageUid;
 		if (1 > $pageUid) {
 			return NULL;
 		}
 		$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $pageUid);
-		while (NULL !== $page && 0 !== intval($page['uid']) && TRUE === empty($page['tx_fed_page_flexform'])) {
-			$resolveParentPageUid = 0 > (integer) $page['pid'] ? $page['t3ver_oid'] : $page['pid'];
-			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', (integer) $resolveParentPageUid);
+		while (NULL !== $page && 0 !== (integer) $page['uid'] && TRUE === empty($page['tx_fed_page_flexform'])) {
+			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
+			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
 		};
 		return $page['tx_fed_page_flexform'];
 	}
