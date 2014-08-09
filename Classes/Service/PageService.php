@@ -61,7 +61,7 @@ class PageService implements SingletonInterface {
 	/**
 	 * @var WorkspacesAwareRecordService
 	 */
-	protected $workspaceAwareRecordService;
+	protected $workspacesAwareRecordService;
 
 	/**
 	 * @param ObjectManager $objectManager
@@ -91,8 +91,8 @@ class PageService implements SingletonInterface {
 	 * @param WorkspacesAwareRecordService $workspacesAwareRecordService
 	 * @return void
 	 */
-	public function injectWorkspaceAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
-		$this->workspaceAwareRecordService = $workspacesAwareRecordService;
+	public function injectWorkspacesAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
+		$this->workspacesAwareRecordService = $workspacesAwareRecordService;
 	}
 
 	/**
@@ -109,7 +109,7 @@ class PageService implements SingletonInterface {
 		if (1 > $pageUid) {
 			return NULL;
 		}
-		$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $pageUid);
+		$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
 
 		// Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
 		// configuration as an emulated first parent page.
@@ -123,7 +123,7 @@ class PageService implements SingletonInterface {
 				$resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
 			}
 			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
-			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
+			$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
 		} while (NULL !== $page && (NULL === $resolvedMainTemplateIdentity || NULL === $resolvedSubTemplateIdentity));
 		if (NULL === $resolvedMainTemplateIdentity && NULL === $resolvedSubTemplateIdentity) {
 			return NULL;
@@ -150,10 +150,10 @@ class PageService implements SingletonInterface {
 		if (1 > $pageUid) {
 			return NULL;
 		}
-		$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $pageUid);
+		$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
 		while (NULL !== $page && 0 !== (integer) $page['uid'] && TRUE === empty($page['tx_fed_page_flexform'])) {
 			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
-			$page = $this->workspaceAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
+			$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
 		};
 		return $page['tx_fed_page_flexform'];
 	}
