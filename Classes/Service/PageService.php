@@ -26,7 +26,6 @@ namespace FluidTYPO3\Fluidpages\Service;
 
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Utility\PathUtility;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -62,6 +61,11 @@ class PageService implements SingletonInterface {
 	 * @var WorkspacesAwareRecordService
 	 */
 	protected $workspacesAwareRecordService;
+
+	/**
+	 * @var array
+	 */
+	protected $pageTemplateConfiguration = array();
 
 	/**
 	 * @param ObjectManager $objectManager
@@ -106,36 +110,48 @@ class PageService implements SingletonInterface {
 	 */
 	public function getPageTemplateConfiguration($pageUid) {
 		$pageUid = (integer) $pageUid;
-		if (1 > $pageUid) {
-			return NULL;
-		}
-		$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
+		if (!array_key_exists($pageUid, $this->pageTemplateConfiguration)) {
+			if (1 > $pageUid) {
+				$this->pageTemplateConfiguration[$pageUid] = NULL;
+			}
+			$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
 
-		// Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
-		// configuration as an emulated first parent page.
-		$resolvedMainTemplateIdentity = NULL;
-		$resolvedSubTemplateIdentity = NULL;
-		do {
+			// Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
+			// configuration as an emulated first parent page.
+			$resolvedMainTemplateIdentity = NULL;
+			$resolvedSubTemplateIdentity = NULL;
 			if (NULL === $resolvedMainTemplateIdentity && FALSE !== strpos($page['tx_fed_page_controller_action'], '->')) {
 				$resolvedMainTemplateIdentity = $page['tx_fed_page_controller_action'];
 			}
 			if (NULL === $resolvedSubTemplateIdentity && FALSE !== strpos($page['tx_fed_page_controller_action_sub'], '->')) {
 				$resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
 			}
-			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
-			$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
-		} while (NULL !== $page && (NULL === $resolvedMainTemplateIdentity || NULL === $resolvedSubTemplateIdentity));
-		if (NULL === $resolvedMainTemplateIdentity && NULL === $resolvedSubTemplateIdentity) {
-			return NULL;
-		}
-		if (NULL === $resolvedMainTemplateIdentity && NULL !== $resolvedSubTemplateIdentity) {
-			$resolvedMainTemplateIdentity = $resolvedSubTemplateIdentity;
-		}
-		return array(
-			'tx_fed_page_controller_action' => 	$resolvedMainTemplateIdentity,
-			'tx_fed_page_controller_action_sub' => 	$resolvedSubTemplateIdentity
-		);
+			if (NULL === $resolvedMainTemplateIdentity || NULL === $resolvedSubTemplateIdentity) {
+				$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
+				if (0 < $resolveParentPageUid) {
+					$parentPageConfiguration = $this->getPageTemplateConfiguration($resolveParentPageUid);
 
+					if (NULL === $resolvedMainTemplateIdentity) {
+						$resolvedMainTemplateIdentity = $parentPageConfiguration['tx_fed_page_controller_action_sub'];
+					}
+					if (NULL === $resolvedSubTemplateIdentity) {
+						$resolvedSubTemplateIdentity = $parentPageConfiguration['tx_fed_page_controller_action_sub'];
+					}
+				}
+			}
+			if (NULL === $resolvedMainTemplateIdentity && NULL === $resolvedSubTemplateIdentity) {
+				$this->pageTemplateConfiguration[$pageUid] = NULL;
+			}
+			if (NULL === $resolvedMainTemplateIdentity && NULL !== $resolvedSubTemplateIdentity) {
+				$resolvedMainTemplateIdentity = $resolvedSubTemplateIdentity;
+			}
+			$this->pageTemplateConfiguration[$pageUid] = array(
+				'tx_fed_page_controller_action' => 	$resolvedMainTemplateIdentity,
+				'tx_fed_page_controller_action_sub' => 	$resolvedSubTemplateIdentity
+			);
+		}
+
+		return $this->pageTemplateConfiguration[$pageUid];
 	}
 
 	/**
