@@ -187,7 +187,8 @@ class PageLayoutView extends \TYPO3\CMS\Backend\View\PageLayoutView {
 				$cList = explode(',', $this->tt_contentConfig['cols']);
 				$content = array();
 				$head = array();
-
+				// Set language for tt_content elements, required for languageMode and FCEs
+				$GLOBALS['FLUX']['tt_content-LP'] = $lP;
 				// Select content records per column
 				$contentRecordsPerColumn = $this->getContentRecordsPerColumn('table', $id, array_values($cList), $showHidden . $showLanguage);
 				// For each column, render the content into a variable:
