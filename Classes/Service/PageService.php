@@ -113,18 +113,15 @@ class PageService implements SingletonInterface {
 
 		// Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
 		// configuration as an emulated first parent page.
-		$resolvedMainTemplateIdentity = NULL;
+		$resolvedMainTemplateIdentity = $page['tx_fed_page_controller_action'];
 		$resolvedSubTemplateIdentity = NULL;
 		do {
-			if (NULL === $resolvedMainTemplateIdentity && FALSE !== strpos($page['tx_fed_page_controller_action'], '->')) {
-				$resolvedMainTemplateIdentity = $page['tx_fed_page_controller_action'];
-			}
 			if (NULL === $resolvedSubTemplateIdentity && FALSE !== strpos($page['tx_fed_page_controller_action_sub'], '->')) {
 				$resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
 			}
 			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
 			$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
-		} while (NULL !== $page && (NULL === $resolvedMainTemplateIdentity || NULL === $resolvedSubTemplateIdentity));
+		} while (NULL !== $page && NULL === $resolvedSubTemplateIdentity);
 		if (NULL === $resolvedMainTemplateIdentity && NULL === $resolvedSubTemplateIdentity) {
 			return NULL;
 		}
