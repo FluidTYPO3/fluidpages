@@ -123,10 +123,10 @@ class PageService implements SingletonInterface {
 			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
 			$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
 		} while (NULL !== $page && NULL === $resolvedSubTemplateIdentity);
-		if (NULL === $resolvedMainTemplateIdentity && NULL === $resolvedSubTemplateIdentity) {
+		if (TRUE === empty($resolvedMainTemplateIdentity) && NULL === $resolvedSubTemplateIdentity) {
 			return NULL;
 		}
-		if (NULL === $resolvedMainTemplateIdentity && NULL !== $resolvedSubTemplateIdentity) {
+		if (TRUE === empty($resolvedMainTemplateIdentity) && NULL !== $resolvedSubTemplateIdentity) {
 			$resolvedMainTemplateIdentity = $resolvedSubTemplateIdentity;
 		}
 		return array(
