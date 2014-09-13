@@ -23,5 +23,3 @@ $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] .= ($GLOBALS['TYPO3_CONF_
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\View\\BackendLayoutView'] =
 	array('className' => 'FluidTYPO3\Fluidpages\Override\Backend\View\BackendLayoutView');
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\View\\PageLayoutView'] =
-	array('className' => 'FluidTYPO3\Fluidpages\Override\Backend\View\PageLayoutView');
