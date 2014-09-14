@@ -21,5 +21,12 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EX
 
 $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] .= ($GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] == '' ? '' : ',') . 'tx_fed_page_controller_action,tx_fed_page_controller_action_sub,tx_fed_page_flexform,tx_fed_page_flexform_sub,';
 
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\View\\BackendLayoutView'] =
-	array('className' => 'FluidTYPO3\Fluidpages\Override\Backend\View\BackendLayoutView');
+if (6.2 <= (float) substr(TYPO3_version, 0, 3)) {
+	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['BackendLayoutDataProvider']['fluidpages'] =
+		'FluidTYPO3\Fluidpages\Backend\BackendLayoutDataProvider';
+} else {
+	$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\View\\BackendLayoutView'] =
+		array('className' => 'FluidTYPO3\Fluidpages\Override\Backend\View\BackendLayoutView');
+}
+
+
