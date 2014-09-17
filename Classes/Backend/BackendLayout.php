@@ -159,7 +159,7 @@ class BackendLayout implements SingletonInterface {
 	 *
 	 * @param integer $id Starting page id when parsing he rootline
 	 * @param array $tcaItems The current set of colpos TCA items
-	 * @param t3lib_TCEForms $tceForms A back reference to the TCEforms object which generated the item list
+	 * @param \TYPO3\CMS\Backend\Form\FormEngine $tceForms A back reference to the TCEforms object which generated the item list
 	 * @return void
 	 */
 	public function postProcessColPosListItemsParsed(&$id, array &$tcaItems, &$tceForms) {
