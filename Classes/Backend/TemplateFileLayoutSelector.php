@@ -24,12 +24,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
  ***************************************************************/
 
 use FluidTYPO3\Flux\Form;
-use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Class that renders a Layout selector based on a template file

@@ -135,7 +135,7 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 
 	/**
 	 * @param integer $pageUid Starting page UID in the rootline (this current page)
-	 * @return NULL|void
+	 * @return array
 	 */
 	protected function getBackendLayoutConfiguration($pageUid) {
 		try {

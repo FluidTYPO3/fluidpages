@@ -26,7 +26,6 @@ namespace FluidTYPO3\Fluidpages\Backend;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Service\ContentService;
-use FluidTYPO3\Flux\Utility\VersionUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
@@ -85,7 +84,6 @@ class BackendLayout implements SingletonInterface {
 				$this->configurationService->message('No template selected - backend layout will not be rendered', GeneralUtility::SYSLOG_SEVERITY_INFO);
 				return NULL;
 			}
-			$paths = $provider->getTemplatePaths($record);
 			$grid = $provider->getGrid($record)->build();
 			if (FALSE === is_array($grid) || 0 === count($grid['rows'])) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior
@@ -160,7 +158,7 @@ class BackendLayout implements SingletonInterface {
 	 *
 	 * @param integer $id Starting page id when parsing he rootline
 	 * @param array $tcaItems The current set of colpos TCA items
-	 * @param t3lib_TCEForms $tceForms A back reference to the TCEforms object which generated the item list
+	 * @param \TYPO3\CMS\Backend\Form\FormEngine $tceForms A back reference to the TCEforms object which generated the item list
 	 * @return void
 	 */
 	public function postProcessColPosListItemsParsed(&$id, array &$tcaItems, &$tceForms) {

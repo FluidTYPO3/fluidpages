@@ -32,6 +32,7 @@ use FluidTYPO3\Flux\Provider\AbstractProvider;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Utility\PathUtility;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
+use FluidTYPO3\Flux\Utility\ResolveUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -167,7 +168,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		$paths = $this->getTemplatePaths($row);
 		if (FALSE === empty($action)) {
 			list (, $action) = explode('->', $action);
-			$templatePathAndFilename = \FluidTYPO3\Flux\Utility\ResolveUtility::resolveTemplatePathAndFilenameByPathAndControllerNameAndActionAndFormat($paths, 'Page', $action);
+			$templatePathAndFilename = ResolveUtility::resolveTemplatePathAndFilenameByPathAndControllerNameAndActionAndFormat($paths, 'Page', $action);
 		}
 		$templatePathAndFilename = GeneralUtility::getFileAbsFileName($templatePathAndFilename);
 		return $templatePathAndFilename;
