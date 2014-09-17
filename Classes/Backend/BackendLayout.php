@@ -84,7 +84,6 @@ class BackendLayout implements SingletonInterface {
 				$this->configurationService->message('No template selected - backend layout will not be rendered', GeneralUtility::SYSLOG_SEVERITY_INFO);
 				return NULL;
 			}
-			$paths = $provider->getTemplatePaths($record);
 			$grid = $provider->getGrid($record)->build();
 			if (FALSE === is_array($grid) || 0 === count($grid['rows'])) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior
