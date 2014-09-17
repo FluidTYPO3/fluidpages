@@ -27,7 +27,6 @@ namespace FluidTYPO3\Fluidpages\Controller;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Controller\AbstractFluxController;
-use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 
 /**
