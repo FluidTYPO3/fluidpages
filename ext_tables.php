@@ -8,7 +8,6 @@ if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']
 	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Fluidpages PAGE rendering');
 }
 
-\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA('pages');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', array(
 	'tx_fed_page_controller_action' => array (
 		'exclude' => 1,
