@@ -24,7 +24,7 @@ if (FALSE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'
 
 $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] .= ($GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] == '' ? '' : ',') . 'tx_fed_page_controller_action,tx_fed_page_controller_action_sub,tx_fed_page_flexform,tx_fed_page_flexform_sub,';
 
-if (6.2 <= (float) substr(TYPO3_version, 0, 3)) {
+if (6.2 > (float) substr(TYPO3_version, 0, 3)) {
 	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['BackendLayoutDataProvider']['fluidpages'] =
 		'FluidTYPO3\Fluidpages\Backend\BackendLayoutDataProvider';
 } else {
