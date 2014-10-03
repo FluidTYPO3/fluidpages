@@ -25,6 +25,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
 
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Flux\Service\ContentService;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use TYPO3\CMS\Backend\View\BackendLayout\BackendLayout;
 use TYPO3\CMS\Backend\View\BackendLayout\BackendLayoutCollection;
@@ -33,6 +34,7 @@ use TYPO3\CMS\Backend\View\BackendLayout\DataProviderInterface;
 use TYPO3\CMS\Core\TypoScript\ExtendedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Class for backend layouts
@@ -206,6 +208,14 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 			);
 			++ $rowIndex;
 		}
+		$config['rows.'][($rowIndex + 1) . '.'] = array(
+			'columns.' => array(
+				'1.' => array(
+					'name' => LocalizationUtility::translate('fluidContentArea', 'fluidpages'),
+					'colPos' => ContentService::COLPOS_FLUXCONTENT
+				)
+			)
+		);
 		return $config;
 	}
 
