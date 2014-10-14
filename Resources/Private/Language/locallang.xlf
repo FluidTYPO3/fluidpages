@@ -39,6 +39,9 @@
 			<trans-unit id="pages.tx_fluidpages_layout">
 				<source>Layout to use for rendering</source>
 			</trans-unit>
+			<trans-unit id="fluidContentArea">
+				<source>Fluid Content Area</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
