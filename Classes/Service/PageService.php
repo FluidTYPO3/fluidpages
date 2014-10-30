@@ -115,7 +115,8 @@ class PageService implements SingletonInterface {
 		$resolvedMainTemplateIdentity = $page['tx_fed_page_controller_action'];
 		$resolvedSubTemplateIdentity = NULL;
 		do {
-			if (NULL === $resolvedSubTemplateIdentity && FALSE !== strpos($page['tx_fed_page_controller_action_sub'], '->')) {
+			$containsSubDefinition = (FALSE !== strpos($page['tx_fed_page_controller_action_sub'], '->'));
+			if (TRUE === $containsSubDefinition && NULL === $resolvedSubTemplateIdentity && (integer) $page['uid'] !== $pageUid) {
 				$resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
 				break;
 			}
