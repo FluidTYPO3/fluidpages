@@ -110,25 +110,32 @@ class PageService implements SingletonInterface {
 		}
 		$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
 
-		// Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
-		// configuration as an emulated first parent page.
+		// Initialize with possibly-empty values and loop root line
+		// to fill values as they are detected.
 		$resolvedMainTemplateIdentity = $page['tx_fed_page_controller_action'];
-		$resolvedSubTemplateIdentity = NULL;
+		$resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
 		do {
 			$containsSubDefinition = (FALSE !== strpos($page['tx_fed_page_controller_action_sub'], '->'));
 			$isCandidate = ((integer) $page['uid'] !== $pageUid);
 			if (TRUE === $containsSubDefinition && TRUE === $isCandidate) {
 				$resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
+				if (TRUE === empty($resolvedMainTemplateIdentity)) {
+					// Conditions met: current page is not $pageUid, original page did not
+					// contain a "this page" layout, current rootline page has "sub" selection.
+					// Then, set our "this page" value to use the "sub" selection that was detected.
+					$resolvedMainTemplateIdentity = $resolvedSubTemplateIdentity;
+				}
 				break;
 			}
+			// Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
+			// configuration as an emulated first parent page.
 			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
 			$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
 		} while (NULL !== $page);
-		if (TRUE === empty($resolvedMainTemplateIdentity) && NULL === $resolvedSubTemplateIdentity) {
+		if (TRUE === empty($resolvedMainTemplateIdentity) && TRUE === empty($resolvedSubTemplateIdentity)) {
+			// Neither directly configured "this page" nor inherited "sub" contains a valid value;
+			// no configuration was detected at all.
 			return NULL;
-		}
-		if (TRUE === empty($resolvedMainTemplateIdentity) && NULL !== $resolvedSubTemplateIdentity) {
-			$resolvedMainTemplateIdentity = $resolvedSubTemplateIdentity;
 		}
 		return array(
 			'tx_fed_page_controller_action' => 	$resolvedMainTemplateIdentity,
