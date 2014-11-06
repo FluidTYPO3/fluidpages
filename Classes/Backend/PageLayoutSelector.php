@@ -25,6 +25,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
 
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
+use FluidTYPO3\Flux\Utility\MiscellaneousUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
@@ -126,7 +127,7 @@ class PageLayoutSelector {
 						$this->configurationService->message('Template file ' . $templatePathAndFilename . ' is disabled by configuration', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
 						continue;
 					}
-					$thumbnail = $form->getIcon();
+					$thumbnail = MiscellaneousUtility::getIconForTemplate($form);
 					$label = $form->getLabel();
 					$translatedLabel = LocalizationUtility::translate($label, $extensionName);
 					if (NULL !== $translatedLabel) {
