@@ -185,11 +185,6 @@ The template does not contain an example of rendering a menu - you can find a mo
 
 ## Incompatibilities
 
-Using EXT:view Fluid Page template rendering cannot be overlaid - but arguments for ViewHelpers used in page templates can.
-
-Backend Layouts defined directly in the page template (and thus dynamic just like other Flux FlexForm configurations) is only
-supported on TYPO3 6.0 and above. On 4.x branches you still have to use the traditional Backend Layout records.
-
 Currently it is not possible to run alongside TemplaVoila - which should come as no surprise and most likely is not a factor.
 If you chose Fluid Pages you should not need TemplaVoila (the extension Fluid Content can be used to create content elements that
 work like TemplaVoila's flexible content elements, but written in Fluid and allowing the same type of configuration as Fluid
