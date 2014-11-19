@@ -1,19 +1,18 @@
 language: php
 
 php:
-  - 5.3
   - 5.4
   - 5.5
+  - 5.6
 
 env:
-  - DB=mysql TYPO3=master INTEGRATION=master
-  - DB=mysql TYPO3=TYPO3_6-1 INTEGRATION=master
+  - DB=mysql TYPO3=master INTEGRATION=master INTRODUCTION=master
+  - DB=mysql TYPO3=TYPO3_6-2 INTEGRATION=master INTRODUCTION=master
 
 matrix:
-   fast_finish: true
    include:
-     - php: 5.6
-       env: DB=mysql TYPO3=master INTEGRATION=master
+     - php: 5.3
+       env: DB=mysql TYPO3=TYPO3_6-2 INTEGRATION=master INTRODUCTION=master
 
 before_script:
   - cd ..
@@ -22,7 +21,7 @@ before_script:
   - git clone git://github.com/squizlabs/PHP_CodeSniffer.git build-environment/CodeSniffer
   - git clone --single-branch --branch $TYPO3 --depth 1 https://github.com/TYPO3/TYPO3.CMS.git core
   - source build-environment/install-helper.sh
-  - git clone --single-branch --branch $TYPO3 --depth 1 git://git.typo3.org/TYPO3CMS/Distributions/Introduction.git build-environment/Introduction
+  - git clone --single-branch --branch $INTRODUCTION --depth 1 git://git.typo3.org/TYPO3CMS/Distributions/Introduction.git build-environment/Introduction
   - mv core/typo3 .
   - if [[ -d core/t3lib ]]; then mv core/t3lib . ; fi
   - mv build-environment/typo3conf .
@@ -30,8 +29,18 @@ before_script:
   - mkdir uploads
   - mkdir typo3temp
 
+  - >
+    if [[ "$TYPO3" == "master" ]]; then
+        echo;
+        echo "Copying composer.json to working dir. - Installing composer deps";
+        cp core/composer.json .
+        composer --dev install;
+    else
+        echo "Need to install ext phpunit. Wait..";
+        git clone --depth 1 git://git.typo3.org/TYPO3CMS/Extensions/phpunit.git typo3conf/ext/phpunit
+    fi
+
   - git clone --depth 1 --single-branch --branch $TRAVIS_BRANCH git://github.com/FluidTYPO3/flux.git typo3conf/ext/flux
-  - git clone --depth 1 git://git.typo3.org/TYPO3CMS/Extensions/phpunit.git typo3conf/ext/phpunit
   - git clone --depth 1 git://github.com/FluidTYPO3/builder.git typo3conf/ext/builder
   - mv fluidpages ./typo3conf/ext/
 
@@ -43,10 +52,21 @@ before_script:
   - if [[ "$DB" == "mysql" && -f typo3conf/ext/builder/Build/ImportSchema.sql ]]; then mysql -uroot typo3_test < typo3conf/ext/builder/Build/ImportSchema.sql; fi
   - if [[ "$DB" == "mysql" && -f typo3conf/ext/flux/Build/ImportSchema.sql ]]; then mysql -uroot typo3_test < typo3conf/ext/flux/Build/ImportSchema.sql; fi
   - if [[ "$DB" == "mysql" && -f typo3conf/ext/fluidpages/Build/ImportSchema.sql ]]; then mysql -uroot typo3_test < typo3conf/ext/fluidpages/Build/ImportSchema.sql; fi
-  - if [[ -f typo3conf/LocalConfiguration.php && -f typo3conf/ext/fluidpages/Build/LocalConfiguration.php ]]; then cp typo3conf/ext/fluidpages/Build/LocalConfiguration.php typo3conf/LocalConfiguration.php; fi
-  - if [[ -f typo3conf/ext/fluidpages/Build/PackageStates.php ]]; then cp typo3conf/ext/fluidpages/Build/PackageStates.php typo3conf/PackageStates.php; fi
-  - if [[ -f typo3conf/localconf.php && -f typo3conf/ext/fluidpages/Build/localconf.php ]]; then cp typo3conf/ext/fluidpages/Build/localconf.php typo3conf/localconf.php; fi
-  - if [[ -f typo3conf/ext/fluidpages/Tests/phpunit.xml ]]; then cp typo3conf/ext/fluidpages/Tests/phpunit.xml phpunit.xml; fi
+  # On CMS 6 we need EXT:phpunit, on CMS 7 we can get away with a custom bootstrap.
+  # Other than that, the phpunit.xml slightly differs
+  - >
+    echo "Copying configuration..";
+    if [[ "$TYPO3" == "master" ]]; then
+      # CMS 7 / master
+      cp typo3conf/ext/fluidpages/Build/LocalConfiguration7.php typo3conf/LocalConfiguration.php;
+      cp typo3conf/ext/fluidpages/Build/PackageStates7.php typo3conf/PackageStates.php;
+      cp typo3conf/ext/fluidpages/Tests/phpunit7.xml phpunit.xml;
+    elif [[ "$TYPO3" != "master" ]]; then
+      # CMS 6
+      cp typo3conf/ext/fluidpages/Build/LocalConfiguration.php typo3conf/LocalConfiguration.php;
+      cp typo3conf/ext/fluidpages/Build/PackageStates.php typo3conf/PackageStates.php;
+      cp typo3conf/ext/fluidpages/Tests/phpunit.xml phpunit.xml;
+    fi
 
 script:
 # phplint checking on all PHP source files in extension
@@ -55,5 +75,15 @@ script:
   - typo3/cli_dispatch.phpsh extbase builder:fluidsyntax --extension fluidpages
 # PHPCodeSniffer code inspection with only errors displayed (no warnings)
   - build-environment/CodeSniffer/scripts/phpcs -n --standard=$PWD/build-environment/FluidTYPO3-CodingStandards/ruleset.xml $PWD/typo3conf/ext/fluidpages
-# PHPUnit tests from overridden phpunit tests configuration file
-  - if [[ -f typo3conf/ext/fluidpages/Tests/phpunit.xml ]]; then typo3/cli_dispatch.phpsh phpunit -c phpunit.xml; fi
+# PHPUnit tests from overridden phpunit tests configuration file - CMS 6
+  - >
+    if [[ -f typo3conf/ext/fluidpages/Tests/phpunit.xml && "$TYPO3" != "master" ]]; then
+      echo "Running unit tests for EXT:fluidpages (CMS 6)";
+      typo3/cli_dispatch.phpsh phpunit -c phpunit.xml --coverage-clover flux/build/logs/clover.xml;
+    fi
+# PHPUnit tests from overridden phpunit tests configuration file - CMS 7
+  - >
+    if [[ -f typo3conf/ext/fluidpages/Tests/phpunit7.xml && "$TYPO3" == "master" ]]; then
+      echo "Running unit tests for EXT:fluidpages (CMS 7)";
+      ./bin/phpunit --colors -c phpunit.xml --coverage-clover fluidpages/build/logs/clover.xml;
+    fi
