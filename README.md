@@ -127,7 +127,7 @@ EXT:myextension/Resources/Private/Templates/Page/FrontPage.html):
 <div xmlns="http://www.w3.org/1999/xhtml" lang="en"
      xmlns:v="http://fedext.net/ns/vhs/ViewHelpers"
      xmlns:flux="http://fedext.net/ns/flux/ViewHelpers"
-     xmlns:f="http://typo3.org/ns/fluid/ViewHelpers">
+     xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers">
 
 <f:section name="Configuration">
 	<flux:form id="sample-page" label="Sample Fluid page">
