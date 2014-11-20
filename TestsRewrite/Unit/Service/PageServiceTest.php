@@ -39,14 +39,14 @@ class PageServiceTest extends UnitTestCase {
 	/**
 	 * @test
 	 */
-	public function GetPageFlexFormSourceWithZeroUidReturnsNull() {
+	public function getPageFlexFormSourceWithZeroUidReturnsNull() {
 		$this->assertNull($this->getPageService()->getPageFlexFormSource(0));
 	}
 
 	/**
 	 * @test
 	 */
-	public function GetPageTemplateConfigurationWithZeroUidReturnsNull() {
+	public function getPageTemplateConfigurationWithZeroUidReturnsNull() {
 		$this->assertNull($this->getPageService()->getPageTemplateConfiguration(0));
 	}
 }
