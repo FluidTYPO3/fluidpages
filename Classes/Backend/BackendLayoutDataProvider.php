@@ -190,7 +190,7 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 				}
 				$columns[$key] = array(
 					'name' => $columnName,
-					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['colCount']
+					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : NULL
 				);
 				if ($column['colspan']) {
 					$columns[$key]['colspan'] = $column['colspan'];
