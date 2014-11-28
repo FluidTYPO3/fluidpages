@@ -27,6 +27,7 @@ namespace FluidTYPO3\Fluidpages\Service;
 use FluidTYPO3\Flux\Core;
 use FluidTYPO3\Flux\Service\FluxService;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
+use FluidTYPO3\Flux\Utility\RecursiveArrayUtility;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -122,7 +123,7 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 		}
 		$newLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'collections', 'fluidpages');
 		$oldLocation = (array) $this->getTypoScriptSubConfiguration($extensionName, 'page', 'fed');
-		$merged = (array) GeneralUtility::array_merge_recursive_overrule($oldLocation, $newLocation);
+		$merged = RecursiveArrayUtility::mergeRecursiveOverrule($oldLocation, $newLocation);
 		if (NULL === $extensionName) {
 			$registeredExtensionKeys = Core::getRegisteredProviderExtensionKeys('Page');
 			foreach ($registeredExtensionKeys as $registeredExtensionKey) {
@@ -141,7 +142,7 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 		} else {
 			$nativeViewLocation = $this->getViewConfigurationForExtensionName($extensionName);
 			if (TRUE === is_array($nativeViewLocation)) {
-				$merged = GeneralUtility::array_merge_recursive_overrule($nativeViewLocation, $merged);
+				$merged = RecursiveArrayUtility::mergeRecursiveOverrule($nativeViewLocation, $merged);
 			}
 			if (FALSE === isset($nativeViewLocation['extensionKey'])) {
 				$merged['extensionKey'] = ExtensionNamingUtility::getExtensionKey($extensionName);
