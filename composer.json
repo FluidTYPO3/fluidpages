@@ -5,40 +5,54 @@
     "fluidtypo3/flux": "*"
   },
   "type": "typo3-cms-extension",
-	"keywords": [
+  "keywords": [
     "TYPO3 CMS",
     "templating",
     "flux",
     "fluidpages",
     "fedext",
-    "fluid"],
-	"homepage": "http://fluidtypo3.org",
-	"license": "GPL-2.0+",
+    "fluid"
+  ],
+  "homepage": "http://fluidtypo3.org",
+  "license": "GPL-2.0+",
   "version": "3.2.0",
-	"support": {
-		"irc": "irc://irc.freenode.org/fedext",
-		"issues": "https://github.com/FluidTYPO3/fluidcontent/issues"
-	},
+  "support": {
+    "irc": "irc://irc.freenode.org/fedext",
+    "issues": "https://github.com/FluidTYPO3/fluidcontent/issues"
+  },
   "suggest": {
     "fluidtypo3/fluidcontent": "Gives the ability to render custom content elements with pure fluid.",
     "fluidtypo3/fluidcontent_core": "Gives the ability to render core content elements with pure fluid."
   },
-  "replace": {
-    "typo3/cms-composer-installers": "*"
-  },
+  "minimum-stability": "dev",
+  "repositories": [
+    {
+      "type": "package",
+	  "package": {
+          "name": "typo3/cms",
+          "version": "6.2.7",
+          "dist": {
+          "url": "https://github.com/TYPO3/TYPO3.CMS/archive/6.2.7.zip",
+          "type": "zip"
+        }
+      }
+    }
+  ],
   "autoload": {
     "psr-4": {
       "FluidTYPO3\\Fluidpages\\": "Classes/"
     },
     "classmap": [
-      "Tests/",
-      "vendor/typo3/cms/typo3/sysext"
+      "Tests",
+      "vendor/typo3/cms/typo3/sysext/extbase",
+      "vendor/typo3/cms/typo3/sysext/fluid",
+      "vendor/typo3/cms/typo3/sysext/core",
+      "vendor/typo3/cms/typo3/sysext/backend",
+      "vendor/typo3/cms/typo3/sysext/frontend"
     ]
   },
   "require-dev": {
-    "satooshi/php-coveralls": "dev-master",
-    "typo3/cms": "~6.2.5",
-    "phpunit/phpunit": "4.2.*",
-    "mikey179/vfsStream": "~1.3.0"
+    "fluidtypo3/development": "dev-master",
+    "typo3/cms": "6.2.7"
   }
 }

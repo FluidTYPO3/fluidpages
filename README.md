@@ -5,7 +5,7 @@ Fluidpages: Fluid Page Templates
 > in the extension FED and ported into this extension, making a very light (actually bordering on simple) extension. It uses Flux
 > to enable highly dynamic configuration of variables used when rendering the template.
 
-[![Build Status](https://travis-ci.org/FluidTYPO3/fluidpages.png?branch=master)](https://travis-ci.org/FluidTYPO3/fluidpages)
+[![Build Status](https://img.shields.io/jenkins/s/https/jenkins.fluidtypo3.org/fluidpages.svg?style=flat-square)](https://jenkins.fluidtypo3.org/job/fluidpages) [![Coverage Status](https://img.shields.io/coveralls/FluidTYPO3/fluidpages/development.svg?style=flat-square)](https://coveralls.io/r/FluidTYPO3/fluidpages)
 
 ## What does it do?
 
