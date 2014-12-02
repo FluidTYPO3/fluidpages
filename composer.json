@@ -24,7 +24,6 @@
     "fluidtypo3/fluidcontent": "Gives the ability to render custom content elements with pure fluid.",
     "fluidtypo3/fluidcontent_core": "Gives the ability to render core content elements with pure fluid."
   },
-  "minimum-stability": "dev",
   "repositories": [
     {
       "type": "package",
@@ -52,7 +51,7 @@
     ]
   },
   "require-dev": {
-    "fluidtypo3/development": "dev-master",
+    "fluidtypo3/development": "*",
     "typo3/cms": "6.2.7"
   }
 }
