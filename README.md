@@ -12,7 +12,7 @@ page and one for subpage templates, like TemplaVoila).
 ## Why use it?
 
 Although the FLUIDTEMPLATE object in TypoScript allows Fluid templates to be used as page templates, it has limited capabilities.
-Using EXT:fluidtemplate the page templates are not only selectable in page properties but also rendered from a proper Controller.
+Using EXT:fluidpages the page templates are not only selectable in page properties but also rendered from a proper Controller.
 
 In addition to this, Fluid Pages uses all the power of Flux to allow the template to contain dynamic but very compact configuration
 sections - which translate to fields in the page properties, the values of which are available when rendering the template.
