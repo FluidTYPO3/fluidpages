@@ -27,6 +27,10 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Service;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
+/**
+ * Class PageServiceTest
+ * @package FluidTYPO3\Fluidpages\Tests\Unit\Service
+ */
 class PageServiceTest extends UnitTestCase {
 
 	/**
