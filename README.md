@@ -1,7 +1,7 @@
 Fluidpages: Fluid Page Templates
 ================================
 
-[![Build Status](https://img.shields.io/jenkins/s/https/jenkins.fluidtypo3.org/fluidpages.svg?style=flat-square)](https://jenkins.fluidtypo3.org/job/fluidpages) [![Coverage Status](https://img.shields.io/coveralls/FluidTYPO3/fluidpages/development.svg?style=flat-square)](https://coveralls.io/r/FluidTYPO3/fluidpages) [![Build status](http://img.shields.io/badge/documentation-online-blue.svg?style=flat-square)](https://fluidtypo3.org/templating-manual/introduction.html)
+[![Build Status](https://img.shields.io/jenkins/s/https/jenkins.fluidtypo3.org/fluidpages.svg?style=flat-square)](https://jenkins.fluidtypo3.org/job/fluidpages) [![Coverage Status](https://img.shields.io/coveralls/FluidTYPO3/fluidpages/development.svg?style=flat-square)](https://coveralls.io/r/FluidTYPO3/fluidpages) [![Documentation](http://img.shields.io/badge/documentation-online-blue.svg?style=flat-square)](https://fluidtypo3.org/templating-manual/introduction.html)
 
 ## What does it do?
 
