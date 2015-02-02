@@ -20,9 +20,6 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Class that renders a Page template selection field.
- *
- * @package	Fluidpages
- * @subpackage Backend
  */
 class PageLayoutSelector {
 

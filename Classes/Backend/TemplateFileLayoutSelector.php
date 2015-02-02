@@ -15,9 +15,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class that renders a Layout selector based on a template file
- *
- * @package	Fluidpages
- * @subpackage Backend
  */
 class TemplateFileLayoutSelector {
 

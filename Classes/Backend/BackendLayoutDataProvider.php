@@ -23,9 +23,6 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Class for backend layouts
- *
- * @package	Fluidpages
- * @subpackage Backend
  */
 class BackendLayoutDataProvider implements DataProviderInterface {
 

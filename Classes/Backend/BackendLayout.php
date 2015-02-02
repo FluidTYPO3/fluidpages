@@ -18,9 +18,6 @@ use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
  * Class for backend layouts
- *
- * @package	Fluidpages
- * @subpackage Backend
  */
 class BackendLayout implements SingletonInterface {
 

@@ -22,10 +22,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Page Configuration Provider
- *
- * @author Claus Due <claus@namelesscoder.net>
- * @package Fluidpages
- * @subpackage Provider
  */
 class PageProvider extends AbstractProvider implements ProviderInterface {
 

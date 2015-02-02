@@ -20,9 +20,6 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
  *
  * Service for interacting with Pages - gets content elements and page configuration
  * options.
- *
- * @package Fluidpages
- * @subpackage Service
  */
 class PageService implements SingletonInterface {
 

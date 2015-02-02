@@ -16,8 +16,6 @@ use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 /**
  * Page Controller
  *
- * @package Fluidpages
- * @subpackage Controller
  * @route off
  */
 abstract class AbstractPageController extends AbstractFluxController implements PageControllerInterface {

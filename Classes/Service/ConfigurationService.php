@@ -21,10 +21,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * Provides methods to read various configuration related
  * to Fluid Content Elements.
- *
- * @author Claus Due
- * @package Fluidpages
- * @subpackage Service
  */
 class ConfigurationService extends FluxService implements SingletonInterface {
 

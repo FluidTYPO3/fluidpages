@@ -11,8 +11,6 @@ namespace FluidTYPO3\Fluidpages\Controller;
 /**
  * Page Controller
  *
- * @package Fluidpages
- * @subpackage Controller
  * @route off
  */
 class PageController extends AbstractPageController implements PageControllerInterface {

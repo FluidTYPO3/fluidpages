@@ -16,8 +16,6 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface;
  * Implement in custom controllers which must be located at
  * <PackageName>/Classes/Controller/PageController by convention.
  *
- * @package Fluidpages
- * @subpackage Controller
  * @route off
  */
 interface PageControllerInterface extends ControllerInterface {
