@@ -9,8 +9,9 @@ namespace FluidTYPO3\Fluidpages\Backend;
  */
 
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
-use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Service\ContentService;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
+use TYPO3\CMS\Backend\Form\FormEngine;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
@@ -143,7 +144,7 @@ class BackendLayout implements SingletonInterface {
 	 *
 	 * @param integer $id Starting page id when parsing he rootline
 	 * @param array $tcaItems The current set of colpos TCA items
-	 * @param \TYPO3\CMS\Backend\Form\FormEngine $tceForms A back reference to the TCEforms object which generated the item list
+	 * @param FormEngine $tceForms A back reference to the TCEforms object which generated the item list
 	 * @return void
 	 */
 	public function postProcessColPosListItemsParsed(&$id, array &$tcaItems, &$tceForms) {

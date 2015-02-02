@@ -9,7 +9,6 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Controller;
  */
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class AbstractPageControllerTest

@@ -8,11 +8,14 @@ namespace FluidTYPO3\Fluidpages\Backend;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use FluidTYPO3\Flux\Utility\MiscellaneousUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
@@ -24,12 +27,12 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 class PageLayoutSelector {
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager
+	 * @var BackendConfigurationManager
 	 */
 	protected $configurationManager;
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
+	 * @var ConfigurationService
 	 */
 	protected $configurationService;
 
@@ -39,7 +42,7 @@ class PageLayoutSelector {
 	protected $recognizedFormats = array('html', 'xml', 'txt', 'json', 'js', 'css');
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\PageService
+	 * @var PageService
 	 */
 	protected $pageService;
 

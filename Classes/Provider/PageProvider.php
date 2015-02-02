@@ -14,9 +14,10 @@ use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Provider\AbstractProvider;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
-use FluidTYPO3\Flux\Utility\PathUtility;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
+use FluidTYPO3\Flux\Utility\PathUtility;
 use FluidTYPO3\Flux\Utility\ResolveUtility;
+use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -64,17 +65,17 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	protected $configurationSectionName = 'Configuration';
 
 	/**
-	 * @var \TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools
+	 * @var FlexFormTools
 	 */
 	protected $flexformTool;
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\PageService
+	 * @var PageService
 	 */
 	protected $pageService;
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
+	 * @var ConfigurationService
 	 */
 	protected $configurationService;
 
@@ -101,7 +102,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * @param \FluidTYPO3\Fluidpages\Service\PageService $pageService
+	 * @param PageService $pageService
 	 * @return void
 	 */
 	public function injectPageService(PageService $pageService) {
@@ -109,7 +110,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * @param \FluidTYPO3\Fluidpages\Service\ConfigurationService $configurationService
+	 * @param ConfigurationService $configurationService
 	 * @return void
 	 */
 	public function injectConfigurationService(ConfigurationService $configurationService) {

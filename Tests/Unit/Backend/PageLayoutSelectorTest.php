@@ -8,8 +8,6 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
  * LICENSE.md file that was distributed with this source code.
  */
 
-use FluidTYPO3\Fluidpages\Backend\BackendLayout;
-use FluidTYPO3\Flux\Service\ContentService;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 

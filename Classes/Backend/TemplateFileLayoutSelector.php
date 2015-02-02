@@ -8,6 +8,8 @@ namespace FluidTYPO3\Fluidpages\Backend;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -20,12 +22,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TemplateFileLayoutSelector {
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
+	 * @var PageService
 	 */
 	protected $pageService;
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
+	 * @var ConfigurationService
 	 */
 	protected $configurationService;
 
