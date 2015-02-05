@@ -25,3 +25,7 @@ $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] .= ($GLOBALS['TYPO3_CONF_
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['BackendLayoutDataProvider']['fluidpages'] =
 	'FluidTYPO3\Fluidpages\Backend\BackendLayoutDataProvider';
+
+if (TYPO3_MODE === 'BE') {
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/template.php']['preHeaderRenderHook'][] = 'FluidTYPO3\\Fluidpages\\Hooks\\BackendDocumentTemplate->removeFluidContentAreaSection';
+}
