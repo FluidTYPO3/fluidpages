@@ -8,6 +8,7 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Fluidpages\Backend\TemplateFileLayoutSelector;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -24,6 +25,24 @@ class TemplateFileLayoutSelectorTest extends UnitTestCase {
 			->get('FluidTYPO3\\Fluidpages\\Backend\\TemplateFileLayoutSelector');
 		$this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\PageService', 'pageService', $instance);
 		$this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', 'configurationService', $instance);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function testAddLayoutOptions() {
+		$layoutRootPath = 'EXT:fluidpages/Tests/Fixtures/Templates/';
+		$parameters = array('items' => array());
+		$instance = new TemplateFileLayoutSelector();
+		$parent = '';
+		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('getViewConfigurationByFileReference'));
+		$service->expects($this->once())->method('getViewConfigurationByFileReference')->willReturn(array(
+			'layoutRootPath' => $layoutRootPath
+		));
+		$instance->injectConfigurationService($service);
+		$instance->addLayoutOptions($parameters, $parent);
+		$this->assertEquals(array('Dummy', 'Dummy'), $parameters['items'][0]);
+		$this->assertEquals(array('Nested/Dummy', 'Nested/Dummy'), $parameters['items'][1]);
 	}
 
 }

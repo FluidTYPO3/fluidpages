@@ -29,12 +29,28 @@ class TemplateFileLayoutSelector {
 	protected $configurationService;
 
 	/**
+	 * @param ConfigurationService $configurationService
+	 * @return void
+	 */
+	public function injectConfigurationService(ConfigurationService $configurationService) {
+		$this->configurationService = $configurationService;
+	}
+
+	/**
+	 * @param PageService $pageService
+	 * @return void
+	 */
+	public function injectPageService(PageService $pageService) {
+		$this->pageService = $pageService;
+	}
+
+	/**
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
 		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-		$this->pageService = $objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService');
-		$this->configurationService = $objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService');
+		$this->injectConfigurationService($objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'));
+		$this->injectPageService($objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService'));
 	}
 
 	/**
