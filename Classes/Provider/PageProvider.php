@@ -122,22 +122,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		if (FALSE === empty($controllerExtensionKey)) {
 			return ExtensionNamingUtility::getExtensionKey($controllerExtensionKey);
 		}
-		return parent::getExtensionKey($row);
-	}
-
-	/**
-	 * @param array $row
-	 * @return array
-	 */
-	public function getTemplatePaths(array $row) {
-		$extensionName = $this->getExtensionKey($row);
-		$paths = $this->configurationService->getPageConfiguration($extensionName);
-		if (TRUE === is_array($paths) && FALSE === empty($paths)) {
-			$paths = PathUtility::translatePath($paths);
-			return $paths;
-		}
-
-		return parent::getTemplatePaths($row);
+		return $this->extensionKey;
 	}
 
 	/**
@@ -189,7 +174,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 			$extensionName = array_shift(explode('->', $action));
 			return $extensionName;
 		}
-		return parent::getControllerExtensionKeyFromRecord($row);
+		return $this->extensionKey;
 	}
 
 	/**
