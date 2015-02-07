@@ -151,7 +151,7 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getRenderOptionTestValues() {
-		$validFile = ExtensionManagementUtility::extPath('fluidpages', 'Resources/Private/Templates/Page/Render.html');
+		$validFile = ExtensionManagementUtility::extPath('fluidpages', 'Tests/Fixtures/Templates/Dummy.html');
 		$disabledForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled'));
 		$disabledForm->expects($this->once())->method('getEnabled')->willReturn(FALSE);
 		$exceptionForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled'));
