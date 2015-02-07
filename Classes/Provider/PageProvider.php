@@ -132,11 +132,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	public function getTemplatePathAndFilename(array $row) {
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		$paths = $this->getTemplatePaths($row);
+		$templatePathAndFilename = $this->templatePathAndFilename;
 		if (FALSE === empty($action)) {
 			list (, $action) = explode('->', $action);
 			$templatePathAndFilename = ResolveUtility::resolveTemplatePathAndFilenameByPathAndControllerNameAndActionAndFormat($paths, 'Page', $action);
 		}
-		$templatePathAndFilename = GeneralUtility::getFileAbsFileName($templatePathAndFilename);
 		return $templatePathAndFilename;
 	}
 
