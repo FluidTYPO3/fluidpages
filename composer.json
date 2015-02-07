@@ -39,7 +39,8 @@
   ],
   "autoload-dev": {
     "psr-4": {
-      "FluidTYPO3\\Fluidpages\\": "Classes/"
+      "FluidTYPO3\\Fluidpages\\": "Classes/",
+      "FluidTYPO3\\Flux\\": "vendor/fluidtypo3/flux/Classes"
     },
     "classmap": [
       "Tests",
@@ -47,10 +48,12 @@
       "vendor/typo3/cms/typo3/sysext/fluid",
       "vendor/typo3/cms/typo3/sysext/core",
       "vendor/typo3/cms/typo3/sysext/backend",
-      "vendor/typo3/cms/typo3/sysext/frontend"
+      "vendor/typo3/cms/typo3/sysext/frontend",
+      "vendor/typo3/cms/typo3/sysext/lang"
     ]
   },
   "require-dev": {
-    "fluidtypo3/development": "*"
+    "fluidtypo3/development": "*",
+    "fluidtypo3/flux": "dev-development"
   }
 }

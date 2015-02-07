@@ -9,9 +9,12 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
  */
 
 use FluidTYPO3\Fluidpages\Backend\BackendLayout;
+use FluidTYPO3\Flux\Form\Container\Grid;
+use FluidTYPO3\Flux\Provider\Provider;
 use FluidTYPO3\Flux\Service\ContentService;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Lang\LanguageService;
 
 /**
  * Class BackendLayoutTest
@@ -27,6 +30,92 @@ class BackendLayoutTest extends UnitTestCase {
 		$this->assertAttributeInstanceOf('TYPO3\\CMS\\Extbase\\Object\\ObjectManager', 'objectManager', $instance);
 		$this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', 'configurationService', $instance);
 		$this->assertAttributeInstanceOf('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', 'workspacesAwareRecordService', $instance);
+	}
+
+	/**
+	 * @dataProvider getPostProcessBackendLayoutTestValues
+	 * @param Provider $provider
+	 * @param mixed $record
+	 * @param string $messageFunction
+	 * @param integer $messageCount
+	 * @param array $expected
+	 */
+	public function testPostProcessBackendLayout(Provider $provider, $record, $messageFunction, $messageCount, array $expected) {
+		$GLOBALS['LANG'] = $this->getMock('TYPO3\\CMS\\Lang\\LanguageService', array('sL'));
+		$GLOBALS['LANG']->expects($this->any())->method('sL')->willReturn('translatedlabel');
+		$instance = new BackendLayout();
+		$pageUid = 1;
+		$backendLayout = array();
+		$configurationService = $this->getMock(
+			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+			array('resolvePrimaryConfigurationProvider', 'debug', 'message')
+		);
+		$configurationService->expects($this->exactly($messageCount))->method($messageFunction);
+		if (NULL !== $record) {
+			$configurationService->expects($this->once())->method('resolvePrimaryConfigurationProvider')
+				->with('pages', 'tx_fed_page_flexform', $record)->willReturn($provider);
+		}
+		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+		$recordService->expects($this->once())->method('getSingle')->willReturn($record);
+		$instance->injectConfigurationService($configurationService);
+		$instance->injectWorkspacesAwareRecordService($recordService);
+		$instance->postProcessBackendLayout($pageUid, $backendLayout);
+		$this->assertEquals($expected, $backendLayout);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPostProcessBackendLayoutTestValues() {
+		$standardProvider = $this->getMock(
+			'FluidTYPO3\\Flux\\Provider\\Provider',
+			array('getControllerActionFromRecord')
+		);
+		$standardProvider->setTemplatePaths(array());
+		$actionLessProvider = clone $standardProvider;
+		$exceptionProvider = clone $standardProvider;
+		$emptyGridProvider = clone $standardProvider;
+		$gridProvider = clone $standardProvider;
+		$actionLessProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn(NULL);
+		$exceptionProvider->expects($this->any())->method('getControllerActionFromRecord')->willThrowException(new \RuntimeException());
+		$emptyGridProvider->setGrid(Grid::create());
+		$emptyGridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
+		$grid = Grid::create(array());
+		$grid->createContainer('Row', 'row')->createContainer('Column', 'column')->setColSpan(3)->setRowSpan(3)->setColumnPosition(2);
+		$gridProvider->setGrid($grid);
+		$gridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
+		$gridArray = array(
+			'__config' => array(
+				'backend_layout.' => array(
+					'colCount' => 3,
+					'rowCount' => 1,
+					'rows.' => array(
+						'1.' => array(
+							'columns.' => array(
+								'1.' => array(
+									'name' => 'translatedlabel',
+									'colPos' => 2,
+									'colspan' => 3,
+									'rowspan' => 3
+								)
+							)
+						)
+					)
+				)
+			),
+			'__colPosList' => array(2),
+			'__items' => array(
+				array('translatedlabel', 2, NULL)
+			)
+		);
+		return array(
+			array($standardProvider, NULL, 'message', 0, array()),
+			array($standardProvider, array(), 'message', 1, array()),
+			array($actionLessProvider, array(), 'message', 1, array()),
+			array($emptyGridProvider, array(), 'message', 1, array()),
+			array($exceptionProvider, array(), 'debug', 1, array()),
+			array($gridProvider, array(), 'message', 0, $gridArray),
+		);
 	}
 
 	/**

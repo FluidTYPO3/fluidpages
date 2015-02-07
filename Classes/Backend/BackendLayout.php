@@ -37,6 +37,30 @@ class BackendLayout implements SingletonInterface {
 	protected $workspacesAwareRecordService;
 
 	/**
+	 * @param ObjectManagerInterface $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManagerInterface $objectManager) {
+		$this->objectManager = $objectManager;
+	}
+
+	/**
+	 * @param ConfigurationService $configurationService
+	 * @return void
+	 */
+	public function injectConfigurationService(ConfigurationService $configurationService) {
+		$this->configurationService = $configurationService;
+	}
+
+	/**
+	 * @param WorkspacesAwareRecordService $workspacesAwareRecordService
+	 * @return void
+	 */
+	public function injectWorkspacesAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
+		$this->workspacesAwareRecordService = $workspacesAwareRecordService;
+	}
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -73,7 +97,7 @@ class BackendLayout implements SingletonInterface {
 				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
 				return NULL;
 			}
-		} catch (\Exception $error) {
+		} catch (\RuntimeException $error) {
 			$this->configurationService->debug($error);
 			return NULL;
 		}
@@ -95,12 +119,8 @@ class BackendLayout implements SingletonInterface {
 			$columns = array();
 			foreach ($row['columns'] as $column) {
 				$key = ($index + 1) . '.';
-				$columnName = $GLOBALS['LANG']->sL($column['label']);
-				if (TRUE === empty($columnName)) {
-					$columnName = $column['name'];
-				}
 				$columns[$key] = array(
-					'name' => $columnName,
+					'name' => $column['label'],
 					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['backend_layout.']['colCount']
 				);
 				if ($column['colspan']) {
