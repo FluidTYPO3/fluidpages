@@ -31,7 +31,7 @@ class TemplateFileLayoutSelectorTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testAddLayoutOptions() {
-		$layoutRootPath = 'EXT:fluidpages/Tests/Fixtures/Templates/';
+		$layoutRootPath = 'EXT:fluidpages/Tests/Fixtures/Templates/Page/';
 		$parameters = array('items' => array());
 		$instance = new TemplateFileLayoutSelector();
 		$parent = '';
