@@ -37,12 +37,14 @@
       }
     }
   ],
+  "autoload": {
+    "psr-4": {
+      "FluidTYPO3\\Fluidpages\\": "Classes/"
+    }
+  },
   "autoload-dev": {
     "psr-4": {
-      "FluidTYPO3\\Fluidpages\\Tests\\Unit\\": "Tests/Unit/",
-      "FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\": "Tests/Fixtures/",
-      "FluidTYPO3\\Fluidpages\\": "Classes/",
-      "FluidTYPO3\\Flux\\": "vendor/fluidtypo3/flux/Classes"
+      "FluidTYPO3\\Fluidpages\\Tests\\": "Tests/"
     },
     "classmap": [
       "vendor/typo3/cms/typo3/sysext/extbase",
