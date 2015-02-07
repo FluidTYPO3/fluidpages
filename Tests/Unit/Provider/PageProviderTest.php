@@ -27,4 +27,18 @@ class PageProviderTest extends UnitTestCase {
 		$this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', 'configurationService', $instance);
 	}
 
+	public function testGetExtensionKey() {
+		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getControllerExtensionKeyFromRecord'));
+		$instance->expects($this->once())->method('getControllerExtensionKeyFromRecord')->willReturn('fluidpages');
+		$result = $instance->getExtensionKey(array());
+		$this->assertEquals('fluidpages', $result);
+	}
+
+	public function testGetExtensionKeyWithoutSelection() {
+		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getControllerExtensionKeyFromRecord'));
+		$instance->expects($this->once())->method('getControllerExtensionKeyFromRecord')->willReturn(NULL);
+		$result = $instance->getExtensionKey(array());
+		$this->assertEquals('fluidpages', $result);
+	}
+
 }
