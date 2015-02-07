@@ -39,11 +39,12 @@
   ],
   "autoload-dev": {
     "psr-4": {
+      "FluidTYPO3\\Fluidpages\\Tests\\Unit\\": "Tests/Unit/",
+      "FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\": "Tests/Fixtures/",
       "FluidTYPO3\\Fluidpages\\": "Classes/",
       "FluidTYPO3\\Flux\\": "vendor/fluidtypo3/flux/Classes"
     },
     "classmap": [
-      "Tests",
       "vendor/typo3/cms/typo3/sysext/extbase",
       "vendor/typo3/cms/typo3/sysext/fluid",
       "vendor/typo3/cms/typo3/sysext/core",
