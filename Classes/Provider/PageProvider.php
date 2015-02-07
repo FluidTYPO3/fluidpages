@@ -17,6 +17,7 @@ use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use FluidTYPO3\Flux\Utility\PathUtility;
 use FluidTYPO3\Flux\Utility\ResolveUtility;
+use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -130,12 +131,14 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return string
 	 */
 	public function getTemplatePathAndFilename(array $row) {
-		$action = $this->getControllerActionReferenceFromRecord($row);
-		$paths = $this->getTemplatePaths($row);
 		$templatePathAndFilename = $this->templatePathAndFilename;
+		$action = $this->getControllerActionReferenceFromRecord($row);
 		if (FALSE === empty($action)) {
+			$paths = $this->getTemplatePaths($row);
+			$templatePaths = new TemplatePaths($paths);
 			list (, $action) = explode('->', $action);
-			$templatePathAndFilename = ResolveUtility::resolveTemplatePathAndFilenameByPathAndControllerNameAndActionAndFormat($paths, 'Page', $action);
+			$action = ucfirst($action);
+			$templatePathAndFilename = $templatePaths->resolveTemplateFileForControllerAndActionAndFormat('Page', $action);
 		}
 		return $templatePathAndFilename;
 	}

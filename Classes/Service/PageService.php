@@ -10,6 +10,7 @@ namespace FluidTYPO3\Fluidpages\Service;
 
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Utility\PathUtility;
+use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -158,54 +159,37 @@ class PageService implements SingletonInterface {
 		if (FALSE === is_array($typoScript)) {
 			return $output;
 		}
-		foreach ($typoScript as $extensionName=>$group) {
+		foreach ($typoScript as $extensionName => $group) {
 			if (TRUE === isset($group['enable']) && 1 > $group['enable']) {
 				continue;
 			}
-			if (FALSE === isset($group['templateRootPath'])) {
-				$this->configurationService->message('The template group "' . $extensionName . '" does not define a set of template containing at least a templateRootPath' .
-					'paths. This indicates a problem with your TypoScript configuration - most likely a static template is not loaded', GeneralUtility::SYSLOG_SEVERITY_WARNING);
-				continue;
-			}
-			$configuredPath = rtrim($group['templateRootPath'], '/') . '/Page/';
-			$path = GeneralUtility::getFileAbsFileName($configuredPath);
-			if (FALSE === is_dir($path)) {
-				$this->configurationService->message('The template group "' . $extensionName . '" has been configured to use the templateRootPath "' .
-					$configuredPath . '" but this directory does not exist.', GeneralUtility::SYSLOG_SEVERITY_FATAL);
-				continue;
-			}
-			$files = scandir($path);
 			$output[$extensionName] = array();
-			foreach ($files as $key => $file) {
-				$pathinfo = pathinfo($path . $file);
-				$extension = $pathinfo['extension'];
-				if ('.' === substr($file, 0, 1)) {
-					unset($files[$key]);
-				} else if (strtolower($extension) != strtolower($format)) {
-					unset($files[$key]);
-				} else {
-					$output[$extensionName][] = $pathinfo['filename'];
+			$templatePaths = new TemplatePaths($group);
+			$templateRootPaths = $templatePaths->getTemplateRootPaths();
+			foreach ($templateRootPaths as $templateRootPath) {
+				$configuredPath = $templateRootPath . 'Page/';
+				$path = GeneralUtility::getFileAbsFileName($configuredPath);
+				if (FALSE === is_dir($path)) {
+					$this->configurationService->message('The template group "' . $extensionName . '" has been configured to use the templateRootPath "' .
+						$configuredPath . '" but this directory does not exist.', GeneralUtility::SYSLOG_SEVERITY_FATAL);
+					continue;
+				}
+				$files = scandir($path);
+				foreach ($files as $key => $file) {
+					$pathinfo = pathinfo($path . $file);
+					$extension = $pathinfo['extension'];
+					$filename = $pathinfo['filename'];
+					if ('.' === substr($file, 0, 1)) {
+						unset($files[$key]);
+					} else if (strtolower($extension) != strtolower($format)) {
+						unset($files[$key]);
+					} else {
+						$output[$extensionName][$filename] = $filename;
+					}
 				}
 			}
 		}
 		return $output;
-	}
-
-	/**
-	 * @param array $paths
-	 * @param string $template
-	 * @return string
-	 */
-	public function expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template) {
-		if (TRUE === file_exists($template)) {
-			$templatePathAndFilename = $template;
-		} else {
-			if (TRUE === is_array($paths) && FALSE === empty($paths)) {
-				$paths = PathUtility::translatePath($paths);
-			}
-			$templatePathAndFilename = rtrim($paths['templateRootPath'], '/') . '/Page/' . $template . '.html';
-		}
-		return $templatePathAndFilename;
 	}
 
 }
