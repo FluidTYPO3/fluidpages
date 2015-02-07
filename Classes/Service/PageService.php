@@ -146,36 +146,6 @@ class PageService implements SingletonInterface {
 	}
 
 	/**
-	 * Gets a human-readable label from a Fluid Page template file
-	 *
-	 * @param string $extensionName
-	 * @param string $templateFile
-	 * @return string
-	 * @api
-	 */
-	public function getPageTemplateLabel($extensionName, $templateFile) {
-		$config = $this->configurationService->getPageConfiguration($extensionName);
-		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$form = $this->configurationService->getFormFromTemplateFile($templatePathAndFilename, 'Configuration', 'form', array(), $extensionName);
-		return (FALSE === empty($form) ? $form->getLabel() : $templateFile . '.html');
-	}
-
-	/**
-	 * Returns TRUE if the template is enabled
-	 *
-	 * @param string $extensionName
-	 * @param string $templateFile
-	 * @return string
-	 * @api
-	 */
-	public function getPageTemplateEnabled($extensionName, $templateFile) {
-		$config = $this->configurationService->getPageConfiguration($extensionName);
-		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$form = $this->configurationService->getFormFromTemplateFile($templatePathAndFilename, 'Configuration', 'form', array(), $extensionName);
-		return $form->getEnabled();
-	}
-
-	/**
 	 * Gets a list of usable Page Templates from defined page template TypoScript
 	 *
 	 * @param string $format
@@ -214,7 +184,6 @@ class PageService implements SingletonInterface {
 				} else if (strtolower($extension) != strtolower($format)) {
 					unset($files[$key]);
 				} else {
-					$this->getPageTemplateLabel($extensionName, $path . $file);
 					$output[$extensionName][] = $pathinfo['filename'];
 				}
 			}
