@@ -47,13 +47,45 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 	protected $recordService;
 
 	/**
+	 * @param ObjectManagerInterface $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManagerInterface $objectManager) {
+		$this->objectManager = $objectManager;
+	}
+
+	/**
+	 * @param ConfigurationService $configurationService
+	 * @return void
+	 */
+	public function injectConfigurationService(ConfigurationService $configurationService) {
+		$this->configurationService = $configurationService;
+	}
+
+	/**
+	 * @param PageService $pageService
+	 * @return void
+	 */
+	public function injectPageService(PageService $pageService) {
+		$this->pageService = $pageService;
+	}
+
+	/**
+	 * @param WorkspacesAwareRecordService $workspacesAwareRecordService
+	 * @return void
+	 */
+	public function injectWorkspacesAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
+		$this->recordService = $workspacesAwareRecordService;
+	}
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->objectManager = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
-		$this->configurationService = $this->objectManager->get('FluidTYPO3\Fluidpages\Service\ConfigurationService');
-		$this->pageService = $this->objectManager->get('FluidTYPO3\Fluidpages\Service\PageService');
-		$this->recordService = $this->objectManager->get('FluidTYPO3\Flux\Service\WorkspacesAwareRecordService');
+		$this->injectConfigurationService($this->objectManager->get('FluidTYPO3\Fluidpages\Service\ConfigurationService'));
+		$this->injectPageService($this->objectManager->get('FluidTYPO3\Fluidpages\Service\PageService'));
+		$this->injectWorkspacesAwareRecordService($this->objectManager->get('FluidTYPO3\Flux\Service\WorkspacesAwareRecordService'));
 	}
 
 	/**
@@ -76,7 +108,7 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 	 *
 	 * @param string $identifier
 	 * @param integer $pageUid
-	 * @return NULL|BackendLayout
+	 * @return BackendLayout
 	 */
 	public function getBackendLayout($identifier, $pageUid) {
 		$configuration = $this->getBackendLayoutConfiguration($pageUid);
@@ -137,11 +169,6 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 				return array();
 			}
 			$paths = $provider->getTemplatePaths($record);
-			if (0 === count($paths)) {
-				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
-					. 'have included the TypoScript for the desired template collection.', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
-				return array();
-			}
 			$grid = $provider->getGrid($record)->build();
 			if (FALSE === is_array($grid) || 0 === count($grid['rows'])) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior
@@ -166,12 +193,8 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 			$columns = array();
 			foreach ($row['columns'] as $column) {
 				$key = ($index + 1) . '.';
-				$columnName = $GLOBALS['LANG']->sL($column['label']);
-				if (TRUE === empty($columnName)) {
-					$columnName = $column['name'];
-				}
 				$columns[$key] = array(
-					'name' => $columnName,
+					'name' => $column['label'],
 					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : NULL
 				);
 				if ($column['colspan']) {
