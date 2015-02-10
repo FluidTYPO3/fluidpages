@@ -101,7 +101,7 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	public function testRenderOptions($extension, $expectedTitle) {
 		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector', array('renderOption'));
 		$instance->expects($this->any())->method('renderOption')->willReturn('');
-		$result = $this->callInaccessibleMethod($instance, 'renderOptions', $extension, array('foo' => 'bar'), '');
+		$result = $this->callInaccessibleMethod($instance, 'renderOptions', $extension, array('foo' => 'bar'), array());
 		$this->assertContains($expectedTitle, $result);
 	}
 
@@ -138,7 +138,7 @@ class PageLayoutSelectorTest extends UnitTestCase {
 			$service->expects($this->once())->method($expectedMessageFunction);
 		}
 		$instance->injectConfigurationService($service);
-		$result = $this->callInaccessibleMethod($instance, 'renderOption', 'fluidpages', $file, NULL);
+		$result = $this->callInaccessibleMethod($instance, 'renderOption', 'fluidpages', $file, array());
 		if (TRUE === $expectsEmptyOutput) {
 			$this->assertEmpty($result);
 		} else {

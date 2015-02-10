@@ -91,7 +91,7 @@ class PageLayoutSelector {
 		$selector = '<div>';
 		$selector .= $this->renderInheritanceField($parameters);
 		foreach ($availableTemplates as $extension => $group) {
-			$selector .= $this->renderOptions($extension, $group, $value);
+			$selector .= $this->renderOptions($extension, $group, $parameters);
 		}
 		$selector .= '</div>';
 		return $selector;
@@ -129,10 +129,10 @@ class PageLayoutSelector {
 	/**
 	 * @param string $extension
 	 * @param array $group
-	 * @param string $value
+	 * @param array $parameters
 	 * @return string
 	 */
-	protected function renderOptions($extension, array $group, $value) {
+	protected function renderOptions($extension, array $group, array $parameters) {
 		$selector = '';
 		$extensionKey = ExtensionNamingUtility::getExtensionKey($extension);
 		if (FALSE === ExtensionManagementUtility::isLoaded($extensionKey)) {
@@ -146,7 +146,7 @@ class PageLayoutSelector {
 		$packageLabel = LocalizationUtility::translate('pages.tx_fed_page_package', 'Fluidpages');
 		$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
 		foreach ($group as $template) {
-			$selector .= $this->renderOption($extension, $template, $value);
+			$selector .= $this->renderOption($extension, $template, $parameters);
 		}
 		return $selector;
 	}
@@ -154,10 +154,12 @@ class PageLayoutSelector {
 	/**
 	 * @param string $extension
 	 * @param string $template
-	 * @param string $value
+	 * @param array $parameters
 	 * @return string
 	 */
-	protected function renderOption($extension, $template, $value) {
+	protected function renderOption($extension, $template, array $parameters) {
+		$name = $parameters['itemFormElName'];
+		$value = $parameters['itemFormElValue'];
 		$selector = '';
 		try {
 			$paths = $this->configurationService->getPageConfiguration($extension);
