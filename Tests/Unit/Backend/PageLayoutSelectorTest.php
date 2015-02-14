@@ -126,13 +126,11 @@ class PageLayoutSelectorTest extends UnitTestCase {
 		$instance = new PageLayoutSelector();
 		$service = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array(
-				'getPageConfiguration', 'expandPathsAndTemplateFileToTemplatePathAndFilename',
-				'getFormFromTemplateFile', 'message', 'debug'
-			)
+			array('getPageConfiguration', 'getFormFromTemplateFile', 'message', 'debug')
 		);
-		$service->expects($this->any())->method('getPageConfiguration')->willReturn(array());
-		$service->expects($this->any())->method('expandPathsAndTemplateFileToTemplatePathAndFilename')->willReturn($file);
+		$service->expects($this->any())->method('getPageConfiguration')->willReturn(array(
+			'templateRootPaths' => 'EXT:fluidpages/Tests/Fixtures/Templates/'
+		));
 		$service->expects($this->any())->method('getFormFromTemplateFile')->willReturn($form);
 		if (NULL !== $expectedMessageFunction) {
 			$service->expects($this->once())->method($expectedMessageFunction);
@@ -151,7 +149,7 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getRenderOptionTestValues() {
-		$validFile = ExtensionManagementUtility::extPath('fluidpages', 'Tests/Fixtures/Templates/Page/Dummy.html');
+		$validFile = 'Dummy';
 		$disabledForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled'));
 		$disabledForm->expects($this->once())->method('getEnabled')->willReturn(FALSE);
 		$exceptionForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled'));

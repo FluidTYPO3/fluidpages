@@ -11,6 +11,8 @@ namespace FluidTYPO3\Fluidpages\Backend;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
+use FluidTYPO3\Flux\View\ViewContext;
+use FluidTYPO3\Flux\View\TemplatePaths;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use FluidTYPO3\Flux\Utility\MiscellaneousUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -162,14 +164,18 @@ class PageLayoutSelector {
 		$value = $parameters['itemFormElValue'];
 		$selector = '';
 		try {
-			$paths = $this->configurationService->getPageConfiguration($extension);
-			$extensionName = ExtensionNamingUtility::getExtensionName($extension);
-			$templatePathAndFilename = $this->pageService->expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template);
+			$extensionName = ExtensionNamingUtility::getExtensionKey($extension);
+			$paths = $this->configurationService->getPageConfiguration($extensionName);
+			$templatePaths = new TemplatePaths($paths);
+			$templatePathAndFilename = $templatePaths->resolveTemplateFileForControllerAndActionAndFormat('Page', $template);
 			if (FALSE === file_exists($templatePathAndFilename)) {
 				$this->configurationService->message('Missing template file: ' . $templatePathAndFilename, GeneralUtility::SYSLOG_SEVERITY_WARNING);
 				return '';
 			}
-			$form = $this->configurationService->getFormFromTemplateFile($templatePathAndFilename, 'Configuration', 'form', $paths, $extensionName);
+			$viewContext = new ViewContext($templatePathAndFilename, $extensionName);
+			$viewContext->setTemplatePaths($templatePaths);
+			$viewContext->setSectionName('Configuration');
+			$form = $this->configurationService->getFormFromTemplateFile($viewContext);
 			if (FALSE === $form instanceof Form) {
 				$this->configurationService->message('Template file ' . $templatePathAndFilename . ' contains an unparsable Form definition', GeneralUtility::SYSLOG_SEVERITY_FATAL);
 				return '';
