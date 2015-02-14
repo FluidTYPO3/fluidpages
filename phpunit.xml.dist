@@ -15,11 +15,11 @@
 
     <testsuites>
         <testsuite name="EXT:fluidpages">
-            <directory>Tests</directory>
+            <directory>Tests/Unit/</directory>
         </testsuite>
     </testsuites>
     <filter>
-        <whitelist>
+        <whitelist processUncoveredFilesFromWhitelist="TRUE">
             <directory>Classes</directory>
         </whitelist>
     </filter>
