@@ -112,7 +112,7 @@ class PageLayoutSelector {
 		$name = $parameters['itemFormElName'];
 		$value = $parameters['itemFormElValue'];
 		$typoScript = $this->configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
-		$settings = GeneralUtility::removeDotsFromTS($typoScript['plugin.']['tx_fluidpages.']);
+		$settings = GeneralUtility::removeDotsFromTS((array) $typoScript['plugin.']['tx_fluidpages.']);
 		$hideInheritFieldSiteRoot = (boolean) (TRUE === isset($settings['siteRootInheritance']) ? 1 > $settings['siteRootInheritance'] : FALSE);
 		$forceDisplayInheritSiteRoot = (boolean) ('tx_fed_page_controller_action_sub' === $parameters['field']);
 		$forceHideInherit = (boolean) (0 === intval($parameters['row']['pid']));
