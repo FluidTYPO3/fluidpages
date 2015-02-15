@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FluidTYPO3/flux.git",
-                "reference": "92b0c4ec8755812a95e630c6fc7383a3cb8a6c67"
+                "reference": "5b10da53ed53d7a545e4952bd25dad430d071f64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FluidTYPO3/flux/zipball/92b0c4ec8755812a95e630c6fc7383a3cb8a6c67",
-                "reference": "92b0c4ec8755812a95e630c6fc7383a3cb8a6c67",
+                "url": "https://api.github.com/repos/FluidTYPO3/flux/zipball/5b10da53ed53d7a545e4952bd25dad430d071f64",
+                "reference": "5b10da53ed53d7a545e4952bd25dad430d071f64",
                 "shasum": ""
             },
             "require-dev": {
@@ -41,7 +41,7 @@
             ],
             "description": "The flux package from FluidTYPO3",
             "homepage": "http://fluidtypo3.org",
-            "time": "2015-02-14 23:40:31"
+            "time": "2015-02-15 18:44:09"
         }
     ],
     "packages-dev": [
