@@ -10,14 +10,19 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Provider;
 
 use FluidTYPO3\Fluidpages\Controller\PageControllerInterface;
 use FluidTYPO3\Fluidpages\Provider\PageProvider;
+use FluidTYPO3\Flux\Form;
+use FluidTYPO3\Flux\Tests\Fixtures\Data\Records;
+use FluidTYPO3\Flux\Tests\Fixtures\Data\Xml;
+use FluidTYPO3\Flux\Tests\Unit\AbstractTestCase;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Class PageProviderTest
  */
-class PageProviderTest extends UnitTestCase {
+class PageProviderTest extends AbstractTestCase {
 
 	/**
 	 * @return void
@@ -123,6 +128,167 @@ class PageProviderTest extends UnitTestCase {
 			array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => ''), 'tx_fed_page_flexform_sub', TRUE, 'default'),
 			array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => 'fluidpages->action'), 'tx_fed_page_flexform_sub', FALSE, 'action'),
 		);
+	}
+
+	/**
+	 * @test
+	 */
+	public function canGetFlexformValuesUnderInheritanceConditions() {
+		$tree = array(
+			$this->getBasicRecord(),
+			$this->getBasicRecord()
+		);
+		$record = $this->getBasicRecord();
+		$provider = $this->getMock(str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4)), array('getForm', 'getInheritanceTree', 'getMergedConfiguration'));
+		$mockConfigurationService = $this->getMock('FluidTYPO3\Fluidpages\Service\ConfigurationService', array('convertFlexFormContentToArray'));
+		$mockConfigurationService->expects($this->once())->method('convertFlexFormContentToArray')->will($this->returnValue(array()));
+		$provider->expects($this->once())->method('getForm')->will($this->returnValue(Form::create()));
+		$provider->expects($this->once())->method('getInheritanceTree')->will($this->returnValue($tree));
+		$provider->expects($this->once())->method('getMergedConfiguration')->with($tree)->will($this->returnValue(array()));
+		$provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
+		$provider->injectConfigurationService($mockConfigurationService);
+		$provider->reset();
+		$values = $provider->getFlexformValues($record);
+		$this->assertEquals($values, array());
+	}
+
+	/**
+	 * @test
+	 */
+	public function canUseInheritanceTree() {
+		$this->markTestSkipped('Skipped because of incomplete mocking of DB accessors');
+		$provider = new PageProvider();
+		$provider->setFieldName('pi_flexform');
+		$provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_PREVIEW_EMPTY));
+		$record = $this->getBasicRecord();
+		$byPathExists = $this->callInaccessibleMethod($provider, 'getInheritedPropertyValueByDottedPath', $record, 'settings');
+		$byDottedPathExists = $this->callInaccessibleMethod($provider, 'getInheritedPropertyValueByDottedPath', $record, 'settings.input');
+		$byPathDoesNotExist = $this->callInaccessibleMethod($provider, 'getInheritedPropertyValueByDottedPath', $record, 'void.doesnotexist');
+		$this->assertEmpty($byPathDoesNotExist);
+		$this->assertEmpty($byPathExists);
+		$this->assertEmpty($byDottedPathExists);
+	}
+
+	/**
+	 * @test
+	 */
+	public function canLoadRecordTreeFromDatabase() {
+		$record = $this->getBasicRecord();
+		$provider = $this->getMock(
+			str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4)),
+			array('loadRecordFromDatabase', 'getParentFieldName', 'getParentFieldValue')
+		);
+		$provider->expects($this->exactly(2))->method('getParentFieldName')->will($this->returnValue('somefield'));
+		$provider->expects($this->exactly(1))->method('getParentFieldValue')->will($this->returnValue(1));
+		$provider->expects($this->exactly(1))->method('loadRecordFromDatabase')->will($this->returnValue($record));
+		$output = $this->callInaccessibleMethod($provider, 'loadRecordTreeFromDatabase', $record);
+		$expected = array($record);
+		$this->assertEquals($expected, $output);
+	}
+
+	/**
+	 * @test
+	 */
+	public function setsDefaultValueInFieldsBasedOnInheritedValue() {
+		$row = array();
+		$className = str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4));
+		$instance = $this->getMock($className, array('getInheritedPropertyValueByDottedPath'));
+		$instance->expects($this->once())->method('getInheritedPropertyValueByDottedPath')
+			->with($row, 'input')->will($this->returnValue('default'));
+		$form = Form::create();
+		$field = $form->createField('Input', 'input');
+		$returnedForm = $this->callInaccessibleMethod($instance, 'setDefaultValuesInFieldsWithInheritedValues', $form, $row);
+		$this->assertSame($form, $returnedForm);
+		$this->assertEquals('default', $field->getDefault());
+	}
+
+	/**
+	 * @test
+	 */
+	public function canGetMergedConfiguration() {
+		$form = Form::create();
+		$form->createContainer('Grid', 'grid');
+		$form->createField('Input', 'test');
+		$form->createContainer('Object', 'testobject');
+		$record = $this->getBasicRecord();
+		$tree = array($record);
+		$instance = $this->getMock(str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4)), array('getForm', 'getFlexFormValues'));
+		$instance->reset();
+		$instance->expects($this->once())->method('getForm')->will($this->returnValue($form));
+		$output = $this->callInaccessibleMethod($instance, 'getMergedConfiguration', $tree);
+		$this->assertEquals(array(), $output);
+	}
+
+	/**
+	 * @test
+	 */
+	public function getMergedConfigurationReturnsEmptyArrayIfFormIsNull() {
+		$record = $this->getBasicRecord();
+		$tree = array($record);
+		$instance = $this->getMock(str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4)), array('getForm'));
+		$instance->reset();
+		$instance->expects($this->once())->method('getForm')->will($this->returnValue(NULL));
+		$output = $this->callInaccessibleMethod($instance, 'getMergedConfiguration', $tree);
+		$this->assertEquals(array(), $output);
+	}
+
+	/**
+	 * @test
+	 * @dataProvider getRemoveInheritedTestValues
+	 * @param mixed $testValue
+	 * @param boolean $inherit
+	 * @param boolean $inheritEmpty
+	 * @param boolean $expectsOverride
+	 */
+	public function removesInheritedValuesFromFields($testValue, $inherit, $inheritEmpty, $expectsOverride) {
+		$instance = $this->createInstance();
+		$field = Form\Field\Input::create(array('type' => 'Input'));
+		$field->setName('test');
+		$field->setInherit($inherit);
+		$field->setInheritEmpty($inheritEmpty);
+		$values = array('foo' => 'bar', 'test' => $testValue);
+		$result = $this->callInaccessibleMethod($instance, 'unsetInheritedValues', $field, $values);
+		if (TRUE === $expectsOverride) {
+			$this->assertEquals($values, $result);
+		} else {
+			$this->assertEquals(array('foo' => 'bar'), $result);
+		}
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getRemoveInheritedTestValues() {
+		return array(
+			array('test', TRUE, TRUE, TRUE),
+			array('', TRUE, FALSE, TRUE),
+			array('', TRUE, TRUE, FALSE),
+		);
+	}
+
+	/**
+	 * @test
+	 */
+	public function getParentFieldValueLoadsRecordFromDatabaseIfRecordLacksParentFieldValue() {
+		$row = Records::$contentRecordWithoutParentAndWithoutChildren;
+		$row['uid'] = 2;
+		$rowWithPid = $row;
+		$rowWithPid['pid'] = 1;
+		$className = str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4));
+		$instance = $this->getMock($className, array('getParentFieldName', 'getTableName', 'loadRecordFromDatabase'));
+		$instance->expects($this->once())->method('loadRecordFromDatabase')->with($row['uid'])->will($this->returnValue($rowWithPid));
+		$instance->expects($this->once())->method('getParentFieldName')->with($row)->will($this->returnValue('pid'));
+		$result = $this->callInaccessibleMethod($instance, 'getParentFieldValue', $row);
+		$this->assertEquals($rowWithPid['pid'], $result);
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function getBasicRecord() {
+		$record = Records::$contentRecordWithoutParentAndWithoutChildren;
+		$record['pi_flexform'] = Xml::SIMPLE_FLEXFORM_SOURCE_DEFAULT_SHEET_ONE_FIELD;
+		return $record;
 	}
 
 }
