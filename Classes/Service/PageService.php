@@ -168,13 +168,12 @@ class PageService implements SingletonInterface {
 			$templateRootPaths = $templatePaths->getTemplateRootPaths();
 			foreach ($templateRootPaths as $templateRootPath) {
 				$configuredPath = $templateRootPath . 'Page/';
-				$path = GeneralUtility::getFileAbsFileName($configuredPath);
-				if (FALSE === is_dir($path)) {
+				if (FALSE === is_dir($configuredPath)) {
 					$this->configurationService->message('The template group "' . $extensionName . '" has been configured to use the templateRootPath "' .
 						$configuredPath . '" but this directory does not exist.', GeneralUtility::SYSLOG_SEVERITY_FATAL);
 					continue;
 				}
-				$files = scandir($path);
+				$files = scandir($configuredPath);
 				foreach ($files as $key => $file) {
 					$pathinfo = pathinfo($path . $file);
 					$extension = $pathinfo['extension'];
