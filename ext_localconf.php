@@ -11,7 +11,7 @@ if (FALSE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'
 \FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\PageProvider');
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-	$_EXTKEY,
+	'FluidTYPO3.Fluidpages',
 	'Page',
 	array(
 		'Page' => 'render,error',
