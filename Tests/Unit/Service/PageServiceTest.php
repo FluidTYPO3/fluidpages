@@ -39,6 +39,36 @@ class PageServiceTest extends UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider getPageTemplateConfigurationTestValues
+	 * @param array $records
+	 * @param array|NULL $expected
+	 */
+	public function testGetPageTemplateConfiguration(array $records, $expected) {
+		$service = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+		foreach ($records as $index => $record) {
+			$service->expects($this->at($index))->method('getSingle')->willReturn($record);
+		}
+		$instance = new PageService();
+		$instance->injectWorkspacesAwareRecordService($service);
+		$result = $instance->getPageTemplateConfiguration(1);
+		$this->assertEquals($expected, $result);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPageTemplateConfigurationTestValues() {
+		$m = 'tx_fed_page_controller_action';
+		$s = 'tx_fed_page_controller_action_sub';
+		return array(
+			array(array(array()), NULL),
+			array(array(array($m => '', $s => '')), NULL),
+			array(array(array($m => 'test1->test1', $s => 'test2->test2')), array($m => 'test1->test1', $s => 'test2->test2')),
+			array(array(array($m => ''), array($s => 'test2->test2')), array($m => 'test2->test2', $s => 'test2->test2'))
+		);
+	}
+
+	/**
 	 * @return void
 	 */
 	public function testGetPageFlexFormSource() {
