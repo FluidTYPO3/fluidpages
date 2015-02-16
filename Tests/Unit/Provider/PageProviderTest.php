@@ -49,13 +49,10 @@ class PageProviderTest extends AbstractTestCase {
 		$this->assertEquals('fluidpages', $result);
 	}
 
-	/**
-	 * @dataProvider getTemplatePathAndFilenameTestValues
-	 * @param string $fieldName
-	 * @param string $expected
-	 */
-	public function testGetTemplatePathAndFilename($fieldName, $expected) {
-		$dataFieldName = str_replace('tx_fed_page_controller_action', 'tx_fed_page_flexform', $fieldName);
+	public function testGetTemplatePathAndFilename() {
+		$expected = ExtensionManagementUtility::extPath('fluidpages', 'Tests/Fixtures/Templates/Page/Dummy.html');
+		$fieldName = 'tx_fed_page_controller_action';
+		$dataFieldName = 'tx_fed_page_flexform';
 		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
 		$instance = new PageProvider();
 		$instance->setTemplatePaths(array('templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/'));
@@ -67,29 +64,6 @@ class PageProviderTest extends AbstractTestCase {
 		$instance->trigger($record, NULL, $dataFieldName);
 		$result = $instance->getTemplatePathAndFilename($record);
 		$this->assertEquals($expected, $result);
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getTemplatePathAndFilenameTestValues() {
-		$template = ExtensionManagementUtility::extPath('fluidpages', 'Tests/Fixtures/Templates/Page/Dummy.html');
-		return array(
-			array('tx_fed_page_controller_action', $template),
-			array('tx_fed_page_controller_action_sub', $template)
-		);
-	}
-
-	/**
-	 * @return void
-	 */
-	public function testTriggerSetsFieldName() {
-		$instance = new PageProvider();
-		$this->assertAttributeEmpty('currentFieldName', $instance);
-		$instance->trigger(array(), 'pages', 'tx_fed_page_flexform');
-		$this->assertAttributeEquals('tx_fed_page_flexform', 'currentFieldName', $instance);
-		$instance->trigger(array(), 'pages', 'tx_fed_page_flexform_sub');
-		$this->assertAttributeEquals('tx_fed_page_flexform_sub', 'currentFieldName', $instance);
 	}
 
 	/**
@@ -125,8 +99,6 @@ class PageProviderTest extends AbstractTestCase {
 			array(array('doktype' => PageControllerInterface::DOKTYPE_RAW), '', FALSE, 'raw'),
 			array(array('doktype' => 0, 'tx_fed_page_controller_action' => ''), 'tx_fed_page_flexform', TRUE, 'default'),
 			array(array('doktype' => 0, 'tx_fed_page_controller_action' => 'fluidpages->action'), 'tx_fed_page_flexform', FALSE, 'action'),
-			array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => ''), 'tx_fed_page_flexform_sub', TRUE, 'default'),
-			array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => 'fluidpages->action'), 'tx_fed_page_flexform_sub', FALSE, 'action'),
 		);
 	}
 

@@ -28,6 +28,9 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  */
 class PageProvider extends AbstractProvider implements ProviderInterface {
 
+	const FIELD_ACTION_MAIN = 'tx_fed_page_controller_action';
+	const FIELD_ACTION_SUB = 'tx_fed_page_controller_action_sub';
+
 	/**
 	 * @var string
 	 */
@@ -42,16 +45,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @var string
 	 */
 	protected $fieldName = 'tx_fed_page_flexform';
-
-	/**
-	 * @var string
-	 */
-	protected $subFieldName = 'tx_fed_page_flexform_sub';
-
-	/**
-	 * @var string
-	 */
-	protected $currentFieldName = NULL;
 
 	/**
 	 * @var string
@@ -82,16 +75,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @var integer
 	 */
 	protected $priority = 100;
-
-	/**
-	 * @var string
-	 */
-	protected $mainAction = 'tx_fed_page_controller_action';
-
-	/**
-	 * @var string
-	 */
-	protected $subAction = 'tx_fed_page_controller_action_sub';
 
 	/**
 	 * CONSTRUCTOR
@@ -165,16 +148,17 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return array
 	 */
 	public function getInheritanceTree(array $row) {
-		if (TRUE === $this->isUsingSubFieldName()) {
-			return array();
-		}
 		$records = $this->loadRecordTreeFromDatabase($row);
 		if (0 === count($records)) {
 			return $records;
 		}
-		$template = $records[0][$this->subAction];
+		$template = $records[0][self::FIELD_ACTION_SUB];
 		foreach ($records as $index => $record) {
-			if ((FALSE === empty($record[$this->mainAction]) && $template !== $record[$this->mainAction]) || (FALSE === empty($record[$this->subAction]) && $template !== $record[$this->subAction])) {
+			$hasMainAction = FALSE === empty($record[self::FIELD_ACTION_MAIN]);
+			$hasSubAction = FALSE === empty($record[self::FIELD_ACTION_SUB]);
+			$shouldUseMainTemplate = $template !== $record[self::FIELD_ACTION_SUB];
+			$shouldUseSubTemplate = $template !== $record[self::FIELD_ACTION_MAIN];
+			if (($hasMainAction && $shouldUseSubTemplate) || ($hasSubAction && $shouldUseMainTemplate)) {
 				return array_slice($records, $index);
 			}
 		}
@@ -219,40 +203,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 */
 	public function getControllerActionReferenceFromRecord(array $row) {
 		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		if (TRUE === $this->isUsingSubFieldName()) {
-			return $configuration[$this->subAction];
-		}
-		return $configuration[$this->mainAction];
-	}
-
-	/**
-	 * @param array $row The record row which triggered processing
-	 * @return string|NULL
-	 */
-	public function getFieldName(array $row) {
-		if (TRUE === $this->isUsingSubFieldName()) {
-			return $this->subFieldName;
-		}
-		return $this->fieldName;
-	}
-
-	/**
-	 * @param array $row
-	 * @param string $table
-	 * @param string $field
-	 * @param string $extensionKey
-	 * @return boolean
-	 */
-	public function trigger(array $row, $table, $field, $extensionKey = NULL) {
-		$this->currentFieldName = $field;
-		return parent::trigger($row, $table, $field, $extensionKey);
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function isUsingSubFieldName() {
-		return $this->currentFieldName === $this->subFieldName;
+		return $configuration[self::FIELD_ACTION_MAIN];
 	}
 
 	/**
@@ -323,33 +274,25 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 
 	/**
 	 * @param array $tree
-	 * @param string $cacheKey Overrides the cache key
-	 * @param boolean $mergeToCache Merges the configuration of $tree to the current $cacheKey
 	 * @return array
 	 */
-	protected function getMergedConfiguration(array $tree, $cacheKey = NULL, $mergeToCache = FALSE) {
-		if (FALSE === $this->isUsingSubFieldName()) {
-			$branch = reset($tree);
-			$hasMainAction = FALSE === empty($branch[$this->mainAction]);
-			$hasSubAction = FALSE === empty($branch[$this->subAction]);
-			$hasSubActionValue = FALSE === empty($branch[$this->subFieldName]);
-			$mainAndSubActionsDiffer = $branch[$this->mainAction] !== $branch[$this->subAction];
-			if (TRUE === $hasMainAction && TRUE === $hasSubAction && TRUE === $mainAndSubActionsDiffer && TRUE === $hasSubActionValue) {
-				$branch = array_shift($tree);
-				$this->currentFieldName = $this->subFieldName;
-				$this->getMergedConfigurationInternal(array($branch), $cacheKey);
-				$this->currentFieldName = $this->fieldName;
-			}
+	protected function getMergedConfiguration(array $tree) {
+		$branch = reset($tree);
+		$hasMainAction = FALSE === empty($branch[self::FIELD_ACTION_MAIN]);
+		$hasSubAction = FALSE === empty($branch[self::FIELD_ACTION_SUB]);
+		$mainAndSubActionsDiffer = $branch[self::FIELD_ACTION_MAIN] !== $branch[self::FIELD_ACTION_SUB];
+		if (TRUE === $hasMainAction && TRUE === $hasSubAction && TRUE === $mainAndSubActionsDiffer) {
+			$branch = array_shift($tree);
+			$this->getMergedConfigurationInternal(array($branch), $cacheKey);
 		}
-		return $this->getMergedConfigurationInternal($tree, $cacheKey);
+		return $this->getMergedConfigurationInternal($tree);
 	}
 
 	/**
 	 * @param array $tree
-	 * @param string $cacheKey Overrides the cache key
 	 * @return array
 	 */
-	protected function getMergedConfigurationInternal(array $tree, $cacheKey = NULL) {
+	protected function getMergedConfigurationInternal(array $tree) {
 		$data = array();
 		foreach ($tree as $branch) {
 			$form = $this->getForm($branch);

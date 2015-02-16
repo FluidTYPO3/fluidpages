@@ -9,6 +9,7 @@ if (FALSE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'
 }
 
 \FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\PageProvider');
+\FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\SubPageProvider');
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
 	'FluidTYPO3.Fluidpages',
