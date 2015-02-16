@@ -105,9 +105,7 @@ class PageLayoutSelector {
 	 */
 	protected function renderInheritanceField(array $parameters) {
 		$selector = '';
-		if (FALSE === strpos($name, 'tx_fed_controller_action_sub')) {
-			$onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
-		}
+		$onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
 		$pageIsSiteRoot = (boolean) ($parameters['row']['is_siteroot']);
 		$name = $parameters['itemFormElName'];
 		$value = $parameters['itemFormElValue'];
@@ -162,6 +160,7 @@ class PageLayoutSelector {
 	protected function renderOption($extension, $template, array $parameters) {
 		$name = $parameters['itemFormElName'];
 		$value = $parameters['itemFormElValue'];
+		$onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
 		$selector = '';
 		try {
 			$extensionName = ExtensionNamingUtility::getExtensionKey($extension);
