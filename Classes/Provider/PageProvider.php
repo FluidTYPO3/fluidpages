@@ -28,6 +28,7 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  */
 class PageProvider extends AbstractProvider implements ProviderInterface {
 
+	const FIELD_NAME = 'tx_fed_page_flexform';
 	const FIELD_ACTION_MAIN = 'tx_fed_page_controller_action';
 	const FIELD_ACTION_SUB = 'tx_fed_page_controller_action_sub';
 
@@ -44,7 +45,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	/**
 	 * @var string
 	 */
-	protected $fieldName = 'tx_fed_page_flexform';
+	protected $fieldName = self::FIELD_NAME;
 
 	/**
 	 * @var string
@@ -230,17 +231,38 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		$fieldName = $this->getFieldName($row);
  		$form = $this->getForm($row);
 		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
-		$tree = $this->getInheritanceTree($row);
-		if (0 === count($tree)) {
-			return (array) $immediateConfiguration;
-		}
-		$inheritedConfiguration = $this->getMergedConfiguration($tree);
-		if (0 === count($immediateConfiguration)) {
-			return (array) $inheritedConfiguration;
-		}
+		$inheritedConfiguration = $this->getInheritedConfiguration($row);
 		$merged = RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
 		return $merged;
  	}
+
+	/**
+	 * @param array $row
+	 * @return array
+	 */
+	protected function getInheritedConfiguration(array $row) {
+		$tree = $this->getInheritanceTree($row);
+		if (0 === count($tree)) {
+			return array();
+		}
+		$data = array();
+		foreach ($tree as $branch) {
+			$provider = $this->configurationService->resolvePrimaryConfigurationProvider(
+				$this->tableName, SubPageProvider::FIELD_NAME, $branch
+			);
+			$form = $provider->getForm($branch);
+			if (NULL === $form) {
+				return $data;
+			}
+			$fields = $form->getFields();
+			$values = $provider->getFlexFormValues($branch);
+			foreach ($fields as $field) {
+				$values = $this->unsetInheritedValues($field, $values);
+			}
+			$data = RecursiveArrayUtility::merge($data, $values);
+		}
+		return $data;
+	}
 
 	/**
 	 * @param array $row
@@ -248,8 +270,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return mixed
 	 */
 	protected function getInheritedPropertyValueByDottedPath(array $row, $propertyPath) {
-		$tree = $this->getInheritanceTree($row);
-		$inheritedConfiguration = $this->getMergedConfiguration($tree);
+		$inheritedConfiguration = $this->getInheritedConfiguration($row);
 		if (FALSE === strpos($propertyPath, '.')) {
 			return TRUE === isset($inheritedConfiguration[$propertyPath]) ? ObjectAccess::getProperty($inheritedConfiguration, $propertyPath) : NULL;
 		}
@@ -270,43 +291,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 			unset($values[$name]);
 		}
 		return $values;
-	}
-
-	/**
-	 * @param array $tree
-	 * @return array
-	 */
-	protected function getMergedConfiguration(array $tree) {
-		$branch = reset($tree);
-		$hasMainAction = FALSE === empty($branch[self::FIELD_ACTION_MAIN]);
-		$hasSubAction = FALSE === empty($branch[self::FIELD_ACTION_SUB]);
-		$mainAndSubActionsDiffer = $branch[self::FIELD_ACTION_MAIN] !== $branch[self::FIELD_ACTION_SUB];
-		if (TRUE === $hasMainAction && TRUE === $hasSubAction && TRUE === $mainAndSubActionsDiffer) {
-			$branch = array_shift($tree);
-			$this->getMergedConfigurationInternal(array($branch), $cacheKey);
-		}
-		return $this->getMergedConfigurationInternal($tree);
-	}
-
-	/**
-	 * @param array $tree
-	 * @return array
-	 */
-	protected function getMergedConfigurationInternal(array $tree) {
-		$data = array();
-		foreach ($tree as $branch) {
-			$form = $this->getForm($branch);
-			if (NULL === $form) {
-				return $data;
-			}
-			$fields = $form->getFields();
-			$values = $this->getFlexFormValues($branch);
-			foreach ($fields as $field) {
-				$values = $this->unsetInheritedValues($field, $values);
-			}
-			$data = RecursiveArrayUtility::merge($data, $values);
-		}
-		return $data;
 	}
 
 	/**

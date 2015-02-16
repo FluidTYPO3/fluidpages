@@ -111,15 +111,16 @@ class PageProviderTest extends AbstractTestCase {
 			$this->getBasicRecord()
 		);
 		$record = $this->getBasicRecord();
-		$provider = $this->getMock(str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4)), array('getForm', 'getInheritanceTree', 'getMergedConfiguration'));
-		$mockConfigurationService = $this->getMock('FluidTYPO3\Fluidpages\Service\ConfigurationService', array('convertFlexFormContentToArray'));
-		$mockConfigurationService->expects($this->once())->method('convertFlexFormContentToArray')->will($this->returnValue(array()));
-		$provider->expects($this->once())->method('getForm')->will($this->returnValue(Form::create()));
+		$dummyProvider = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
+		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getInheritanceTree', 'unsetInheritedValues', 'getForm'));
+		$mockConfigurationService = $this->getMock('FluidTYPO3\Fluidpages\Service\ConfigurationService', array('resolvePrimaryConfigurationProvider'));
+		$mockConfigurationService->expects($this->at(0))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider);
+		$mockConfigurationService->expects($this->at(1))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider);
 		$provider->expects($this->once())->method('getInheritanceTree')->will($this->returnValue($tree));
-		$provider->expects($this->once())->method('getMergedConfiguration')->with($tree)->will($this->returnValue(array()));
+		$provider->expects($this->any())->method('unsetInheritedValues');
+		$provider->expects($this->any())->method('getForm')->willReturn(Form::create());
 		$provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
 		$provider->injectConfigurationService($mockConfigurationService);
-		$provider->reset();
 		$values = $provider->getFlexformValues($record);
 		$this->assertEquals($values, array());
 	}
@@ -172,36 +173,6 @@ class PageProviderTest extends AbstractTestCase {
 		$returnedForm = $this->callInaccessibleMethod($instance, 'setDefaultValuesInFieldsWithInheritedValues', $form, $row);
 		$this->assertSame($form, $returnedForm);
 		$this->assertEquals('default', $field->getDefault());
-	}
-
-	/**
-	 * @test
-	 */
-	public function canGetMergedConfiguration() {
-		$form = Form::create();
-		$form->createContainer('Grid', 'grid');
-		$form->createField('Input', 'test');
-		$form->createContainer('Object', 'testobject');
-		$record = $this->getBasicRecord();
-		$tree = array($record);
-		$instance = $this->getMock(str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4)), array('getForm', 'getFlexFormValues'));
-		$instance->reset();
-		$instance->expects($this->once())->method('getForm')->will($this->returnValue($form));
-		$output = $this->callInaccessibleMethod($instance, 'getMergedConfiguration', $tree);
-		$this->assertEquals(array(), $output);
-	}
-
-	/**
-	 * @test
-	 */
-	public function getMergedConfigurationReturnsEmptyArrayIfFormIsNull() {
-		$record = $this->getBasicRecord();
-		$tree = array($record);
-		$instance = $this->getMock(str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4)), array('getForm'));
-		$instance->reset();
-		$instance->expects($this->once())->method('getForm')->will($this->returnValue(NULL));
-		$output = $this->callInaccessibleMethod($instance, 'getMergedConfiguration', $tree);
-		$this->assertEquals(array(), $output);
 	}
 
 	/**

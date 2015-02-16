@@ -28,21 +28,12 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  */
 class SubPageProvider extends PageProvider implements ProviderInterface {
 
+	const FIELD_NAME = 'tx_fed_page_flexform_sub';
+
 	/**
 	 * @var string
 	 */
-	protected $fieldName = 'tx_fed_page_flexform_sub';
-
-	/**
-	 * Gets an inheritance tree (ordered parent -> ... -> this record)
-	 * of record arrays containing raw values.
-	 *
-	 * @param array $row
-	 * @return array
-	 */
-	public function getInheritanceTree(array $row) {
-		return array();
-	}
+	protected $fieldName = self::FIELD_NAME;
 
 	/**
 	 * @param array $row
