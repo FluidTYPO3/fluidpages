@@ -268,7 +268,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 */
 	protected function getInheritedPropertyValueByDottedPath(array $row, $propertyPath) {
 		$inheritedConfiguration = $this->getInheritedConfiguration($row);
-		if (FALSE === strpos($propertyPath, '.')) {
+		if (TRUE === empty($propertyPath)) {
+			return NULL;
+		} elseif (FALSE === strpos($propertyPath, '.')) {
 			return TRUE === isset($inheritedConfiguration[$propertyPath]) ? ObjectAccess::getProperty($inheritedConfiguration, $propertyPath) : NULL;
 		}
 		return ObjectAccess::getPropertyPath($inheritedConfiguration, $propertyPath);
