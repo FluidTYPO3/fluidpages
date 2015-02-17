@@ -17,6 +17,11 @@ use FluidTYPO3\Flux\Form;
 class DummyPageProvider extends PageProvider {
 
 	/**
+	 * @var array
+	 */
+	protected $values = array();
+
+	/**
 	 * @param array $row
 	 * @param string $table
 	 * @param string $field
@@ -25,6 +30,14 @@ class DummyPageProvider extends PageProvider {
 	 */
 	public function trigger(array $row, $table, $field, $extensionKey = NULL) {
 		return TRUE;
+	}
+
+	/**
+	 * @param array $values
+	 * @return void
+	 */
+	public function setFlexFormValues(array $values) {
+		$this->values = $values;
 	}
 
 	/**
@@ -40,7 +53,7 @@ class DummyPageProvider extends PageProvider {
 	 * @return Form
 	 */
 	public function getForm(array $row) {
-		return Form::create();
+		return $this->form;
 	}
 
 }
