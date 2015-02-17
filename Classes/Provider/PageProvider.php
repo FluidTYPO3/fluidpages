@@ -25,10 +25,16 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Page Configuration Provider
+ *
+ * Main Provider - triggers only on
+ * records which have a selected action.
+ * All other page records will be associated
+ * with the SubPageProvider instead.
  */
 class PageProvider extends AbstractProvider implements ProviderInterface {
 
-	const FIELD_NAME = 'tx_fed_page_flexform';
+	const FIELD_NAME_MAIN = 'tx_fed_page_flexform';
+	const FIELD_NAME_SUB = 'tx_fed_page_flexform_sub';
 	const FIELD_ACTION_MAIN = 'tx_fed_page_controller_action';
 	const FIELD_ACTION_SUB = 'tx_fed_page_controller_action_sub';
 
@@ -45,7 +51,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	/**
 	 * @var string
 	 */
-	protected $fieldName = self::FIELD_NAME;
+	protected $fieldName = self::FIELD_NAME_MAIN;
 
 	/**
 	 * @var string
@@ -82,6 +88,26 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 */
 	public function __construct() {
 		$this->flexformTool = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Configuration\\FlexForm\\FlexFormTools');
+	}
+
+	/**
+	 * Returns TRUE that this Provider should trigger if:
+	 *
+	 * - table matches 'pages'
+	 * - field is NULL or matches self::FIELD_NAME
+	 * - a selection was made in the "template for this page" field
+	 *
+	 * @param array $row
+	 * @param string $table
+	 * @param string $field
+	 * @param string|NULL $extensionKey
+	 * @return boolean
+	 */
+	public function trigger(array $row, $table, $field, $extensionKey = NULL) {
+		$isRightTable = ($table === $this->tableName);
+		$isRightField = (NULL === $field || $field === self::FIELD_NAME_MAIN);
+		$hasActionFilled = (FALSE === empty($row[self::FIELD_ACTION_MAIN]));
+		return (TRUE === $isRightTable && TRUE === $isRightField && TRUE === $hasActionFilled);
 	}
 
 	/**
@@ -244,9 +270,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		$tree = $this->getInheritanceTree($row);
 		$data = array();
 		foreach ($tree as $branch) {
-			$provider = $this->configurationService->resolvePrimaryConfigurationProvider(
-				$this->tableName, SubPageProvider::FIELD_NAME, $branch
-			);
+			$provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->tableName, NULL, $branch);
 			$form = $provider->getForm($branch);
 			if (NULL === $form) {
 				return $data;

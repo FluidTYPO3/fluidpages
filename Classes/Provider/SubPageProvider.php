@@ -25,15 +25,45 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Page SubConfiguration Provider
+ *
+ * This Provider has a slightly lower priority
+ * than the main PageProvider but will trigger
+ * on any selection in the targeted field,
+ * including when "parent decides" is selected.
+ *
+ * This lets the PageProvider act on records
+ * that define a specific action to use and the
+ * SubPageProvider act on all other page records.
  */
 class SubPageProvider extends PageProvider implements ProviderInterface {
-
-	const FIELD_NAME = 'tx_fed_page_flexform_sub';
 
 	/**
 	 * @var string
 	 */
-	protected $fieldName = self::FIELD_NAME;
+	protected $fieldName = self::FIELD_NAME_SUB;
+
+	/**
+	 * @var integer
+	 */
+	protected $priority = 99;
+
+	/**
+	 * Returns TRUE that this Provider should trigger if:
+	 *
+	 * - table matches 'pages'
+	 * - field is NULL or matches self::FIELD_NAME
+	 *
+	 * @param array $row
+	 * @param string $table
+	 * @param string $field
+	 * @param string|NULL $extensionKey
+	 * @return boolean
+	 */
+	public function trigger(array $row, $table, $field, $extensionKey = NULL) {
+		$isRightTable = ($table === $this->tableName);
+		$isRightField = (NULL === $field || $field === self::FIELD_NAME_MAIN || $field === self::FIELD_NAME_SUB);
+		return (TRUE === $isRightTable && TRUE === $isRightField);
+	}
 
 	/**
 	 * @param array $row

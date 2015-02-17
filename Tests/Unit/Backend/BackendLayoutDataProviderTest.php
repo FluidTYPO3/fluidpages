@@ -57,7 +57,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 		$configurationService->expects($this->exactly($messageCount))->method($messageFunction);
 		if (NULL !== $record) {
 			$configurationService->expects($this->once())->method('resolvePrimaryConfigurationProvider')
-				->with('pages', 'tx_fed_page_flexform', $record)->willReturn($provider);
+				->with('pages', NULL, $record)->willReturn($provider);
 		}
 		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
 		$recordService->expects($this->once())->method('getSingle')->willReturn($record);

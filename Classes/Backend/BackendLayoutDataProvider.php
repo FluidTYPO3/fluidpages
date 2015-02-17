@@ -8,6 +8,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Fluidpages\Provider\PageProvider;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Service\ContentService;
@@ -162,7 +163,7 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 				return array();
 			}
 
-			$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $record);
+			$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', NULL, $record);
 			$action = $provider->getControllerActionFromRecord($record);
 			if (TRUE === empty($action)) {
 				$this->configurationService->message('No template selected - backend layout will not be rendered', GeneralUtility::SYSLOG_SEVERITY_INFO);

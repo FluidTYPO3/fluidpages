@@ -65,6 +65,15 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	}
 
 	/**
+	 * @throws \RuntimeException
+	 * @return void
+	 */
+	protected function initializeProvider() {
+		$row = $this->getRecord();
+		$this->provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->fluxTableName, NULL, $row);
+	}
+
+	/**
 	 * @return string
 	 */
 	public function rawAction() {
