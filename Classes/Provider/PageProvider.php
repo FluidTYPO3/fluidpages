@@ -148,7 +148,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @param array $row
 	 * @return array
 	 */
-	public function getInheritanceTree(array $row) {
+	protected function getInheritanceTree(array $row) {
 		$records = $this->loadRecordTreeFromDatabase($row);
 		if (0 === count($records)) {
 			return $records;
