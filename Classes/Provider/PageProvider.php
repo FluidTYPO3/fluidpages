@@ -242,9 +242,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 */
 	protected function getInheritedConfiguration(array $row) {
 		$tree = $this->getInheritanceTree($row);
-		if (0 === count($tree)) {
-			return array();
-		}
 		$data = array();
 		foreach ($tree as $branch) {
 			$provider = $this->configurationService->resolvePrimaryConfigurationProvider(
