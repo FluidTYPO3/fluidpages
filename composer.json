@@ -24,19 +24,6 @@
     "fluidtypo3/fluidcontent": "Gives the ability to render custom content elements with pure fluid.",
     "fluidtypo3/fluidcontent_core": "Gives the ability to render core content elements with pure fluid."
   },
-  "repositories": [
-    {
-      "type": "package",
-	  "package": {
-          "name": "typo3/cms",
-          "version": "6.2.7",
-          "dist": {
-          "url": "https://github.com/TYPO3/TYPO3.CMS/archive/6.2.7.zip",
-          "type": "zip"
-        }
-      }
-    }
-  ],
   "autoload": {
     "psr-4": {
       "FluidTYPO3\\Fluidpages\\": "Classes/"
@@ -58,5 +45,11 @@
   "require-dev": {
     "fluidtypo3/development": "*",
     "fluidtypo3/flux": "dev-development"
-  }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/TYPO3/TYPO3.CMS"
+    }
+  ]
 }
