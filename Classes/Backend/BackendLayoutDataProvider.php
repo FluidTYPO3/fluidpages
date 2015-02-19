@@ -213,15 +213,26 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 			);
 			++ $rowIndex;
 		}
-		$config['rows.'][($rowIndex + 1) . '.'] = array(
-			'columns.' => array(
-				'1.' => array(
-					'name' => LocalizationUtility::translate('fluidContentArea', 'fluidpages'),
-					'colPos' => ContentService::COLPOS_FLUXCONTENT
+		if (FALSE === $this->isPageModuleLanguageView()) {
+			$config['rows.'][($rowIndex + 1) . '.'] = array(
+				'columns.' => array(
+					'1.' => array(
+						'name' => LocalizationUtility::translate('fluidContentArea', 'fluidpages'),
+						'colPos' => ContentService::COLPOS_FLUXCONTENT
+					)
 				)
-			)
-		);
+			);
+		}
 		return $config;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	protected function isPageModuleLanguageView() {
+		$module = GeneralUtility::_GET('M');
+		$function = TRUE === isset($GLOBALS['SOBE']->MOD_SETTINGS['function']) ? $GLOBALS['SOBE']->MOD_SETTINGS['function'] : NULL;
+		return ('web_layout' === $module && 2 === (integer) $function);
 	}
 
 }
