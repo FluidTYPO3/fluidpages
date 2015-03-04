@@ -20,6 +20,7 @@ use FluidTYPO3\Flux\Utility\RecursiveArrayUtility;
 use FluidTYPO3\Flux\Utility\ResolveUtility;
 use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -79,11 +80,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	protected $configurationService;
 
 	/**
-	 * @var integer
-	 */
-	protected $priority = 100;
-
-	/**
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
@@ -105,9 +101,8 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 */
 	public function trigger(array $row, $table, $field, $extensionKey = NULL) {
 		$isRightTable = ($table === $this->tableName);
-		$isRightField = (NULL === $field || $field === self::FIELD_NAME_MAIN);
-		$hasActionFilled = (FALSE === empty($row[self::FIELD_ACTION_MAIN]));
-		return (TRUE === $isRightTable && TRUE === $isRightField && TRUE === $hasActionFilled);
+		$isRightField = (NULL === $field || $field === $this->fieldName);
+		return (TRUE === $isRightTable && TRUE === $isRightField);
 	}
 
 	/**
@@ -168,31 +163,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * Gets an inheritance tree (ordered parent -> ... -> this record)
-	 * of record arrays containing raw values.
-	 *
-	 * @param array $row
-	 * @return array
-	 */
-	protected function getInheritanceTree(array $row) {
-		$records = $this->loadRecordTreeFromDatabase($row);
-		if (0 === count($records)) {
-			return $records;
-		}
-		$template = $records[0][self::FIELD_ACTION_SUB];
-		foreach ($records as $index => $record) {
-			$hasMainAction = FALSE === empty($record[self::FIELD_ACTION_MAIN]);
-			$hasSubAction = FALSE === empty($record[self::FIELD_ACTION_SUB]);
-			$shouldUseMainTemplate = $template !== $record[self::FIELD_ACTION_SUB];
-			$shouldUseSubTemplate = $template !== $record[self::FIELD_ACTION_MAIN];
-			if (($hasMainAction && $shouldUseSubTemplate) || ($hasSubAction && $shouldUseMainTemplate)) {
-				return array_slice($records, $index);
-			}
-		}
-		return $records;
-	}
-
-	/**
 	 * @param array $row
 	 * @return string
 	 */
@@ -234,10 +204,77 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-		 * @param Form $form
-		 * @param array $row
-		 * @return Form
-		 */
+	 * @param array $row
+	 * @return array
+	 */
+	public function getFlexFormValues(array $row) {
+		$fieldName = $this->getFieldName($row);
+ 		$form = $this->getForm($row);
+		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
+		$inheritedConfiguration = $this->getInheritedConfiguration($row);
+		$merged = RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
+		return $merged;
+ 	}
+
+	/**
+	 * @param string $operation
+	 * @param integer $id
+	 * @param array $row
+	 * @param DataHandler $reference
+	 * @param array $removals Allows overridden methods to pass an additional array of field names to remove from the stored Flux value
+	 */
+	public function postProcessRecord($operation, $id, array &$row, DataHandler $reference, array $removals = array()) {
+		$stored = $this->recordService->getSingle($this->tableName, '*', $id);
+		$form = $this->getForm($stored);
+		if (NULL !== $form && 'update' === $operation) {
+			$record = $reference->datamap[$this->tableName][$id];
+			foreach ($form->getFields() as $field) {
+				$fieldName = $field->getName();
+				$sheetName = $field->getParent()->getName();
+				$inherit = (boolean) $field->getInherit();
+				$inheritEmpty = (boolean) $field->getInheritEmpty();
+				$value = $record[$this->fieldName]['data'][$sheetName]['lDEF'][$fieldName]['vDEF'];
+				$inheritedValue = $this->getInheritedPropertyValueByDottedPath($stored, $fieldName);
+				$empty = (TRUE === empty($value) && $value !== '0' && $value !== 0);
+				$same = ($inheritedValue == $value);
+				if (TRUE === $same && TRUE === $inherit || (TRUE === $inheritEmpty && TRUE === $empty)) {
+					$removals[] = $fieldName;
+				}
+			}
+		}
+		parent::postProcessRecord($operation, $id, $row, $reference, $removals);
+	}
+
+	/**
+	 * Gets an inheritance tree (ordered parent -> ... -> this record)
+	 * of record arrays containing raw values.
+	 *
+	 * @param array $row
+	 * @return array
+	 */
+	protected function getInheritanceTree(array $row) {
+		$records = $this->loadRecordTreeFromDatabase($row);
+		if (0 === count($records)) {
+			return $records;
+		}
+		$template = $records[0][self::FIELD_ACTION_SUB];
+		foreach ($records as $index => $record) {
+			$hasMainAction = FALSE === empty($record[self::FIELD_ACTION_MAIN]);
+			$hasSubAction = FALSE === empty($record[self::FIELD_ACTION_SUB]);
+			$shouldUseMainTemplate = $template !== $record[self::FIELD_ACTION_SUB];
+			$shouldUseSubTemplate = $template !== $record[self::FIELD_ACTION_MAIN];
+			if (($hasMainAction && $shouldUseSubTemplate) || ($hasSubAction && $shouldUseMainTemplate)) {
+				return array_slice($records, $index);
+			}
+		}
+		return $records;
+	}
+
+	/**
+	 * @param Form $form
+	 * @param array $row
+	 * @return Form
+	 */
 	protected function setDefaultValuesInFieldsWithInheritedValues(Form $form, array $row) {
 		foreach ($form->getFields() as $field) {
 			$name = $field->getName();
@@ -253,24 +290,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @param array $row
 	 * @return array
 	 */
-	public function getFlexFormValues(array $row) {
-		$fieldName = $this->getFieldName($row);
- 		$form = $this->getForm($row);
-		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
-		$inheritedConfiguration = $this->getInheritedConfiguration($row);
-		$merged = RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
-		return $merged;
- 	}
-
-	/**
-	 * @param array $row
-	 * @return array
-	 */
 	protected function getInheritedConfiguration(array $row) {
 		$tree = $this->getInheritanceTree($row);
 		$data = array();
 		foreach ($tree as $branch) {
-			$provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->tableName, NULL, $branch);
+			$provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
 			$form = $provider->getForm($branch);
 			if (NULL === $form) {
 				return $data;

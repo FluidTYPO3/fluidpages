@@ -43,29 +43,6 @@ class SubPageProvider extends PageProvider implements ProviderInterface {
 	protected $fieldName = self::FIELD_NAME_SUB;
 
 	/**
-	 * @var integer
-	 */
-	protected $priority = 99;
-
-	/**
-	 * Returns TRUE that this Provider should trigger if:
-	 *
-	 * - table matches 'pages'
-	 * - field is NULL or matches self::FIELD_NAME
-	 *
-	 * @param array $row
-	 * @param string $table
-	 * @param string $field
-	 * @param string|NULL $extensionKey
-	 * @return boolean
-	 */
-	public function trigger(array $row, $table, $field, $extensionKey = NULL) {
-		$isRightTable = ($table === $this->tableName);
-		$isRightField = (NULL === $field || $field === self::FIELD_NAME_MAIN || $field === self::FIELD_NAME_SUB);
-		return (TRUE === $isRightTable && TRUE === $isRightField);
-	}
-
-	/**
 	 * @param array $row
 	 * @return string
 	 */

@@ -8,6 +8,7 @@ namespace FluidTYPO3\Fluidpages\Controller;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Fluidpages\Provider\PageProvider;
 use FluidTYPO3\Flux\Controller\AbstractFluxController;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
@@ -70,7 +71,10 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	 */
 	protected function initializeProvider() {
 		$row = $this->getRecord();
-		$this->provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->fluxTableName, NULL, $row);
+		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		$hasMainAction = TRUE === empty($row[PageProvider::FIELD_ACTION_MAIN]);
+		$fieldName = TRUE === $hasMainAction ? PageProvider::FIELD_NAME_MAIN : PageProvider::FIELD_NAME_SUB;
+		$this->provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->fluxTableName, $fieldName, $row);
 	}
 
 	/**

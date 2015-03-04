@@ -320,4 +320,51 @@ class PageProviderTest extends AbstractTestCase {
 		return $record;
 	}
 
+	/**
+	 * @test
+	 */
+	public function canPostProcessRecord() {
+		$form = Form::create();
+		$form->createField('Input', 'settings.input')->setInherit(TRUE);
+		$record = $this->getBasicRecord();
+		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getForm', 'getInheritedPropertyValueByDottedPath'));
+		$provider->expects($this->any())->method('getForm')->willReturn($form);
+		$provider->expects($this->once())->method('getInheritedPropertyValueByDottedPath')->with($record, 'settings.input')->willReturn('test');
+		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle', 'update'));
+		$recordService->expects($this->atLeastOnce())->method('getSingle')->willReturn($record);
+		$recordService->expects($this->once())->method('update');
+		$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
+		$configurationService->expects($this->any())->method('message');
+		$provider->injectRecordService($recordService);
+		$provider->injectConfigurationService($configurationService);
+		$parentInstance = GeneralUtility::makeInstance('TYPO3\CMS\Core\DataHandling\DataHandler');
+		$record['test'] = 'test';
+		$id = $record['uid'];
+		$tableName = $provider->getTableName($record);
+		if (TRUE === empty($tableName)) {
+			$tableName = 'pages';
+			$provider->setTableName($tableName);
+		}
+		$fieldName = $provider->getFieldName($record);
+		$record[$fieldName] = array(
+			'data' => array(
+				'options' => array(
+					'lDEF' => array(
+						'settings.input' => array(
+							'vDEF' => 'test'
+						),
+						'settings.input_clear' => array(
+							'vDEF' => 1
+						)
+					)
+				)
+			)
+		);
+		$parentInstance->datamap[$tableName][$id] = $record;
+		$record[$fieldName] = Xml::EXPECTING_FLUX_REMOVALS;
+		$provider->postProcessRecord('update', $id, $record, $parentInstance);
+		$this->assertIsString($record[$fieldName]);
+		$this->assertNotContains('settings.input', $record[$fieldName]);
+	}
+
 }

@@ -68,10 +68,17 @@ class PageControllerTest extends UnitTestCase {
 				'resolvePrimaryConfigurationProvider',
 			)
 		);
+		$pageService = $this->getMock(
+			'FluidTYPO3\\Fluidpages\\Service\\PageService',
+			array(
+				'getPageTemplateConfiguration'
+			)
+		);
 		$configurationService->expects($this->once())->method('resolvePrimaryConfigurationProvider');
 		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Controller\\PageController', array('getRecord'));
 		$instance->expects($this->once())->method('getRecord')->willReturn(array());
 		$instance->injectConfigurationService($configurationService);
+		$instance->injectPageService($pageService);
 		$this->callInaccessibleMethod($instance, 'initializeProvider');
 	}
 
