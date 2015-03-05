@@ -224,17 +224,17 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @param array $removals Allows overridden methods to pass an additional array of field names to remove from the stored Flux value
 	 */
 	public function postProcessRecord($operation, $id, array &$row, DataHandler $reference, array $removals = array()) {
-		$stored = $this->recordService->getSingle($this->tableName, '*', $id);
-		$form = $this->getForm($stored);
+		$form = $this->getForm($row);
 		if (NULL !== $form && 'update' === $operation) {
 			$record = $reference->datamap[$this->tableName][$id];
+			$tableFieldName = $this->getFieldName($record);
 			foreach ($form->getFields() as $field) {
 				$fieldName = $field->getName();
 				$sheetName = $field->getParent()->getName();
 				$inherit = (boolean) $field->getInherit();
 				$inheritEmpty = (boolean) $field->getInheritEmpty();
-				$value = $record[$this->fieldName]['data'][$sheetName]['lDEF'][$fieldName]['vDEF'];
-				$inheritedValue = $this->getInheritedPropertyValueByDottedPath($stored, $fieldName);
+				$value = $record[$tableFieldName]['data'][$sheetName]['lDEF'][$fieldName]['vDEF'];
+				$inheritedValue = $this->getInheritedPropertyValueByDottedPath($record, $fieldName);
 				$empty = (TRUE === empty($value) && $value !== '0' && $value !== 0);
 				$same = ($inheritedValue == $value);
 				if (TRUE === $same && TRUE === $inherit || (TRUE === $inheritEmpty && TRUE === $empty)) {
