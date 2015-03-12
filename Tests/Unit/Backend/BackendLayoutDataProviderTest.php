@@ -38,11 +38,9 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	 * @dataProvider getBackendLayoutConfigurationTestValues
 	 * @param Provider $provider
 	 * @param mixed $record
-	 * @param string $messageFunction
-	 * @param integer $messageCount
 	 * @param array $expected
 	 */
-	public function testGetBackendLayoutConfiguration(Provider $provider, $record, $messageFunction, $messageCount, array $expected) {
+	public function testGetBackendLayoutConfiguration(Provider $provider, $record, array $expected) {
 		$GLOBALS['LANG'] = $this->getMock('TYPO3\\CMS\\Lang\\LanguageService', array('sL'));
 		$GLOBALS['LANG']->csConvObj = $this->getMock('TYPO3\CMS\Core\Charset\CharsetConverter', array('readLLfile'));
 		$GLOBALS['LANG']->expects($this->any())->method('sL')->willReturn('translatedlabel');
@@ -52,12 +50,11 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 		$backendLayout = array();
 		$configurationService = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('resolvePrimaryConfigurationProvider', 'debug', 'message')
+			array('resolvePageProvider', 'debug', 'message')
 		);
-		$configurationService->expects($this->exactly($messageCount))->method($messageFunction);
 		if (NULL !== $record) {
-			$configurationService->expects($this->once())->method('resolvePrimaryConfigurationProvider')
-				->with('pages', NULL, $record)->willReturn($provider);
+			$configurationService->expects($this->once())->method('resolvePageProvider')
+				->with($record)->willReturn($provider);
 		}
 		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
 		$recordService->expects($this->once())->method('getSingle')->willReturn($record);
@@ -113,12 +110,12 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 			)
 		);
 		return array(
-			array($standardProvider, NULL, 'message', 0, array()),
-			array($standardProvider, array(), 'message', 1, array()),
-			array($actionLessProvider, array(), 'message', 1, array()),
-			array($emptyGridProvider, array(), 'message', 1, array()),
-			array($exceptionProvider, array(), 'debug', 1, array()),
-			array($gridProvider, array(), 'message', 0, $gridArray),
+			array($standardProvider, NULL, array()),
+			array($standardProvider, array(), array()),
+			array($actionLessProvider, array(), array()),
+			array($emptyGridProvider, array(), array()),
+			array($exceptionProvider, array(), array()),
+			array($gridProvider, array(), $gridArray),
 		);
 	}
 
