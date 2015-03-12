@@ -8,10 +8,10 @@ namespace FluidTYPO3\Fluidpages\Service;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Fluidpages\Provider\PageProvider;
 use FluidTYPO3\Flux\Core;
+use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Service\FluxService;
-use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
-use FluidTYPO3\Flux\Utility\RecursiveArrayUtility;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -92,5 +92,21 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 		}
 		return $configurations;
 	}
+
+	/**
+	 * Resolve fluidpages specific configuration provider.
+	 *
+	 * @param array $row
+	 *
+	 * @return ProviderInterface|NULL
+	 */
+	public function resolvePageProvider($row) {
+		$hasMainAction = FALSE === empty($row[PageProvider::FIELD_ACTION_MAIN]);
+		$fieldName = TRUE === $hasMainAction ? PageProvider::FIELD_NAME_MAIN : PageProvider::FIELD_NAME_SUB;
+		$provider = $this->resolvePrimaryConfigurationProvider('pages', $fieldName, $row);
+
+		return $provider;
+	}
+
 
 }

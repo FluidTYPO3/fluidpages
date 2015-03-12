@@ -70,11 +70,7 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	 * @return void
 	 */
 	protected function initializeProvider() {
-		$row = $this->getRecord();
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		$hasMainAction = TRUE === empty($row[PageProvider::FIELD_ACTION_MAIN]);
-		$fieldName = TRUE === $hasMainAction ? PageProvider::FIELD_NAME_MAIN : PageProvider::FIELD_NAME_SUB;
-		$this->provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->fluxTableName, $fieldName, $row);
+		$this->provider = $this->configurationService->resolvePageProvider($this->getRecord());
 	}
 
 	/**
