@@ -97,14 +97,12 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 	 * Resolve fluidpages specific configuration provider.
 	 *
 	 * @param array $row
-	 *
 	 * @return ProviderInterface|NULL
 	 */
 	public function resolvePageProvider($row) {
 		$hasMainAction = FALSE === empty($row[PageProvider::FIELD_ACTION_MAIN]);
 		$fieldName = TRUE === $hasMainAction ? PageProvider::FIELD_NAME_MAIN : PageProvider::FIELD_NAME_SUB;
 		$provider = $this->resolvePrimaryConfigurationProvider('pages', $fieldName, $row);
-
 		return $provider;
 	}
 
