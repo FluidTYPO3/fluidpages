@@ -129,7 +129,7 @@ class PageLayoutSelectorTest extends UnitTestCase {
 			array('getPageConfiguration', 'getFormFromTemplateFile', 'message', 'debug')
 		);
 		$service->expects($this->any())->method('getPageConfiguration')->willReturn(array(
-			'templateRootPaths' => 'EXT:fluidpages/Tests/Fixtures/Templates/'
+			'templateRootPaths' => array('EXT:fluidpages/Tests/Fixtures/Templates/')
 		));
 		$service->expects($this->any())->method('getFormFromTemplateFile')->willReturn($form);
 		if (NULL !== $expectedMessageFunction) {

@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FluidTYPO3/flux.git",
-                "reference": "57fd59f628ee3515aca8d525ceed40cff32d97c3"
+                "reference": "a77e3de6ce62507b4fb71b9a6934553685827c23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FluidTYPO3/flux/zipball/57fd59f628ee3515aca8d525ceed40cff32d97c3",
-                "reference": "57fd59f628ee3515aca8d525ceed40cff32d97c3",
+                "url": "https://api.github.com/repos/FluidTYPO3/flux/zipball/a77e3de6ce62507b4fb71b9a6934553685827c23",
+                "reference": "a77e3de6ce62507b4fb71b9a6934553685827c23",
                 "shasum": ""
             },
             "require-dev": {
@@ -41,7 +41,7 @@
             ],
             "description": "The flux package from FluidTYPO3",
             "homepage": "http://fluidtypo3.org",
-            "time": "2015-03-04 01:20:00"
+            "time": "2015-03-14 18:55:33"
         }
     ],
     "packages-dev": [
@@ -120,16 +120,16 @@
         },
         {
             "name": "fluidtypo3/development",
-            "version": "1.1.9",
+            "version": "1.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FluidTYPO3/fluidtypo3-development.git",
-                "reference": "97bdf7fec76386261186a882385ad93c3bd3dcf7"
+                "reference": "cd00d5894b1ddfddfef4b6e4b006ba4b7ce9317c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FluidTYPO3/fluidtypo3-development/zipball/97bdf7fec76386261186a882385ad93c3bd3dcf7",
-                "reference": "97bdf7fec76386261186a882385ad93c3bd3dcf7",
+                "url": "https://api.github.com/repos/FluidTYPO3/fluidtypo3-development/zipball/cd00d5894b1ddfddfef4b6e4b006ba4b7ce9317c",
+                "reference": "cd00d5894b1ddfddfef4b6e4b006ba4b7ce9317c",
                 "shasum": ""
             },
             "require": {
@@ -174,7 +174,7 @@
                 "php",
                 "typo3"
             ],
-            "time": "2015-02-19 15:53:48"
+            "time": "2015-03-06 03:18:16"
         },
         {
             "name": "guzzle/guzzle",
@@ -1195,20 +1195,21 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "2.2.0",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "b301c98f19414d836fdaa678648745fcca5aeb4f"
+                "reference": "5046b0e01c416fc2b06df961d0673c85bcdc896c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/b301c98f19414d836fdaa678648745fcca5aeb4f",
-                "reference": "b301c98f19414d836fdaa678648745fcca5aeb4f",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/5046b0e01c416fc2b06df961d0673c85bcdc896c",
+                "reference": "5046b0e01c416fc2b06df961d0673c85bcdc896c",
                 "shasum": ""
             },
             "require": {
                 "ext-tokenizer": "*",
+                "ext-xmlwriter": "*",
                 "php": ">=5.1.2"
             },
             "bin": [
@@ -1216,6 +1217,11 @@
                 "scripts/phpcbf"
             ],
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
             "autoload": {
                 "classmap": [
                     "CodeSniffer.php",
@@ -1259,7 +1265,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2015-01-21 22:44:05"
+            "time": "2015-03-04 02:07:03"
         },
         {
             "name": "symfony/config",

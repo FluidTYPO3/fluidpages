@@ -11,6 +11,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
+use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -64,18 +65,12 @@ class TemplateFileLayoutSelector {
 		$referringField = $parameters['config']['arguments']['referring_field'];
 		$currentValue = $parameters['row'][$referringField];
 		$configuration = $this->configurationService->getViewConfigurationByFileReference($currentValue);
-		$layoutRootPath = $configuration['layoutRootPath'];
-		$layoutRootPath = GeneralUtility::getFileAbsFileName($layoutRootPath);
-		$files = array();
-		$files = TRUE === is_dir($layoutRootPath) ? GeneralUtility::getAllFilesAndFoldersInPath($files, $layoutRootPath) : array();
+		$templatePaths = new TemplatePaths($configuration);
+		$files = $templatePaths->resolveAvailableLayoutFiles();
+		$files = array_map('basename', $files);
 		foreach ($files as $file) {
-			$file = substr($file, strlen($layoutRootPath));
 			if (0 !== strpos($file, '.')) {
-				$dir = pathinfo($file, PATHINFO_DIRNAME);
 				$file = pathinfo($file, PATHINFO_FILENAME);
-				if ('.' !== $dir) {
-					$file = $dir . '/' . $file;
-				}
 				array_push($parameters['items'], array($file, $file));
 			}
 		}
