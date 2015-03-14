@@ -40,7 +40,7 @@ if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']
 			'type' => 'flex',
 		)
 	),
-), 1);
+));
 
 $doktypeIcon = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('fluidpages') . 'doktype_icon.png';
 
