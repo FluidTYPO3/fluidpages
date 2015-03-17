@@ -3,7 +3,13 @@
 Fluidpages: Fluid Page Templates
 ================================
 
+Package status:
+
 [![Build Status](https://img.shields.io/jenkins/s/https/jenkins.fluidtypo3.org/fluidpages.svg?style=flat-square)](https://jenkins.fluidtypo3.org/job/fluidpages) [![Coverage Status](https://img.shields.io/coveralls/FluidTYPO3/fluidpages/development.svg?style=flat-square)](https://coveralls.io/r/FluidTYPO3/fluidpages) [![Documentation](http://img.shields.io/badge/documentation-online-blue.svg?style=flat-square)](https://fluidtypo3.org/templating-manual/introduction.html)
+
+Framework status:
+
+[![Build Status](https://img.shields.io/jenkins/s/https/jenkins.fluidtypo3.org/fluidtypo3-testing.svg?style=flat-square)](https://jenkins.fluidtypo3.org/job/fluidtypo3-testing/) [![Coverage Status](https://img.shields.io/coveralls/FluidTYPO3/fluidtypo3-testing/master.svg?style=flat-square)](https://coveralls.io/r/FluidTYPO3/fluidtypo3-testing)
 
 ## What does it do?
 
