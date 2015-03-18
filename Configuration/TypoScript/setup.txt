@@ -4,6 +4,7 @@ page.typeNum = 0
 page.5 = USER
 page.5.userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
 page.5.extensionName = Fluidpages
+page.5.vendorName = FluidTYPO3
 page.5.pluginName = Page
 page.10 >
 
@@ -23,6 +24,7 @@ fluidpagesRawTemplate {
 	10 {
 		userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
 		extensionName = Fluidpages
+		vendorName = FluidTYPO3
 		pluginName = Page
 	}
 }
