@@ -1,27 +1,12 @@
 <?php
 namespace FluidTYPO3\Fluidpages\Backend;
-/***************************************************************
- *  Copyright notice
+
+/*
+ * This file is part of the FluidTYPO3/Fluidpages project under GPLv2 or later.
  *
- *  (c) 2014 Claus Due <claus@namelesscoder.net>
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
+ * For the full copyright and license information, please read the
+ * LICENSE.md file that was distributed with this source code.
+ */
 
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
@@ -38,9 +23,6 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Class for backend layouts
- *
- * @package	Fluidpages
- * @subpackage Backend
  */
 class BackendLayoutDataProvider implements DataProviderInterface {
 
@@ -65,13 +47,45 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 	protected $recordService;
 
 	/**
+	 * @param ObjectManagerInterface $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManagerInterface $objectManager) {
+		$this->objectManager = $objectManager;
+	}
+
+	/**
+	 * @param ConfigurationService $configurationService
+	 * @return void
+	 */
+	public function injectConfigurationService(ConfigurationService $configurationService) {
+		$this->configurationService = $configurationService;
+	}
+
+	/**
+	 * @param PageService $pageService
+	 * @return void
+	 */
+	public function injectPageService(PageService $pageService) {
+		$this->pageService = $pageService;
+	}
+
+	/**
+	 * @param WorkspacesAwareRecordService $workspacesAwareRecordService
+	 * @return void
+	 */
+	public function injectWorkspacesAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
+		$this->recordService = $workspacesAwareRecordService;
+	}
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->objectManager = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
-		$this->configurationService = $this->objectManager->get('FluidTYPO3\Fluidpages\Service\ConfigurationService');
-		$this->pageService = $this->objectManager->get('FluidTYPO3\Fluidpages\Service\PageService');
-		$this->recordService = $this->objectManager->get('FluidTYPO3\Flux\Service\WorkspacesAwareRecordService');
+		$this->injectConfigurationService($this->objectManager->get('FluidTYPO3\Fluidpages\Service\ConfigurationService'));
+		$this->injectPageService($this->objectManager->get('FluidTYPO3\Fluidpages\Service\PageService'));
+		$this->injectWorkspacesAwareRecordService($this->objectManager->get('FluidTYPO3\Flux\Service\WorkspacesAwareRecordService'));
 	}
 
 	/**
@@ -94,7 +108,7 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 	 *
 	 * @param string $identifier
 	 * @param integer $pageUid
-	 * @return NULL|BackendLayout
+	 * @return BackendLayout
 	 */
 	public function getBackendLayout($identifier, $pageUid) {
 		$configuration = $this->getBackendLayoutConfiguration($pageUid);
@@ -148,16 +162,10 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 				return array();
 			}
 
-			$provider = $this->configurationService->resolvePrimaryConfigurationProvider('pages', 'tx_fed_page_flexform', $record);
+			$provider = $this->configurationService->resolvePageProvider($record);
 			$action = $provider->getControllerActionFromRecord($record);
 			if (TRUE === empty($action)) {
 				$this->configurationService->message('No template selected - backend layout will not be rendered', GeneralUtility::SYSLOG_SEVERITY_INFO);
-				return array();
-			}
-			$paths = $provider->getTemplatePaths($record);
-			if (0 === count($paths)) {
-				$this->configurationService->message('Unable to detect a configuration. If it is not intentional, check that you '
-					. 'have included the TypoScript for the desired template collection.', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
 				return array();
 			}
 			$grid = $provider->getGrid($record)->build();
@@ -184,13 +192,9 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 			$columns = array();
 			foreach ($row['columns'] as $column) {
 				$key = ($index + 1) . '.';
-				$columnName = $GLOBALS['LANG']->sL($column['label']);
-				if (TRUE === empty($columnName)) {
-					$columnName = $column['name'];
-				}
 				$columns[$key] = array(
-					'name' => $columnName,
-					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['colCount']
+					'name' => $column['label'],
+					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : NULL
 				);
 				if ($column['colspan']) {
 					$columns[$key]['colspan'] = $column['colspan'];
@@ -208,15 +212,26 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 			);
 			++ $rowIndex;
 		}
-		$config['rows.'][($rowIndex + 1) . '.'] = array(
-			'columns.' => array(
-				'1.' => array(
-					'name' => LocalizationUtility::translate('fluidContentArea', 'fluidpages'),
-					'colPos' => ContentService::COLPOS_FLUXCONTENT
+		if (FALSE === $this->isPageModuleLanguageView()) {
+			$config['rows.'][($rowIndex + 1) . '.'] = array(
+				'columns.' => array(
+					'1.' => array(
+						'name' => LocalizationUtility::translate('fluidContentArea', 'fluidpages'),
+						'colPos' => ContentService::COLPOS_FLUXCONTENT
+					)
 				)
-			)
-		);
+			);
+		}
 		return $config;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	protected function isPageModuleLanguageView() {
+		$module = GeneralUtility::_GET('M');
+		$function = TRUE === isset($GLOBALS['SOBE']->MOD_SETTINGS['function']) ? $GLOBALS['SOBE']->MOD_SETTINGS['function'] : NULL;
+		return ('web_layout' === $module && 2 === (integer) $function);
 	}
 
 }

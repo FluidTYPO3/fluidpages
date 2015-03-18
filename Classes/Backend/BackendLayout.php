@@ -1,40 +1,23 @@
 <?php
 namespace FluidTYPO3\Fluidpages\Backend;
-/***************************************************************
- *  Copyright notice
+
+/*
+ * This file is part of the FluidTYPO3/Fluidpages project under GPLv2 or later.
  *
- *  (c) 2014 Claus Due <claus@namelesscoder.net>
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
+ * For the full copyright and license information, please read the
+ * LICENSE.md file that was distributed with this source code.
+ */
 
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
-use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Service\ContentService;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
+use TYPO3\CMS\Backend\Form\FormEngine;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
  * Class for backend layouts
- *
- * @package	Fluidpages
- * @subpackage Backend
  */
 class BackendLayout implements SingletonInterface {
 
@@ -52,6 +35,30 @@ class BackendLayout implements SingletonInterface {
 	 * @var WorkspacesAwareRecordService
 	 */
 	protected $workspacesAwareRecordService;
+
+	/**
+	 * @param ObjectManagerInterface $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManagerInterface $objectManager) {
+		$this->objectManager = $objectManager;
+	}
+
+	/**
+	 * @param ConfigurationService $configurationService
+	 * @return void
+	 */
+	public function injectConfigurationService(ConfigurationService $configurationService) {
+		$this->configurationService = $configurationService;
+	}
+
+	/**
+	 * @param WorkspacesAwareRecordService $workspacesAwareRecordService
+	 * @return void
+	 */
+	public function injectWorkspacesAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
+		$this->workspacesAwareRecordService = $workspacesAwareRecordService;
+	}
 
 	/**
 	 * Constructor
@@ -90,7 +97,7 @@ class BackendLayout implements SingletonInterface {
 				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
 				return NULL;
 			}
-		} catch (\Exception $error) {
+		} catch (\RuntimeException $error) {
 			$this->configurationService->debug($error);
 			return NULL;
 		}
@@ -112,12 +119,8 @@ class BackendLayout implements SingletonInterface {
 			$columns = array();
 			foreach ($row['columns'] as $column) {
 				$key = ($index + 1) . '.';
-				$columnName = $GLOBALS['LANG']->sL($column['label']);
-				if (TRUE === empty($columnName)) {
-					$columnName = $column['name'];
-				}
 				$columns[$key] = array(
-					'name' => $columnName,
+					'name' => $column['label'],
 					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['backend_layout.']['colCount']
 				);
 				if ($column['colspan']) {
@@ -158,7 +161,7 @@ class BackendLayout implements SingletonInterface {
 	 *
 	 * @param integer $id Starting page id when parsing he rootline
 	 * @param array $tcaItems The current set of colpos TCA items
-	 * @param \TYPO3\CMS\Backend\Form\FormEngine $tceForms A back reference to the TCEforms object which generated the item list
+	 * @param FormEngine $tceForms A back reference to the TCEforms object which generated the item list
 	 * @return void
 	 */
 	public function postProcessColPosListItemsParsed(&$id, array &$tcaItems, &$tceForms) {

@@ -1,31 +1,16 @@
 <?php
 namespace FluidTYPO3\Fluidpages\Service;
-/***************************************************************
- *  Copyright notice
+
+/*
+ * This file is part of the FluidTYPO3/Fluidpages project under GPLv2 or later.
  *
- *  (c) 2014 Claus Due <claus@namelesscoder.net>
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
+ * For the full copyright and license information, please read the
+ * LICENSE.md file that was distributed with this source code.
+ */
 
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Utility\PathUtility;
+use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -36,9 +21,6 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
  *
  * Service for interacting with Pages - gets content elements and page configuration
  * options.
- *
- * @package Fluidpages
- * @subpackage Service
  */
 class PageService implements SingletonInterface {
 
@@ -165,36 +147,6 @@ class PageService implements SingletonInterface {
 	}
 
 	/**
-	 * Gets a human-readable label from a Fluid Page template file
-	 *
-	 * @param string $extensionName
-	 * @param string $templateFile
-	 * @return string
-	 * @api
-	 */
-	public function getPageTemplateLabel($extensionName, $templateFile) {
-		$config = $this->configurationService->getPageConfiguration($extensionName);
-		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$form = $this->configurationService->getFormFromTemplateFile($templatePathAndFilename, 'Configuration', 'form', array(), $extensionName);
-		return (FALSE === empty($form) ? $form->getLabel() : $templateFile . '.html');
-	}
-
-	/**
-	 * Returns TRUE if the template is enabled
-	 *
-	 * @param string $extensionName
-	 * @param string $templateFile
-	 * @return string
-	 * @api
-	 */
-	public function getPageTemplateEnabled($extensionName, $templateFile) {
-		$config = $this->configurationService->getPageConfiguration($extensionName);
-		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$form = $this->configurationService->getFormFromTemplateFile($templatePathAndFilename, 'Configuration', 'form', array(), $extensionName);
-		return $form->getEnabled();
-	}
-
-	/**
 	 * Gets a list of usable Page Templates from defined page template TypoScript
 	 *
 	 * @param string $format
@@ -207,55 +159,36 @@ class PageService implements SingletonInterface {
 		if (FALSE === is_array($typoScript)) {
 			return $output;
 		}
-		foreach ($typoScript as $extensionName=>$group) {
+		foreach ($typoScript as $extensionName => $group) {
 			if (TRUE === isset($group['enable']) && 1 > $group['enable']) {
 				continue;
 			}
-			if (FALSE === isset($group['templateRootPath'])) {
-				$this->configurationService->message('The template group "' . $extensionName . '" does not define a set of template containing at least a templateRootPath' .
-					'paths. This indicates a problem with your TypoScript configuration - most likely a static template is not loaded', GeneralUtility::SYSLOG_SEVERITY_WARNING);
-				continue;
-			}
-			$configuredPath = rtrim($group['templateRootPath'], '/') . '/Page/';
-			$path = GeneralUtility::getFileAbsFileName($configuredPath);
-			if (FALSE === is_dir($path)) {
-				$this->configurationService->message('The template group "' . $extensionName . '" has been configured to use the templateRootPath "' .
-					$configuredPath . '" but this directory does not exist.', GeneralUtility::SYSLOG_SEVERITY_FATAL);
-				continue;
-			}
-			$files = scandir($path);
 			$output[$extensionName] = array();
-			foreach ($files as $key => $file) {
-				$pathinfo = pathinfo($path . $file);
-				$extension = $pathinfo['extension'];
-				if ('.' === substr($file, 0, 1)) {
-					unset($files[$key]);
-				} else if (strtolower($extension) != strtolower($format)) {
-					unset($files[$key]);
-				} else {
-					$this->getPageTemplateLabel($extensionName, $path . $file);
-					$output[$extensionName][] = $pathinfo['filename'];
+			$templatePaths = new TemplatePaths($group);
+			$templateRootPaths = $templatePaths->getTemplateRootPaths();
+			foreach ($templateRootPaths as $templateRootPath) {
+				$configuredPath = $templateRootPath . 'Page/';
+				if (FALSE === is_dir($configuredPath)) {
+					$this->configurationService->message('The template group "' . $extensionName . '" has been configured to use the templateRootPath "' .
+						$configuredPath . '" but this directory does not exist.', GeneralUtility::SYSLOG_SEVERITY_FATAL);
+					continue;
+				}
+				$files = scandir($configuredPath);
+				foreach ($files as $key => $file) {
+					$pathinfo = pathinfo($path . $file);
+					$extension = $pathinfo['extension'];
+					$filename = $pathinfo['filename'];
+					if ('.' === substr($file, 0, 1)) {
+						unset($files[$key]);
+					} else if (strtolower($extension) != strtolower($format)) {
+						unset($files[$key]);
+					} else {
+						$output[$extensionName][$filename] = $filename;
+					}
 				}
 			}
 		}
 		return $output;
-	}
-
-	/**
-	 * @param array $paths
-	 * @param string $template
-	 * @return string
-	 */
-	public function expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template) {
-		if (TRUE === file_exists($template)) {
-			$templatePathAndFilename = $template;
-		} else {
-			if (TRUE === is_array($paths) && FALSE === empty($paths)) {
-				$paths = PathUtility::translatePath($paths);
-			}
-			$templatePathAndFilename = rtrim($paths['templateRootPath'], '/') . '/Page/' . $template . '.html';
-		}
-		return $templatePathAndFilename;
 	}
 
 }

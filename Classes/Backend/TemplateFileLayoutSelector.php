@@ -1,56 +1,57 @@
 <?php
 namespace FluidTYPO3\Fluidpages\Backend;
-/***************************************************************
- *  Copyright notice
- *
- *  (c) 2014 Claus Due <claus@namelesscoder.net>
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
 
+/*
+ * This file is part of the FluidTYPO3/Fluidpages project under GPLv2 or later.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.md file that was distributed with this source code.
+ */
+
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
+use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class that renders a Layout selector based on a template file
- *
- * @package	Fluidpages
- * @subpackage Backend
  */
 class TemplateFileLayoutSelector {
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
+	 * @var PageService
 	 */
 	protected $pageService;
 
 	/**
-	 * @var \FluidTYPO3\Fluidpages\Service\ConfigurationService
+	 * @var ConfigurationService
 	 */
 	protected $configurationService;
+
+	/**
+	 * @param ConfigurationService $configurationService
+	 * @return void
+	 */
+	public function injectConfigurationService(ConfigurationService $configurationService) {
+		$this->configurationService = $configurationService;
+	}
+
+	/**
+	 * @param PageService $pageService
+	 * @return void
+	 */
+	public function injectPageService(PageService $pageService) {
+		$this->pageService = $pageService;
+	}
 
 	/**
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
 		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-		$this->pageService = $objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService');
-		$this->configurationService = $objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService');
+		$this->injectConfigurationService($objectManager->get('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'));
+		$this->injectPageService($objectManager->get('FluidTYPO3\\Fluidpages\\Service\\PageService'));
 	}
 
 	/**
@@ -64,18 +65,12 @@ class TemplateFileLayoutSelector {
 		$referringField = $parameters['config']['arguments']['referring_field'];
 		$currentValue = $parameters['row'][$referringField];
 		$configuration = $this->configurationService->getViewConfigurationByFileReference($currentValue);
-		$layoutRootPath = $configuration['layoutRootPath'];
-		$layoutRootPath = GeneralUtility::getFileAbsFileName($layoutRootPath);
-		$files = array();
-		$files = TRUE === is_dir($layoutRootPath) ? GeneralUtility::getAllFilesAndFoldersInPath($files, $layoutRootPath) : array();
+		$templatePaths = new TemplatePaths($configuration);
+		$files = $templatePaths->resolveAvailableLayoutFiles();
+		$files = array_map('basename', $files);
 		foreach ($files as $file) {
-			$file = substr($file, strlen($layoutRootPath));
 			if (0 !== strpos($file, '.')) {
-				$dir = pathinfo($file, PATHINFO_DIRNAME);
 				$file = pathinfo($file, PATHINFO_FILENAME);
-				if ('.' !== $dir) {
-					$file = $dir . '/' . $file;
-				}
 				array_push($parameters['items'], array($file, $file));
 			}
 		}
