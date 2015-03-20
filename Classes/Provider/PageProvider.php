@@ -217,6 +217,16 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
  	}
 
 	/**
+	 * @param array $row
+	 */
+	public function getFlexFormValuesSingle(array $row) {
+		$fieldName = $this->getFieldName($row);
+		$form = $this->getForm($row);
+		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
+		return $immediateConfiguration;
+	}
+
+	/**
 	 * @param string $operation
 	 * @param integer $id
 	 * @param array $row
@@ -300,7 +310,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 				return $data;
 			}
 			$fields = $form->getFields();
-			$values = $provider->getFlexFormValues($branch);
+			$values = $provider->getFlexFormValuesSingle($branch);
 			foreach ($fields as $field) {
 				$values = $this->unsetInheritedValues($field, $values);
 			}
