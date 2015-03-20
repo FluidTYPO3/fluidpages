@@ -210,7 +210,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	public function getFlexFormValues(array $row) {
 		$fieldName = $this->getFieldName($row);
  		$form = $this->getForm($row);
-		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
+		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[self::FIELD_NAME_MAIN], $form, NULL, NULL);
 		$inheritedConfiguration = $this->getInheritedConfiguration($row);
 		$merged = RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
 		return $merged;
