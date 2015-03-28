@@ -175,7 +175,7 @@ class PageService implements SingletonInterface {
 				}
 				$files = scandir($configuredPath);
 				foreach ($files as $key => $file) {
-					$pathinfo = pathinfo($path . $file);
+					$pathinfo = pathinfo($file);
 					$extension = $pathinfo['extension'];
 					$filename = $pathinfo['filename'];
 					if ('.' === substr($file, 0, 1)) {
