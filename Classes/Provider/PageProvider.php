@@ -181,7 +181,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return string
 	 */
 	public function getControllerActionFromRecord(array $row) {
-		if (PageControllerInterface::DOKTYPE_RAW === intval($row['doktype'])) {
+		if (PageControllerInterface::DOKTYPE_RAW === (integer) $row['doktype']) {
 			return 'raw';
 		}
 		$action = $this->getControllerActionReferenceFromRecord($row);
@@ -216,9 +216,10 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		return $merged;
  	}
 
-	/**
-	 * @param array $row
-	 */
+    /**
+     * @param array $row
+     * @return array
+     */
 	public function getFlexFormValuesSingle(array $row) {
 		$fieldName = $this->getFieldName($row);
 		$form = $this->getForm($row);
@@ -338,7 +339,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * @param FormInterface $field
+	 * @param Form\FormInterface $field
 	 * @param array $values
 	 * @return array
 	 */
@@ -375,7 +376,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 			$record[$parentFieldName] = $this->getParentFieldValue($record);
 		}
 		$records = array();
-		while ($record[$parentFieldName] > 0) {
+		while (0 < $record[$parentFieldName]) {
 			$record = $this->loadRecordFromDatabase($record[$parentFieldName]);
 			$parentFieldName = $this->getParentFieldName($record);
 			array_push($records, $record);
