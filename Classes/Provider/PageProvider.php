@@ -199,8 +199,10 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return string
 	 */
 	public function getControllerActionReferenceFromRecord(array $row) {
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		return $configuration[self::FIELD_ACTION_MAIN];
+		if (TRUE === empty($row[self::FIELD_ACTION_MAIN])) {
+			$row = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		}
+		return $row[self::FIELD_ACTION_MAIN];
 	}
 
 	/**
@@ -210,22 +212,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	public function getFlexFormValues(array $row) {
 		$fieldName = $this->getFieldName($row);
  		$form = $this->getForm($row);
-		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[self::FIELD_NAME_MAIN], $form, NULL, NULL);
+		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
 		$inheritedConfiguration = $this->getInheritedConfiguration($row);
 		$merged = RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
 		return $merged;
  	}
-
-    /**
-     * @param array $row
-     * @return array
-     */
-	public function getFlexFormValuesSingle(array $row) {
-		$fieldName = $this->getFieldName($row);
-		$form = $this->getForm($row);
-		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
-		return $immediateConfiguration;
-	}
 
 	/**
 	 * @param string $operation

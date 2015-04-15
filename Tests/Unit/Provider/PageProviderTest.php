@@ -10,6 +10,7 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Provider;
 
 use FluidTYPO3\Fluidpages\Controller\PageControllerInterface;
 use FluidTYPO3\Fluidpages\Provider\PageProvider;
+use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Records;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Xml;
@@ -69,6 +70,7 @@ class PageProviderTest extends AbstractTestCase {
 	public function testGetFormCallsSetDefaultValuesInFieldsWithInheritedValues() {
 		$form = Form::create();
 		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('setDefaultValuesInFieldsWithInheritedValues'));
+		$instance->injectPageService(new PageService());
 		$instance->expects($this->once())->method('setDefaultValuesInFieldsWithInheritedValues')->willReturn($form);
 		$instance->setForm($form);
 		$instance->getForm(array());
@@ -121,9 +123,8 @@ class PageProviderTest extends AbstractTestCase {
 	 */
 	public function testGetControllerActionFromRecord(array $record, $fieldName, $expectsMessage, $expected) {
 		$instance = new PageProvider();
-		if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype']) {
+		if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype'] && TRUE === empty($record[$fieldName])) {
 			$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
-			$service->expects($this->once())->method('getPageTemplateConfiguration')->willReturn($record);
 			$instance->injectPageService($service);
 		}
 		if (TRUE === $expectsMessage) {
