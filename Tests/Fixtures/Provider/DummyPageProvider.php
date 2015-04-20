@@ -8,13 +8,13 @@ namespace FluidTYPO3\Fluidpages\Tests\Fixtures\Provider;
  * LICENSE.md file that was distributed with this source code.
  */
 
-use FluidTYPO3\Fluidpages\Provider\PageProvider;
+use FluidTYPO3\Fluidpages\Provider\SubPageProvider;
 use FluidTYPO3\Flux\Form;
 
 /**
  * Class DummyPageProvider
  */
-class DummyPageProvider extends PageProvider {
+class DummyPageProvider extends SubPageProvider {
 
 	/**
 	 * @var array
