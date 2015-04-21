@@ -237,12 +237,14 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 					$sheetName = $field->getParent()->getName();
 					$inherit = (boolean) $field->getInherit();
 					$inheritEmpty = (boolean) $field->getInheritEmpty();
-					$value = $record[$tableFieldName]['data'][$sheetName]['lDEF'][$fieldName]['vDEF'];
-					$inheritedValue = $this->getInheritedPropertyValueByDottedPath($record, $fieldName);
-					$empty = (TRUE === empty($value) && $value !== '0' && $value !== 0);
-					$same = ($inheritedValue == $value);
-					if (TRUE === $same && TRUE === $inherit || (TRUE === $inheritEmpty && TRUE === $empty)) {
-						$removals[] = $fieldName;
+					if (TRUE === isset($record[$tableFieldName]['data'])) {
+						$value = $record[$tableFieldName]['data'][$sheetName]['lDEF'][$fieldName]['vDEF'];
+						$inheritedValue = $this->getInheritedPropertyValueByDottedPath($record, $fieldName);
+						$empty = (TRUE === empty($value) && $value !== '0' && $value !== 0);
+						$same = ($inheritedValue == $value);
+						if (TRUE === $same && TRUE === $inherit || (TRUE === $inheritEmpty && TRUE === $empty)) {
+							$removals[] = $fieldName;
+						}
 					}
 				}
 			}
