@@ -79,7 +79,7 @@ class PageService implements SingletonInterface {
 	/**
 	 * Process RootLine to find first usable, configured Fluid Page Template.
 	 * WARNING: do NOT use the output of this feature to overwrite $row - the
-	 * record returned may or may not be the same recod as defined in $id.
+	 * record returned may or may not be the same record as defined in $id.
 	 *
 	 * @param integer $pageUid
 	 * @return array|NULL
@@ -175,12 +175,12 @@ class PageService implements SingletonInterface {
 				}
 				$files = scandir($configuredPath);
 				foreach ($files as $key => $file) {
-					$pathinfo = pathinfo($path . $file);
+					$pathinfo = pathinfo($file);
 					$extension = $pathinfo['extension'];
 					$filename = $pathinfo['filename'];
 					if ('.' === substr($file, 0, 1)) {
 						unset($files[$key]);
-					} else if (strtolower($extension) != strtolower($format)) {
+					} else if (strtolower($extension) !== strtolower($format)) {
 						unset($files[$key]);
 					} else {
 						$output[$extensionName][$filename] = $filename;

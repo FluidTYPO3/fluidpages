@@ -47,8 +47,21 @@ class SubPageProvider extends PageProvider implements ProviderInterface {
 	 * @return string
 	 */
 	public function getControllerActionReferenceFromRecord(array $row) {
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		return $configuration[self::FIELD_ACTION_SUB];
+		if (TRUE === empty($row[self::FIELD_ACTION_SUB])) {
+			$row = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		}
+		return $row[self::FIELD_ACTION_SUB];
+	}
+
+	/**
+	 * @param array $row
+	 * @return array
+	 */
+	public function getFlexFormValuesSingle(array $row) {
+		$fieldName = $this->getFieldName($row);
+		$form = $this->getForm($row);
+		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
+		return $immediateConfiguration;
 	}
 
 }
