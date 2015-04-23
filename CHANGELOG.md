@@ -1,5 +1,14 @@
 # Fluidpages Change log
 
+3.2.1 - 2015-03-23
+------------------
+
+- Bugfixes for incorrectly resolved main/sub provider and template resulting in use of wrong page configuration and broken inheritance
+  - https://github.com/FluidTYPO3/fluidpages/pull/252
+
+- Bugfix for saving incomplete page records when working in the page tree or access module
+  - https://github.com/FluidTYPO3/fluidpages/commit/91b748ef97893a462cac28183c5d69d70f5b4d5e
+
 3.2.0 - 2015-03-18
 ------------------
 
@@ -38,5 +47,5 @@
   - [FluidTYPO3/flux#760](https://github.com/FluidTYPO3/flux/pull/760) - source feature
 
 - Truncating of inherited values fixed
-  - The problem was in persisting inherited FlexForm values in child pages, when saving them - this made no possibility to change inherited value by only changing it in parent page 
+  - The problem was in persisting inherited FlexForm values in child pages, when saving them - this made no possibility to change inherited value by only changing it in parent page
   - [FluidTYPO3/flux#712](https://github.com/FluidTYPO3/flux/pull/712) - detailed description and discussion of this issue
