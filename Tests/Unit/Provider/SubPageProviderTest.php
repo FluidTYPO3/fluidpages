@@ -35,7 +35,6 @@ class SubPageProviderTest extends AbstractTestCase {
 		$instance = new SubPageProvider();
 		if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype']) {
 			$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
-			$service->expects($this->once())->method('getPageTemplateConfiguration')->willReturn($record);
 			$instance->injectPageService($service);
 		}
 		if (TRUE === $expectsMessage) {

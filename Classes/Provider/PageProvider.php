@@ -181,7 +181,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return string
 	 */
 	public function getControllerActionFromRecord(array $row) {
-		if (PageControllerInterface::DOKTYPE_RAW === intval($row['doktype'])) {
+		if (PageControllerInterface::DOKTYPE_RAW === (integer) $row['doktype']) {
 			return 'raw';
 		}
 		$action = $this->getControllerActionReferenceFromRecord($row);
@@ -199,8 +199,10 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return string
 	 */
 	public function getControllerActionReferenceFromRecord(array $row) {
-		$configuration = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		return $configuration[self::FIELD_ACTION_MAIN];
+		if (TRUE === empty($row[self::FIELD_ACTION_MAIN])) {
+			$row = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		}
+		return $row[self::FIELD_ACTION_MAIN];
 	}
 
 	/**
@@ -224,21 +226,26 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @param array $removals Allows overridden methods to pass an additional array of field names to remove from the stored Flux value
 	 */
 	public function postProcessRecord($operation, $id, array &$row, DataHandler $reference, array $removals = array()) {
-		$form = $this->getForm($row);
-		if (NULL !== $form && 'update' === $operation) {
-			$record = $reference->datamap[$this->tableName][$id];
-			$tableFieldName = $this->getFieldName($record);
-			foreach ($form->getFields() as $field) {
-				$fieldName = $field->getName();
-				$sheetName = $field->getParent()->getName();
-				$inherit = (boolean) $field->getInherit();
-				$inheritEmpty = (boolean) $field->getInheritEmpty();
-				$value = $record[$tableFieldName]['data'][$sheetName]['lDEF'][$fieldName]['vDEF'];
-				$inheritedValue = $this->getInheritedPropertyValueByDottedPath($record, $fieldName);
-				$empty = (TRUE === empty($value) && $value !== '0' && $value !== 0);
-				$same = ($inheritedValue == $value);
-				if (TRUE === $same && TRUE === $inherit || (TRUE === $inheritEmpty && TRUE === $empty)) {
-					$removals[] = $fieldName;
+		if ('update' === $operation) {
+			$record = $this->loadRecordFromDatabase($id);
+			$record = RecursiveArrayUtility::mergeRecursiveOverrule($record, $reference->datamap[$this->tableName][$id]);
+			$form = $this->getForm($record);
+			if (NULL !== $form) {
+				$tableFieldName = $this->getFieldName($record);
+				foreach ($form->getFields() as $field) {
+					$fieldName = $field->getName();
+					$sheetName = $field->getParent()->getName();
+					$inherit = (boolean) $field->getInherit();
+					$inheritEmpty = (boolean) $field->getInheritEmpty();
+					if (TRUE === isset($record[$tableFieldName]['data'])) {
+						$value = $record[$tableFieldName]['data'][$sheetName]['lDEF'][$fieldName]['vDEF'];
+						$inheritedValue = $this->getInheritedPropertyValueByDottedPath($record, $fieldName);
+						$empty = (TRUE === empty($value) && $value !== '0' && $value !== 0);
+						$same = ($inheritedValue == $value);
+						if (TRUE === $same && TRUE === $inherit || (TRUE === $inheritEmpty && TRUE === $empty)) {
+							$removals[] = $fieldName;
+						}
+					}
 				}
 			}
 		}
@@ -300,7 +307,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 				return $data;
 			}
 			$fields = $form->getFields();
-			$values = $provider->getFlexFormValues($branch);
+			$values = $provider->getFlexFormValuesSingle($branch);
 			foreach ($fields as $field) {
 				$values = $this->unsetInheritedValues($field, $values);
 			}
@@ -325,7 +332,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * @param FormInterface $field
+	 * @param Form\FormInterface $field
 	 * @param array $values
 	 * @return array
 	 */
@@ -362,7 +369,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 			$record[$parentFieldName] = $this->getParentFieldValue($record);
 		}
 		$records = array();
-		while ($record[$parentFieldName] > 0) {
+		while (0 < $record[$parentFieldName]) {
 			$record = $this->loadRecordFromDatabase($record[$parentFieldName]);
 			$parentFieldName = $this->getParentFieldName($record);
 			array_push($records, $record);

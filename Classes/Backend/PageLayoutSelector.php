@@ -88,7 +88,6 @@ class PageLayoutSelector {
 	 * @return string
 	 */
 	public function renderField(&$parameters, &$pObj) {
-		$value = $parameters['itemFormElValue'];
 		$availableTemplates = $this->pageService->getAvailablePageTemplateFiles();
 		$selector = '<div>';
 		$selector .= $this->renderInheritanceField($parameters);
