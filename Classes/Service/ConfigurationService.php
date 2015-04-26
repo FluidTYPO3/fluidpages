@@ -94,15 +94,16 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 	}
 
 	/**
-	 * Resolve fluidpages specific configuration provider.
+	 * Resolve fluidpages specific configuration provider. Always
+	 * returns the main PageProvider type which needs to be used
+	 * as primary PageProvider when processing a complete page
+	 * rather than just the "sub configuration" field value.
 	 *
 	 * @param array $row
 	 * @return ProviderInterface|NULL
 	 */
 	public function resolvePageProvider($row) {
-		$hasMainAction = FALSE === empty($row[PageProvider::FIELD_ACTION_MAIN]);
-		$fieldName = TRUE === $hasMainAction ? PageProvider::FIELD_NAME_MAIN : PageProvider::FIELD_NAME_SUB;
-		$provider = $this->resolvePrimaryConfigurationProvider('pages', $fieldName, $row);
+		$provider = $this->resolvePrimaryConfigurationProvider('pages', PageProvider::FIELD_NAME_MAIN, $row);
 		return $provider;
 	}
 
