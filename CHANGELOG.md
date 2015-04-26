@@ -1,6 +1,11 @@
 # Fluidpages Change log
+3.2.2 - 2015-04-26
+------------------
 
-3.2.1 - 2015-03-23
+- Bugfix for subpage configuration always being used
+  - https://github.com/FluidTYPO3/fluidpages/commit/66ad2bfc1bd42f4c377cec39829d77d5fef601c7
+
+3.2.1 - 2015-04-23
 ------------------
 
 - Bugfixes for incorrectly resolved main/sub provider and template resulting in use of wrong page configuration and broken inheritance
