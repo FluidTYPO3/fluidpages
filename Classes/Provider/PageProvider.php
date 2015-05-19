@@ -80,6 +80,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	protected $configurationService;
 
 	/**
+	 * @var array
+	 */
+	private static $cache = array();
+
+	/**
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
@@ -298,22 +303,28 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return array
 	 */
 	protected function getInheritedConfiguration(array $row) {
-		$tree = $this->getInheritanceTree($row);
-		$data = array();
-		foreach ($tree as $branch) {
-			$provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
-			$form = $provider->getForm($branch);
-			if (NULL === $form) {
-				return $data;
+		$tableName = $this->getTableName($row);
+		$tableFieldName = $this->getFieldName($row);
+		$cacheKey = $tableName . $tableFieldName . $row['uid'];
+		if (TRUE === empty(self::$cache[$cacheKey])) {
+			$tree = $this->getInheritanceTree($row);
+			$data = array();
+			foreach ($tree as $branch) {
+				$provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
+				$form = $provider->getForm($branch);
+				if (NULL === $form) {
+					break;
+				}
+				$fields = $form->getFields();
+				$values = $provider->getFlexFormValuesSingle($branch);
+				foreach ($fields as $field) {
+					$values = $this->unsetInheritedValues($field, $values);
+				}
+				$data = RecursiveArrayUtility::merge($data, $values);
 			}
-			$fields = $form->getFields();
-			$values = $provider->getFlexFormValuesSingle($branch);
-			foreach ($fields as $field) {
-				$values = $this->unsetInheritedValues($field, $values);
-			}
-			$data = RecursiveArrayUtility::merge($data, $values);
+			self::$cache[$cacheKey] = $data;
 		}
-		return $data;
+		return self::$cache[$cacheKey];
 	}
 
 	/**
