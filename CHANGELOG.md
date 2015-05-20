@@ -1,18 +1,17 @@
 # Fluidpages Change log
+
 3.2.2 - 2015-04-26
 ------------------
 
 - Bugfix for subpage configuration always being used
-  - https://github.com/FluidTYPO3/fluidpages/commit/66ad2bfc1bd42f4c377cec39829d77d5fef601c7
+  - [Source commit with more info](https://github.com/FluidTYPO3/fluidpages/commit/66ad2bfc1bd42f4c377cec39829d77d5fef601c7)
 
 3.2.1 - 2015-04-23
 ------------------
 
-- Bugfixes for incorrectly resolved main/sub provider and template resulting in use of wrong page configuration and broken inheritance
-  - https://github.com/FluidTYPO3/fluidpages/pull/252
+- [#252](https://github.com/FluidTYPO3/fluidpages/pull/252) Bugfix for incorrectly resolved main/sub provider and template resulting in use of wrong page configuration and broken inheritance
 
-- Bugfix for saving incomplete page records when working in the page tree or access module
-  - https://github.com/FluidTYPO3/fluidpages/commit/91b748ef97893a462cac28183c5d69d70f5b4d5e
+- [#241](https://github.com/FluidTYPO3/fluidpages/pull/241) Bugfix for saving incomplete page records when working in the page tree or access module
 
 3.2.0 - 2015-03-18
 ------------------
