@@ -133,19 +133,21 @@ class PageLayoutSelector {
 	 */
 	protected function renderOptions($extension, array $group, array $parameters) {
 		$selector = '';
-		$extensionKey = ExtensionNamingUtility::getExtensionKey($extension);
-		if (FALSE === ExtensionManagementUtility::isLoaded($extensionKey)) {
-			$groupTitle = ucfirst($extension);
-		} else {
-			$emConfigFile = ExtensionManagementUtility::extPath($extensionKey, 'ext_emconf.php');
-			require $emConfigFile;
-			$groupTitle = $EM_CONF['']['title'];
-		}
+		if (FALSE === empty($group)) {
+			$extensionKey = ExtensionNamingUtility::getExtensionKey($extension);
+			if (FALSE === ExtensionManagementUtility::isLoaded($extensionKey)) {
+				$groupTitle = ucfirst($extension);
+			} else {
+				$emConfigFile = ExtensionManagementUtility::extPath($extensionKey, 'ext_emconf.php');
+				require $emConfigFile;
+				$groupTitle = $EM_CONF['']['title'];
+			}
 
-		$packageLabel = LocalizationUtility::translate('pages.tx_fed_page_package', 'Fluidpages');
-		$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
-		foreach ($group as $template) {
-			$selector .= $this->renderOption($extension, $template, $parameters);
+			$packageLabel = LocalizationUtility::translate('pages.tx_fed_page_package', 'Fluidpages');
+			$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
+			foreach ($group as $template) {
+				$selector .= $this->renderOption($extension, $template, $parameters);
+			}
 		}
 		return $selector;
 	}
