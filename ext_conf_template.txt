@@ -1,0 +1,5 @@
+  # cat=basic/enable; type=boolean; label=Automatic initialisation: If enabled, Fluidpages will automatically create the TypoScript setup that is required to render Fluidpages templates in the frontend, and will use it on every page. Unchecking this option instead registers a static TypoScript file which can be loaded as needed.
+autoload = 1
+
+  # cat=basic/enable; type=input; label=Doktypes: CSV list of doktypes to add the page layout selectors to in addition to the default standard pages and shortcuts (0,1,4). Possible use cases are sysfolders (254) or custom page types.
+doktypes =

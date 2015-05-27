@@ -1,0 +1,30 @@
+
+page = PAGE
+page.typeNum = 0
+page.5 = USER
+page.5.userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+page.5.extensionName = Fluidpages
+page.5.vendorName = FluidTYPO3
+page.5.pluginName = Page
+page.10 >
+
+plugin.tx_fluidpages {
+	siteRootInheritance = {$plugin.tx_fluidpages.siteRootInheritance}
+}
+
+fluidpagesRawTemplate = PAGE
+fluidpagesRawTemplate {
+	typeNum = 235
+	headerData >
+	config {
+		disableAllHeaderCode = 1
+		additionalHeaders = Content-type:text/html
+	}
+	10 = USER
+	10 {
+		userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+		extensionName = Fluidpages
+		vendorName = FluidTYPO3
+		pluginName = Page
+	}
+}

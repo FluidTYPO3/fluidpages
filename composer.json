@@ -1,0 +1,74 @@
+{
+  "name": "fluidtypo3/fluidpages",
+  "description": "The fluidpages package from FluidTYPO3",
+  "require": {
+    "fluidtypo3/flux": "*"
+  },
+  "type": "typo3-cms-extension",
+  "keywords": [
+    "TYPO3 CMS",
+    "templating",
+    "flux",
+    "fluidpages",
+    "fedext",
+    "fluid"
+  ],
+  "homepage": "http://fluidtypo3.org",
+  "license": "GPL-2.0+",
+  "version": "3.2.3",
+  "preferred-install": "dist",
+  "support": {
+    "irc": "irc://irc.freenode.org/fedext",
+    "issues": "https://github.com/FluidTYPO3/fluidcontent/issues"
+  },
+  "suggest": {
+    "fluidtypo3/fluidcontent": "Gives the ability to render custom content elements with pure fluid.",
+    "fluidtypo3/fluidcontent_core": "Gives the ability to render core content elements with pure fluid."
+  },
+  "autoload": {
+    "psr-4": {
+      "FluidTYPO3\\Fluidpages\\": "Classes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "FluidTYPO3\\Fluidpages\\Tests\\": "Tests/"
+    },
+    "classmap": [
+      "vendor/typo3/cms/typo3/sysext/extbase",
+      "vendor/typo3/cms/typo3/sysext/fluid",
+      "vendor/typo3/cms/typo3/sysext/core",
+      "vendor/typo3/cms/typo3/sysext/backend",
+      "vendor/typo3/cms/typo3/sysext/frontend",
+      "vendor/typo3/cms/typo3/sysext/lang"
+    ]
+  },
+  "require-dev": {
+    "fluidtypo3/development": "*",
+    "fluidtypo3/flux": "dev-development"
+  },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "typo3/cms",
+                "version": "6.2.11",
+                "dist": {
+                    "url": "https://github.com/TYPO3/TYPO3.CMS/archive/6.2.11.zip",
+                    "type": "zip"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "typo3/cms",
+                "version": "7.1.0",
+                "dist": {
+                    "url": "https://github.com/TYPO3/TYPO3.CMS/archive/7.1.0.zip",
+                    "type": "zip"
+                }
+            }
+        }
+    ]
+}
