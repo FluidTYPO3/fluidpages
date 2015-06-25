@@ -1,5 +1,12 @@
 # Fluidpages Change log
 
+upcoming
+------------------
+
+- [#261](https://github.com/FluidTYPO3/fluidpages/pull/261) Multi-domain installations can rely on static TS inclusion of provider extension
+	- In other words: no more output of any page layouts on those page-tree branches, where no TS from provider extension included
+
+
 3.2.3 - 2015-05-20
 ------------------
 
