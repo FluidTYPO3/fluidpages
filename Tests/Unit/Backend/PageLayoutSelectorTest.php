@@ -80,7 +80,7 @@ class PageLayoutSelectorTest extends UnitTestCase {
 			array(array('field' => 'tx_fed_page_controller_action', 'row' => $rootPage), array('siteRootInheritance' => TRUE), FALSE),
 			// sub template field conditioning
 			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $normalPage), array(), FALSE),
-			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage), array('siteRootInheritance' => FALSE), FALSE),
+			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage), array('siteRootInheritance' => FALSE), TRUE),
 			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage), array('siteRootInheritance' => TRUE), FALSE),
 			// pid zero pages never show inheritance field regardless of other settings
 			array(array('field' => 'tx_fed_page_controller_action', 'row' => $pidZeroPage), array(), TRUE),
