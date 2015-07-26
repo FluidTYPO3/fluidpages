@@ -10,7 +10,7 @@
  * writing. "version" and "dependencies" must not be touched!
  ***************************************************************/
 
-$EM_CONF[$_EXTKEY] = array(
+$EM_CONF[$_EXTKEY] = [
 	'title' => 'Fluid Pages Engine',
 	'description' => 'Fluid Page Template engine - integrates compact and highly dynamic page templates with all the benefits of Fluid.',
 	'category' => 'misc',
@@ -32,21 +32,21 @@ $EM_CONF[$_EXTKEY] = array(
 	'version' => '3.2.3',
 	'CGLcompliance' => '',
 	'CGLcompliance_note' => '',
-	'constraints' => array(
-		'depends' => array(
+	'constraints' => [
+		'depends' => [
 			'typo3' => '6.2.0-7.1.99',
 			'cms' => '',
 			'flux' => '7.2.0-7.2.99',
-		),
-		'conflicts' => array(
+		],
+		'conflicts' => [
 			'templavoila' => '',
-		),
-		'suggests' => array(
-		),
-	),
-	'suggests' => array(
-	),
+		],
+		'suggests' => [
+		],
+	],
+	'suggests' => [
+	],
 	'_md5_values_when_last_written' => '',
-);
+];
 
 ?>

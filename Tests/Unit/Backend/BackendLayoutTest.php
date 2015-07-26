@@ -41,21 +41,21 @@ class BackendLayoutTest extends UnitTestCase {
 	 * @param array $expected
 	 */
 	public function testPostProcessBackendLayout(Provider $provider, $record, $messageFunction, $messageCount, array $expected) {
-		$GLOBALS['LANG'] = $this->getMock('TYPO3\\CMS\\Lang\\LanguageService', array('sL'));
+		$GLOBALS['LANG'] = $this->getMock('TYPO3\\CMS\\Lang\\LanguageService', ['sL']);
 		$GLOBALS['LANG']->expects($this->any())->method('sL')->willReturn('translatedlabel');
 		$instance = new BackendLayout();
 		$pageUid = 1;
-		$backendLayout = array();
+		$backendLayout = [];
 		$configurationService = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('resolvePrimaryConfigurationProvider', 'debug', 'message')
+			['resolvePrimaryConfigurationProvider', 'debug', 'message']
 		);
 		$configurationService->expects($this->exactly($messageCount))->method($messageFunction);
 		if (NULL !== $record) {
 			$configurationService->expects($this->once())->method('resolvePrimaryConfigurationProvider')
 				->with('pages', 'tx_fed_page_flexform', $record)->willReturn($provider);
 		}
-		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', ['getSingle']);
 		$recordService->expects($this->once())->method('getSingle')->willReturn($record);
 		$instance->injectConfigurationService($configurationService);
 		$instance->injectWorkspacesAwareRecordService($recordService);
@@ -69,9 +69,9 @@ class BackendLayoutTest extends UnitTestCase {
 	public function getPostProcessBackendLayoutTestValues() {
 		$standardProvider = $this->getMock(
 			'FluidTYPO3\\Flux\\Provider\\Provider',
-			array('getControllerActionFromRecord')
+			['getControllerActionFromRecord']
 		);
-		$standardProvider->setTemplatePaths(array());
+		$standardProvider->setTemplatePaths([]);
 		$actionLessProvider = clone $standardProvider;
 		$exceptionProvider = clone $standardProvider;
 		$emptyGridProvider = clone $standardProvider;
@@ -80,42 +80,42 @@ class BackendLayoutTest extends UnitTestCase {
 		$exceptionProvider->expects($this->any())->method('getControllerActionFromRecord')->willThrowException(new \RuntimeException());
 		$emptyGridProvider->setGrid(Grid::create());
 		$emptyGridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
-		$grid = Grid::create(array());
+		$grid = Grid::create([]);
 		$grid->createContainer('Row', 'row')->createContainer('Column', 'column')->setColSpan(3)->setRowSpan(3)->setColumnPosition(2);
 		$gridProvider->setGrid($grid);
 		$gridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
-		$gridArray = array(
-			'__config' => array(
-				'backend_layout.' => array(
+		$gridArray = [
+			'__config' => [
+				'backend_layout.' => [
 					'colCount' => 3,
 					'rowCount' => 1,
-					'rows.' => array(
-						'1.' => array(
-							'columns.' => array(
-								'1.' => array(
+					'rows.' => [
+						'1.' => [
+							'columns.' => [
+								'1.' => [
 									'name' => 'translatedlabel',
 									'colPos' => 2,
 									'colspan' => 3,
 									'rowspan' => 3
-								)
-							)
-						)
-					)
-				)
-			),
-			'__colPosList' => array(2),
-			'__items' => array(
-				array('translatedlabel', 2, NULL)
-			)
-		);
-		return array(
-			array($standardProvider, NULL, 'message', 0, array()),
-			array($standardProvider, array(), 'message', 1, array()),
-			array($actionLessProvider, array(), 'message', 1, array()),
-			array($emptyGridProvider, array(), 'message', 1, array()),
-			array($exceptionProvider, array(), 'debug', 1, array()),
-			array($gridProvider, array(), 'message', 0, $gridArray),
-		);
+								]
+							]
+						]
+					]
+				]
+			],
+			'__colPosList' => [2],
+			'__items' => [
+				['translatedlabel', 2, NULL]
+			]
+		];
+		return [
+			[$standardProvider, NULL, 'message', 0, []],
+			[$standardProvider, [], 'message', 1, []],
+			[$actionLessProvider, [], 'message', 1, []],
+			[$emptyGridProvider, [], 'message', 1, []],
+			[$exceptionProvider, [], 'debug', 1, []],
+			[$gridProvider, [], 'message', 0, $gridArray],
+		];
 	}
 
 	/**
@@ -133,12 +133,12 @@ class BackendLayoutTest extends UnitTestCase {
 	 */
 	public function testPostProcessColPosListItemsParsedPerformsNoOperation() {
 		$id = 1;
-		$tca = array('foo' => 'bar');
-		$mock = $this->getMock('TYPO3\CMS\Backend\Form\FormEngine', array('fake'), array(), '', FALSE);
+		$tca = ['foo' => 'bar'];
+		$mock = $this->getMock('TYPO3\CMS\Backend\Form\FormEngine', ['fake'], [], '', FALSE);
 		$instance = new BackendLayout();
 		$instance->postProcessColPosListItemsParsed($id, $tca, $mock);
 		$this->assertEquals(1, $id);
-		$this->assertEquals(array('foo' => 'bar'), $tca);
+		$this->assertEquals(['foo' => 'bar'], $tca);
 	}
 
 	/**
@@ -146,11 +146,11 @@ class BackendLayoutTest extends UnitTestCase {
 	 */
 	public function testPostProcessColPosProcFuncItemsAppendsFluidContentArea() {
 		$instance = new BackendLayout();
-		$parameters = array(
-			'items' => array()
-		);
+		$parameters = [
+			'items' => []
+		];
 		$instance->postProcessColPosProcFuncItems($parameters);
-		$this->assertContains(array('Fluid Content Area', ContentService::COLPOS_FLUXCONTENT, NULL), $parameters['items']);
+		$this->assertContains(['Fluid Content Area', ContentService::COLPOS_FLUXCONTENT, NULL], $parameters['items']);
 	}
 
 }

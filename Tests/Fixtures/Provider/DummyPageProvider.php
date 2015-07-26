@@ -19,7 +19,7 @@ class DummyPageProvider extends SubPageProvider {
 	/**
 	 * @var array
 	 */
-	protected $values = array();
+	protected $values = [];
 
 	/**
 	 * @param array $row
@@ -45,7 +45,7 @@ class DummyPageProvider extends SubPageProvider {
 	 * @return array()
 	 */
 	public function getFlexFormValues(array $row) {
-		return array();
+		return [];
 	}
 
 	/**

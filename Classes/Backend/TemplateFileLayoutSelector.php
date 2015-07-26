@@ -71,7 +71,7 @@ class TemplateFileLayoutSelector {
 		foreach ($files as $file) {
 			if (0 !== strpos($file, '.')) {
 				$file = pathinfo($file, PATHINFO_FILENAME);
-				array_push($parameters['items'], array($file, $file));
+				array_push($parameters['items'], [$file, $file]);
 			}
 		}
 	}

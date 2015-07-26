@@ -39,7 +39,7 @@ class PageLayoutSelector {
 	/**
 	 * @var array
 	 */
-	protected $recognizedFormats = array('html', 'xml', 'txt', 'json', 'js', 'css');
+	protected $recognizedFormats = ['html', 'xml', 'txt', 'json', 'js', 'css'];
 
 	/**
 	 * @var PageService

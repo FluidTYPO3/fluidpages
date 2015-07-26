@@ -32,16 +32,16 @@ class TemplateFileLayoutSelectorTest extends UnitTestCase {
 	 */
 	public function testAddLayoutOptions() {
 		$layoutRootPath = 'EXT:fluidpages/Tests/Fixtures/Templates/Page/';
-		$parameters = array('items' => array());
+		$parameters = ['items' => []];
 		$instance = new TemplateFileLayoutSelector();
 		$parent = '';
-		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('getViewConfigurationByFileReference'));
-		$service->expects($this->once())->method('getViewConfigurationByFileReference')->willReturn(array(
-			'layoutRootPaths' => array($layoutRootPath)
-		));
+		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', ['getViewConfigurationByFileReference']);
+		$service->expects($this->once())->method('getViewConfigurationByFileReference')->willReturn([
+			'layoutRootPaths' => [$layoutRootPath]
+		]);
 		$instance->injectConfigurationService($service);
 		$instance->addLayoutOptions($parameters, $parent);
-		$this->assertEquals(array('Dummy', 'Dummy'), $parameters['items'][0]);
+		$this->assertEquals(['Dummy', 'Dummy'], $parameters['items'][0]);
 	}
 
 }

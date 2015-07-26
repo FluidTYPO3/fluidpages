@@ -39,7 +39,7 @@ class ConfigurationServiceTest extends UnitTestCase {
 		if (NULL !== $resourceFactoryOutput) {
 			$resourceFactory = $this->getMock(
 				'TYPO3\\CMS\\Core\\Resource\\ResourceFactory',
-				array('getFileObjectFromCombinedIdentifier')
+				['getFileObjectFromCombinedIdentifier']
 			);
 			$resourceFactory->expects($this->once())->method('getFileObjectFromCombinedIdentifier')
 				->with($reference)->willReturn($resourceFactoryOutput);
@@ -55,10 +55,10 @@ class ConfigurationServiceTest extends UnitTestCase {
 	public function getConvertFileReferenceToTemplatePathAndFilenameTestValues() {
 		$relativeReference = 'Tests/Fixtures/Templates/Page/Dummy.html';
 		$extensionReference = 'EXT:fluidpages/Tests/Fixtures/Templates/Page/Dummy.html';
-		return array(
-			array($relativeReference, NULL, GeneralUtility::getFileAbsFileName($relativeReference)),
-			array('1', $relativeReference, $relativeReference),
-		);
+		return [
+			[$relativeReference, NULL, GeneralUtility::getFileAbsFileName($relativeReference)],
+			['1', $relativeReference, $relativeReference],
+		];
 	}
 
 	/**
@@ -70,7 +70,7 @@ class ConfigurationServiceTest extends UnitTestCase {
 	public function testGetViewConfigurationByFileReference($reference, $expectedParameter) {
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('getViewConfigurationForExtensionName')
+			['getViewConfigurationForExtensionName']
 		);
 		$instance->expects($this->once())->method('getViewConfigurationForExtensionName')
 			->with($expectedParameter)->willReturn($expectedParameter);
@@ -82,11 +82,11 @@ class ConfigurationServiceTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getViewConfigurationByFileReferenceTestValues() {
-		return array(
-			array('some/file', 'fluidpages'),
-			array('EXT:fluidpages/some/file', 'fluidpages'),
-			array('EXT:other/some/file', 'other')
-		);
+		return [
+			['some/file', 'fluidpages'],
+			['EXT:fluidpages/some/file', 'fluidpages'],
+			['EXT:other/some/file', 'other']
+		];
 	}
 
 	/**
@@ -97,22 +97,22 @@ class ConfigurationServiceTest extends UnitTestCase {
 	public function testGetPageConfigurationReturnsEmptyArrayAndDispatchesMessageOnInvalidInput($input) {
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('message')
+			['message']
 		);
 		$instance->expects($this->once())->method('message');
 		$result = $instance->getPageConfiguration($input);
-		$this->assertEquals(array(), $result);
+		$this->assertEquals([], $result);
 	}
 
 	/**
 	 * @return array
 	 */
 	public function getPageConfigurationInvalidTestValues() {
-		return array(
-			array(''),
-			array(0),
-			array(array()),
-		);
+		return [
+			[''],
+			[0],
+			[[]],
+		];
 	}
 
 	/**
@@ -121,11 +121,11 @@ class ConfigurationServiceTest extends UnitTestCase {
 	public function testGetPageConfigurationCallsGetViewConfigurationForExtensionName() {
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('getViewConfigurationForExtensionName')
+			['getViewConfigurationForExtensionName']
 		);
-		$instance->expects($this->once())->method('getViewConfigurationForExtensionName')->with('foobar')->willReturn(array());
+		$instance->expects($this->once())->method('getViewConfigurationForExtensionName')->with('foobar')->willReturn([]);
 		$result = $instance->getPageConfiguration('foobar');
-		$this->assertEquals(array(), $result);
+		$this->assertEquals([], $result);
 	}
 
 	/**
@@ -134,7 +134,7 @@ class ConfigurationServiceTest extends UnitTestCase {
 	public function testGetPageConfigurationWithoutExtensionNameReadsRegisteredProviders() {
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('getViewConfigurationForExtensionName')
+			['getViewConfigurationForExtensionName']
 		);
 		Core::registerProviderExtensionKey('foo', 'Page');
 		Core::registerProviderExtensionKey('bar', 'Page');

@@ -138,7 +138,7 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 	 * @return array
 	 */
 	protected function ensureDottedKeys(array $configuration) {
-		$converted = array();
+		$converted = [];
 		foreach ($configuration as $key => $value) {
 			if (TRUE === is_array($value)) {
 				$key = rtrim($key, '.') . '.';
@@ -159,43 +159,43 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 
 			// Stop processing if no fluidpages template configured in rootline
 			if (NULL === $record) {
-				return array();
+				return [];
 			}
 
 			$provider = $this->configurationService->resolvePageProvider($record);
 			$action = $provider->getControllerActionFromRecord($record);
 			if (TRUE === empty($action)) {
 				$this->configurationService->message('No template selected - backend layout will not be rendered', GeneralUtility::SYSLOG_SEVERITY_INFO);
-				return array();
+				return [];
 			}
 			$grid = $provider->getGrid($record)->build();
 			if (FALSE === is_array($grid) || 0 === count($grid['rows'])) {
 				// no grid is defined; we use the "raw" BE layout as a default behavior
 				$this->configurationService->message('The selected page template does not contain a grid but the template is itself valid.');
-				return array();
+				return [];
 			}
 		} catch (\Exception $error) {
 			$this->configurationService->debug($error);
-			return array();
+			return [];
 		}
 
-		$config = array(
+		$config = [
 			'colCount' => 0,
 			'rowCount' => 0,
-			'rows.' => array()
-		);
+			'rows.' => []
+		];
 		$rowIndex = 0;
 		foreach ($grid['rows'] as $row) {
 			$index = 0;
 			$colCount = 0;
 			$rowKey = ($rowIndex + 1) . '.';
-			$columns = array();
+			$columns = [];
 			foreach ($row['columns'] as $column) {
 				$key = ($index + 1) . '.';
-				$columns[$key] = array(
+				$columns[$key] = [
 					'name' => $column['label'],
 					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : NULL
-				);
+				];
 				if ($column['colspan']) {
 					$columns[$key]['colspan'] = $column['colspan'];
 				}
@@ -207,20 +207,20 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 			}
 			$config['colCount'] = max($config['colCount'], $colCount);
 			$config['rowCount']++;
-			$config['rows.'][$rowKey] = array(
+			$config['rows.'][$rowKey] = [
 				'columns.' => $columns
-			);
+			];
 			++ $rowIndex;
 		}
 		if (FALSE === $this->isPageModuleLanguageView()) {
-			$config['rows.'][($rowIndex + 1) . '.'] = array(
-				'columns.' => array(
-					'1.' => array(
+			$config['rows.'][($rowIndex + 1) . '.'] = [
+				'columns.' => [
+					'1.' => [
 						'name' => LocalizationUtility::translate('fluidContentArea', 'fluidpages'),
 						'colPos' => ContentService::COLPOS_FLUXCONTENT
-					)
-				)
-			);
+					]
+				]
+			];
 		}
 		return $config;
 	}

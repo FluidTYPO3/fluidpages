@@ -18,7 +18,7 @@ $autoloader->addPsr4('TYPO3\\CMS\\Fluid\\', __DIR__ . '/../vendor/typo3/cms/typo
 $autoloader->addPsr4('TYPO3\\CMS\\Backend\\', __DIR__ . '/../vendor/typo3/cms/typo3/sysext/backend/Classes/');
 $autoloader->addPsr4('TYPO3\\CMS\\Frontend\\', __DIR__ . '/../vendor/typo3/cms/typo3/sysext/frontend/Classes/');
 
-\FluidTYPO3\Development\Bootstrap::initialize(array(
+\FluidTYPO3\Development\Bootstrap::initialize([
 	'fluid_template' => \FluidTYPO3\Development\Bootstrap::CACHE_PHP_NULL,
 	'cache_core' => \FluidTYPO3\Development\Bootstrap::CACHE_PHP_NULL,
 	'cache_runtime' => \FluidTYPO3\Development\Bootstrap::CACHE_NULL,
@@ -28,4 +28,4 @@ $autoloader->addPsr4('TYPO3\\CMS\\Frontend\\', __DIR__ . '/../vendor/typo3/cms/t
 	'extbase_datamapfactory_datamap' => \FluidTYPO3\Development\Bootstrap::CACHE_NULL,
 	'extbase_typo3dbbackend_tablecolumns' => \FluidTYPO3\Development\Bootstrap::CACHE_NULL,
 	'extbase_typo3dbbackend_queries' => \FluidTYPO3\Development\Bootstrap::CACHE_NULL
-));
+]);

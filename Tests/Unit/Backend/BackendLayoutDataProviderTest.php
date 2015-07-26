@@ -41,22 +41,22 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	 * @param array $expected
 	 */
 	public function testGetBackendLayoutConfiguration(Provider $provider, $record, array $expected) {
-		$GLOBALS['LANG'] = $this->getMock('TYPO3\\CMS\\Lang\\LanguageService', array('sL'));
-		$GLOBALS['LANG']->csConvObj = $this->getMock('TYPO3\CMS\Core\Charset\CharsetConverter', array('readLLfile'));
+		$GLOBALS['LANG'] = $this->getMock('TYPO3\\CMS\\Lang\\LanguageService', ['sL']);
+		$GLOBALS['LANG']->csConvObj = $this->getMock('TYPO3\CMS\Core\Charset\CharsetConverter', ['readLLfile']);
 		$GLOBALS['LANG']->expects($this->any())->method('sL')->willReturn('translatedlabel');
-		$GLOBALS['LANG']->csConvObj->expects($this->any())->method('readLLfile')->willReturn(array());
+		$GLOBALS['LANG']->csConvObj->expects($this->any())->method('readLLfile')->willReturn([]);
 		$instance = new BackendLayoutDataProvider();
 		$pageUid = 1;
-		$backendLayout = array();
+		$backendLayout = [];
 		$configurationService = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('resolvePageProvider', 'debug', 'message')
+			['resolvePageProvider', 'debug', 'message']
 		);
 		if (NULL !== $record) {
 			$configurationService->expects($this->once())->method('resolvePageProvider')
 				->with($record)->willReturn($provider);
 		}
-		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', ['getSingle']);
 		$recordService->expects($this->once())->method('getSingle')->willReturn($record);
 		$instance->injectConfigurationService($configurationService);
 		$instance->injectWorkspacesAwareRecordService($recordService);
@@ -70,9 +70,9 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	public function getBackendLayoutConfigurationTestValues() {
 		$standardProvider = $this->getMock(
 			'FluidTYPO3\\Flux\\Provider\\Provider',
-			array('getControllerActionFromRecord')
+			['getControllerActionFromRecord']
 		);
-		$standardProvider->setTemplatePaths(array());
+		$standardProvider->setTemplatePaths([]);
 		$actionLessProvider = clone $standardProvider;
 		$exceptionProvider = clone $standardProvider;
 		$emptyGridProvider = clone $standardProvider;
@@ -81,42 +81,42 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 		$exceptionProvider->expects($this->any())->method('getControllerActionFromRecord')->willThrowException(new \RuntimeException());
 		$emptyGridProvider->setGrid(Grid::create());
 		$emptyGridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
-		$grid = Grid::create(array());
+		$grid = Grid::create([]);
 		$grid->createContainer('Row', 'row')->createContainer('Column', 'column')->setColSpan(3)->setRowSpan(3)->setColumnPosition(2);
 		$gridProvider->setGrid($grid);
 		$gridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
-		$gridArray = array(
+		$gridArray = [
 			'colCount' => 3,
 			'rowCount' => 1,
-			'rows.' => array(
-				'1.' => array(
-					'columns.' => array(
-						'1.' => array(
+			'rows.' => [
+				'1.' => [
+					'columns.' => [
+						'1.' => [
 							'name' => 'translatedlabel',
 							'colPos' => 2,
 							'colspan' => 3,
 							'rowspan' => 3
-						)
-					)
-				),
-				'2.' => array(
-					'columns.' => array(
-						'1.' => array(
+						]
+					]
+				],
+				'2.' => [
+					'columns.' => [
+						'1.' => [
 							'name' => 'Fluid Content Area',
 							'colPos' => ContentService::COLPOS_FLUXCONTENT
-						)
-					)
-				)
-			)
-		);
-		return array(
-			array($standardProvider, NULL, array()),
-			array($standardProvider, array(), array()),
-			array($actionLessProvider, array(), array()),
-			array($emptyGridProvider, array(), array()),
-			array($exceptionProvider, array(), array()),
-			array($gridProvider, array(), $gridArray),
-		);
+						]
+					]
+				]
+			]
+		];
+		return [
+			[$standardProvider, NULL, []],
+			[$standardProvider, [], []],
+			[$actionLessProvider, [], []],
+			[$emptyGridProvider, [], []],
+			[$exceptionProvider, [], []],
+			[$gridProvider, [], $gridArray],
+		];
 	}
 
 	/**
@@ -134,16 +134,16 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getEnsureDottedKeysTestValues() {
-		return array(
-			array(
-				array('foo' => array('bar' => 'bar')),
-				array('foo.' => array('bar' => 'bar'))
-			),
-			array(
-				array('foo.' => array('bar' => 'bar')),
-				array('foo.' => array('bar' => 'bar'))
-			)
-		);
+		return [
+			[
+				['foo' => ['bar' => 'bar']],
+				['foo.' => ['bar' => 'bar']]
+			],
+			[
+				['foo.' => ['bar' => 'bar']],
+				['foo.' => ['bar' => 'bar']]
+			]
+		];
 	}
 
 	/**
@@ -161,16 +161,16 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getEncodeTypoScriptArrayTestValues() {
-		return array(
-			array(
-				array('foo' => array('bar' => 'bar')),
+		return [
+			[
+				['foo' => ['bar' => 'bar']],
 				'backend_layout.foo.bar = bar' . PHP_EOL
-			),
-			array(
-				array('foo.' => array('bar' => 'bar')),
+			],
+			[
+				['foo.' => ['bar' => 'bar']],
 				'backend_layout.foo.bar = bar' . PHP_EOL
-			)
-		);
+			]
+		];
 	}
 
 	/**
@@ -179,11 +179,11 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	public function testGetBackendLayout() {
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Backend\\BackendLayoutDataProvider',
-			array('getBackendLayoutConfiguration', 'ensureDottedKeys', 'encodeTypoScriptArray')
+			['getBackendLayoutConfiguration', 'ensureDottedKeys', 'encodeTypoScriptArray']
 		);
-		$instance->expects($this->at(0))->method('getBackendLayoutConfiguration')->with(1)->willReturn(array('conf'));
-		$instance->expects($this->at(1))->method('ensureDottedKeys')->with(array('conf'))->willReturn(array('conf-converted'));
-		$instance->expects($this->at(2))->method('encodeTypoScriptArray')->with(array('conf-converted'))->willReturn('config');
+		$instance->expects($this->at(0))->method('getBackendLayoutConfiguration')->with(1)->willReturn(['conf']);
+		$instance->expects($this->at(1))->method('ensureDottedKeys')->with(['conf'])->willReturn(['conf-converted']);
+		$instance->expects($this->at(2))->method('encodeTypoScriptArray')->with(['conf-converted'])->willReturn('config');
 		$result = $instance->getBackendLayout('identifier', 1);
 		$this->assertInstanceOf('TYPO3\\CMS\\Backend\\View\\BackendLayout\\BackendLayout', $result);
 		$this->assertEquals('identifier', $result->getIdentifier());
@@ -196,10 +196,10 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	public function testAddBackendLayouts() {
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Backend\\BackendLayoutDataProvider',
-			array('getBackendLayoutConfiguration', 'encodeTypoScriptArray')
+			['getBackendLayoutConfiguration', 'encodeTypoScriptArray']
 		);
-		$instance->expects($this->once())->method('getBackendLayoutConfiguration')->with(1)->willReturn(array('conf'));
-		$instance->expects($this->once())->method('encodeTypoScriptArray')->with(array('conf'))->willReturn('conf');
+		$instance->expects($this->once())->method('getBackendLayoutConfiguration')->with(1)->willReturn(['conf']);
+		$instance->expects($this->once())->method('encodeTypoScriptArray')->with(['conf'])->willReturn('conf');
 		$collection = new BackendLayoutCollection('collection');
 		$context = new DataProviderContext();
 		$context->setPageId(1);

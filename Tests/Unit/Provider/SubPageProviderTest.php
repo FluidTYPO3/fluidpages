@@ -34,11 +34,11 @@ class SubPageProviderTest extends AbstractTestCase {
 	public function testGetControllerActionFromRecord(array $record, $fieldName, $expectsMessage, $expected) {
 		$instance = new SubPageProvider();
 		if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype']) {
-			$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
+			$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', ['getPageTemplateConfiguration']);
 			$instance->injectPageService($service);
 		}
 		if (TRUE === $expectsMessage) {
-			$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
+			$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', ['message']);
 			$configurationService->expects($this->once())->method('message');
 			$instance->injectConfigurationService($configurationService);
 		}
@@ -52,24 +52,24 @@ class SubPageProviderTest extends AbstractTestCase {
 	 * @return array
 	 */
 	public function getControllerActionFromRecordTestValues() {
-		return array(
-			array(array('doktype' => PageControllerInterface::DOKTYPE_RAW), '', FALSE, 'raw'),
-			array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => ''), 'tx_fed_page_flexform_sub', TRUE, 'default'),
-			array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => 'fluidpages->action'), 'tx_fed_page_flexform_sub', FALSE, 'action'),
-		);
+		return [
+			[['doktype' => PageControllerInterface::DOKTYPE_RAW], '', FALSE, 'raw'],
+			[['doktype' => 0, 'tx_fed_page_controller_action_sub' => ''], 'tx_fed_page_flexform_sub', TRUE, 'default'],
+			[['doktype' => 0, 'tx_fed_page_controller_action_sub' => 'fluidpages->action'], 'tx_fed_page_flexform_sub', FALSE, 'action'],
+		];
 	}
 
 	public function testGetTemplatePathAndFilename() {
 		$expected = ExtensionManagementUtility::extPath('fluidpages', 'Tests/Fixtures/Templates/Page/Dummy.html');
 		$dataFieldName = 'tx_fed_page_flexform_sub';
 		$fieldName = 'tx_fed_page_controller_action_sub';
-		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
+		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', ['getPageTemplateConfiguration']);
 		$instance = new SubPageProvider();
-		$instance->setTemplatePaths(array('templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/'));
+		$instance->setTemplatePaths(['templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/']);
 		$instance->injectPageService($service);
-		$record = array(
+		$record = [
 			$fieldName => 'Fluidpages->dummy',
-		);
+		];
 		$service->expects($this->any())->method('getPageTemplateConfiguration')->willReturn($record);
 		$instance->trigger($record, NULL, $dataFieldName);
 		$result = $instance->getTemplatePathAndFilename($record);

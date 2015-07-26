@@ -34,11 +34,11 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testRenderField() {
-		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector', array('renderInheritanceField', 'renderOptions'));
-		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getAvailablePageTemplateFiles'));
-		$service->expects($this->once())->method('getAvailablePageTemplateFiles')->willReturn(array('foo' => array('bar')));
+		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector', ['renderInheritanceField', 'renderOptions']);
+		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', ['getAvailablePageTemplateFiles']);
+		$service->expects($this->once())->method('getAvailablePageTemplateFiles')->willReturn(['foo' => ['bar']]);
 		$instance->injectPageService($service);
-		$parameters = array();
+		$parameters = [];
 		$parent = '';
 		$result = $instance->renderField($parameters, $parent);
 		$this->assertStringStartsWith('<div>', $result);
@@ -52,8 +52,8 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 * @param boolean $expectsEmpty
 	 */
 	public function testRenderInheritanceField(array $parameters, array $settings, $expectsEmpty) {
-		$typoScript = array('plugin.' => array('tx_fluidpages.' => $settings));
-		$configurationManager = $this->getMock('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager', array('getConfiguration'));
+		$typoScript = ['plugin.' => ['tx_fluidpages.' => $settings]];
+		$configurationManager = $this->getMock('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager', ['getConfiguration']);
 		$configurationManager->expects($this->any())->method('getConfiguration')->willReturn($typoScript);
 		$instance = new PageLayoutSelector();
 		$instance->injectConfigurationManager($configurationManager);
@@ -69,27 +69,27 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getRenderInheritanceFieldTestValues() {
-		$normalPage = array('pid' => 123, 'is_siteroot' => 0);
-		$rootPage = array('pid' => 1, 'is_siteroot' => 1);
-		$pidZeroPage = array('pid' => 0, 'is_siteroot' => 1);
-		return array(
-			array(array(), array(), TRUE),
+		$normalPage = ['pid' => 123, 'is_siteroot' => 0];
+		$rootPage = ['pid' => 1, 'is_siteroot' => 1];
+		$pidZeroPage = ['pid' => 0, 'is_siteroot' => 1];
+		return [
+			[[], [], TRUE],
 			// main template field conditioning
-			array(array('field' => 'tx_fed_page_controller_action', 'row' => $normalPage), array(), FALSE),
-			array(array('field' => 'tx_fed_page_controller_action', 'row' => $rootPage), array('siteRootInheritance' => FALSE), TRUE),
-			array(array('field' => 'tx_fed_page_controller_action', 'row' => $rootPage), array('siteRootInheritance' => TRUE), FALSE),
+			[['field' => 'tx_fed_page_controller_action', 'row' => $normalPage], [], FALSE],
+			[['field' => 'tx_fed_page_controller_action', 'row' => $rootPage], ['siteRootInheritance' => FALSE], TRUE],
+			[['field' => 'tx_fed_page_controller_action', 'row' => $rootPage], ['siteRootInheritance' => TRUE], FALSE],
 			// sub template field conditioning
-			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $normalPage), array(), FALSE),
-			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage), array('siteRootInheritance' => FALSE), TRUE),
-			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage), array('siteRootInheritance' => TRUE), FALSE),
+			[['field' => 'tx_fed_page_controller_action_sub', 'row' => $normalPage], [], FALSE],
+			[['field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage], ['siteRootInheritance' => FALSE], TRUE],
+			[['field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage], ['siteRootInheritance' => TRUE], FALSE],
 			// pid zero pages never show inheritance field regardless of other settings
-			array(array('field' => 'tx_fed_page_controller_action', 'row' => $pidZeroPage), array(), TRUE),
-			array(array('field' => 'tx_fed_page_controller_action', 'row' => $pidZeroPage), array('siteRootInheritance' => FALSE), TRUE),
-			array(array('field' => 'tx_fed_page_controller_action', 'row' => $pidZeroPage), array('siteRootInheritance' => TRUE), TRUE),
-			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $pidZeroPage), array(), TRUE),
-			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $pidZeroPage), array('siteRootInheritance' => FALSE), TRUE),
-			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $pidZeroPage), array('siteRootInheritance' => TRUE), TRUE),
-		);
+			[['field' => 'tx_fed_page_controller_action', 'row' => $pidZeroPage], [], TRUE],
+			[['field' => 'tx_fed_page_controller_action', 'row' => $pidZeroPage], ['siteRootInheritance' => FALSE], TRUE],
+			[['field' => 'tx_fed_page_controller_action', 'row' => $pidZeroPage], ['siteRootInheritance' => TRUE], TRUE],
+			[['field' => 'tx_fed_page_controller_action_sub', 'row' => $pidZeroPage], [], TRUE],
+			[['field' => 'tx_fed_page_controller_action_sub', 'row' => $pidZeroPage], ['siteRootInheritance' => FALSE], TRUE],
+			[['field' => 'tx_fed_page_controller_action_sub', 'row' => $pidZeroPage], ['siteRootInheritance' => TRUE], TRUE],
+		];
 	}
 
 	/**
@@ -99,9 +99,9 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testRenderOptions($extension, $expectedTitle) {
-		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector', array('renderOption'));
+		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector', ['renderOption']);
 		$instance->expects($this->any())->method('renderOption')->willReturn('');
-		$result = $this->callInaccessibleMethod($instance, 'renderOptions', $extension, array('foo' => 'bar'), array());
+		$result = $this->callInaccessibleMethod($instance, 'renderOptions', $extension, ['foo' => 'bar'], []);
 		$this->assertContains($expectedTitle, $result);
 	}
 
@@ -109,10 +109,10 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getRenderOptionsTestValues() {
-		return array(
-			array('fluidpages', 'Package: Fluid Pages Engine'),
-			array('fakeextensionkey', 'Package: Fakeextensionkey')
-		);
+		return [
+			['fluidpages', 'Package: Fluid Pages Engine'],
+			['fakeextensionkey', 'Package: Fakeextensionkey']
+		];
 	}
 
 	/**
@@ -126,17 +126,17 @@ class PageLayoutSelectorTest extends UnitTestCase {
 		$instance = new PageLayoutSelector();
 		$service = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('getPageConfiguration', 'getFormFromTemplateFile', 'message', 'debug')
+			['getPageConfiguration', 'getFormFromTemplateFile', 'message', 'debug']
 		);
-		$service->expects($this->any())->method('getPageConfiguration')->willReturn(array(
-			'templateRootPaths' => array('EXT:fluidpages/Tests/Fixtures/Templates/')
-		));
+		$service->expects($this->any())->method('getPageConfiguration')->willReturn([
+			'templateRootPaths' => ['EXT:fluidpages/Tests/Fixtures/Templates/']
+		]);
 		$service->expects($this->any())->method('getFormFromTemplateFile')->willReturn($form);
 		if (NULL !== $expectedMessageFunction) {
 			$service->expects($this->once())->method($expectedMessageFunction);
 		}
 		$instance->injectConfigurationService($service);
-		$result = $this->callInaccessibleMethod($instance, 'renderOption', 'fluidpages', $file, array());
+		$result = $this->callInaccessibleMethod($instance, 'renderOption', 'fluidpages', $file, []);
 		if (TRUE === $expectsEmptyOutput) {
 			$this->assertEmpty($result);
 		} else {
@@ -150,20 +150,20 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 */
 	public function getRenderOptionTestValues() {
 		$validFile = 'Dummy';
-		$disabledForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled'));
+		$disabledForm = $this->getMock('FluidTYPO3\\Flux\\Form', ['getEnabled']);
 		$disabledForm->expects($this->once())->method('getEnabled')->willReturn(FALSE);
-		$exceptionForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled'));
+		$exceptionForm = $this->getMock('FluidTYPO3\\Flux\\Form', ['getEnabled']);
 		$exceptionForm->expects($this->once())->method('getEnabled')->willThrowException(new \RuntimeException('test'));
-		$correctForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled', 'getLabel'));
+		$correctForm = $this->getMock('FluidTYPO3\\Flux\\Form', ['getEnabled', 'getLabel']);
 		$correctForm->expects($this->once())->method('getEnabled')->willReturn(TRUE);
 		$correctForm->expects($this->once())->method('getLabel')->willReturn('label');
-		return array(
-			array('/does/not/exist', NULL, 'message', TRUE),
-			array($validFile, NULL, 'message', TRUE),
-			array($validFile, $disabledForm, 'message', TRUE),
-			array($validFile, $exceptionForm, 'debug', TRUE),
-			array($validFile, $correctForm, NULL, FALSE)
-		);
+		return [
+			['/does/not/exist', NULL, 'message', TRUE],
+			[$validFile, NULL, 'message', TRUE],
+			[$validFile, $disabledForm, 'message', TRUE],
+			[$validFile, $exceptionForm, 'debug', TRUE],
+			[$validFile, $correctForm, NULL, FALSE]
+		];
 	}
 
 }

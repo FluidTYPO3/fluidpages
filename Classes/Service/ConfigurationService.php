@@ -80,12 +80,12 @@ class ConfigurationService extends FluxService implements SingletonInterface {
 				'. This indicates a potential problem with your TypoScript configuration - a value which is expected to be ' .
 			    'an array may be defined as a string. This error is not fatal but may prevent the affected collection (which cannot ' .
 				'be identified here) from showing up', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
-			return array();
+			return [];
 		}
 		if (NULL !== $extensionName) {
 			return $this->getViewConfigurationForExtensionName($extensionName);
 		}
-		$configurations = array();
+		$configurations = [];
 		$registeredExtensionKeys = Core::getRegisteredProviderExtensionKeys('Page');
 		foreach ($registeredExtensionKeys as $registeredExtensionKey) {
 			$configurations[$registeredExtensionKey] = $this->getViewConfigurationForExtensionName($registeredExtensionKey);

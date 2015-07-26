@@ -82,7 +82,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	/**
 	 * @var array
 	 */
-	private static $cache = array();
+	private static $cache = [];
 
 	/**
 	 * CONSTRUCTOR
@@ -230,7 +230,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @param DataHandler $reference
 	 * @param array $removals Allows overridden methods to pass an additional array of field names to remove from the stored Flux value
 	 */
-	public function postProcessRecord($operation, $id, array &$row, DataHandler $reference, array $removals = array()) {
+	public function postProcessRecord($operation, $id, array &$row, DataHandler $reference, array $removals = []) {
 		if ('update' === $operation) {
 			$record = $this->loadRecordFromDatabase($id);
 			$record = RecursiveArrayUtility::mergeRecursiveOverrule($record, $reference->datamap[$this->tableName][$id]);
@@ -308,7 +308,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		$cacheKey = $tableName . $tableFieldName . $row['uid'];
 		if (TRUE === empty(self::$cache[$cacheKey])) {
 			$tree = $this->getInheritanceTree($row);
-			$data = array();
+			$data = [];
 			foreach ($tree as $branch) {
 				$provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
 				$form = $provider->getForm($branch);
@@ -379,7 +379,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		if (FALSE === isset($record[$parentFieldName])) {
 			$record[$parentFieldName] = $this->getParentFieldValue($record);
 		}
-		$records = array();
+		$records = [];
 		while (0 < $record[$parentFieldName]) {
 			$record = $this->loadRecordFromDatabase($record[$parentFieldName]);
 			$parentFieldName = $this->getParentFieldName($record);

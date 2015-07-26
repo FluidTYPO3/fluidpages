@@ -20,7 +20,7 @@ class DummyPageController extends PageController {
 	/**
 	 * @var array
 	 */
-	protected $record = array();
+	protected $record = [];
 
 	/**
 	 * @param ViewInterface $view

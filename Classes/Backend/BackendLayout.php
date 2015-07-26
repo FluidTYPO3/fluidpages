@@ -102,27 +102,27 @@ class BackendLayout implements SingletonInterface {
 			return NULL;
 		}
 
-		$config = array(
-			'backend_layout.' => array(
+		$config = [
+			'backend_layout.' => [
 				'colCount' => 0,
 				'rowCount' => 0,
-				'rows.' => array()
-			)
-		);
-		$colPosList = array();
-		$items = array();
+				'rows.' => []
+			]
+		];
+		$colPosList = [];
+		$items = [];
 		$rowIndex = 0;
 		foreach ($grid['rows'] as $row) {
 			$index = 0;
 			$colCount = 0;
 			$rowKey = ($rowIndex + 1) . '.';
-			$columns = array();
+			$columns = [];
 			foreach ($row['columns'] as $column) {
 				$key = ($index + 1) . '.';
-				$columns[$key] = array(
+				$columns[$key] = [
 					'name' => $column['label'],
 					'colPos' => $column['colPos'] >= 0 ? $column['colPos'] : $config['backend_layout.']['colCount']
-				);
+				];
 				if ($column['colspan']) {
 					$columns[$key]['colspan'] = $column['colspan'];
 				}
@@ -130,15 +130,15 @@ class BackendLayout implements SingletonInterface {
 					$columns[$key]['rowspan'] = $column['rowspan'];
 				}
 				array_push($colPosList, $columns[$key]['colPos']);
-				array_push($items, array($columns[$key]['name'], $columns[$key]['colPos'], NULL));
+				array_push($items, [$columns[$key]['name'], $columns[$key]['colPos'], NULL]);
 				$colCount += $column['colspan'] ? $column['colspan'] : 1;
 				++ $index;
 			}
 			$config['backend_layout.']['colCount'] = max($config['backend_layout.']['colCount'], $colCount);
 			$config['backend_layout.']['rowCount']++;
-			$config['backend_layout.']['rows.'][$rowKey] = array(
+			$config['backend_layout.']['rows.'][$rowKey] = [
 				'columns.' => $columns
-			);
+			];
 			++ $rowIndex;
 		}
 		unset($backendLayout['config']);
@@ -174,7 +174,7 @@ class BackendLayout implements SingletonInterface {
 	 * @return void
 	 */
 	public function postProcessColPosProcFuncItems(array &$params) {
-		array_push($params['items'], array('Fluid Content Area', ContentService::COLPOS_FLUXCONTENT, NULL));
+		array_push($params['items'], ['Fluid Content Area', ContentService::COLPOS_FLUXCONTENT, NULL]);
 	}
 
 }

@@ -37,16 +37,16 @@ class PageProviderTest extends AbstractTestCase {
 	}
 
 	public function testGetExtensionKey() {
-		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getControllerExtensionKeyFromRecord'));
+		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', ['getControllerExtensionKeyFromRecord']);
 		$instance->expects($this->once())->method('getControllerExtensionKeyFromRecord')->willReturn('fluidpages');
-		$result = $instance->getExtensionKey(array());
+		$result = $instance->getExtensionKey([]);
 		$this->assertEquals('fluidpages', $result);
 	}
 
 	public function testGetExtensionKeyWithoutSelection() {
-		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getControllerExtensionKeyFromRecord'));
+		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', ['getControllerExtensionKeyFromRecord']);
 		$instance->expects($this->once())->method('getControllerExtensionKeyFromRecord')->willReturn(NULL);
-		$result = $instance->getExtensionKey(array());
+		$result = $instance->getExtensionKey([]);
 		$this->assertEquals('fluidpages', $result);
 	}
 
@@ -54,13 +54,13 @@ class PageProviderTest extends AbstractTestCase {
 		$expected = ExtensionManagementUtility::extPath('fluidpages', 'Tests/Fixtures/Templates/Page/Dummy.html');
 		$fieldName = 'tx_fed_page_controller_action';
 		$dataFieldName = 'tx_fed_page_flexform';
-		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
+		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', ['getPageTemplateConfiguration']);
 		$instance = new PageProvider();
-		$instance->setTemplatePaths(array('templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/'));
+		$instance->setTemplatePaths(['templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/']);
 		$instance->injectPageService($service);
-		$record = array(
+		$record = [
 			$fieldName => 'Fluidpages->dummy',
-		);
+		];
 		$service->expects($this->any())->method('getPageTemplateConfiguration')->willReturn($record);
 		$instance->trigger($record, NULL, $dataFieldName);
 		$result = $instance->getTemplatePathAndFilename($record);
@@ -69,18 +69,18 @@ class PageProviderTest extends AbstractTestCase {
 
 	public function testGetFormCallsSetDefaultValuesInFieldsWithInheritedValues() {
 		$form = Form::create();
-		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('setDefaultValuesInFieldsWithInheritedValues'));
+		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', ['setDefaultValuesInFieldsWithInheritedValues']);
 		$instance->injectPageService(new PageService());
 		$instance->expects($this->once())->method('setDefaultValuesInFieldsWithInheritedValues')->willReturn($form);
 		$instance->setForm($form);
-		$instance->getForm(array());
+		$instance->getForm([]);
 	}
 
 	public function testGetControllerExtensionKeyFromRecordReturnsPresetKeyOnUnrecognisedAction() {
-		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getControllerActionReferenceFromRecord'));
+		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', ['getControllerActionReferenceFromRecord']);
 		$instance->expects($this->once())->method('getControllerActionReferenceFromRecord')->willReturn('invalid');
 		$instance->setExtensionKey('fallback');
-		$result = $instance->getControllerExtensionKeyFromRecord(array());
+		$result = $instance->getControllerExtensionKeyFromRecord([]);
 		$this->assertEquals('fallback', $result);
 	}
 
@@ -90,8 +90,8 @@ class PageProviderTest extends AbstractTestCase {
 	 * @param array $expected
 	 */
 	public function testGetInheritanceTree(array $input, array $expected) {
-		$record = array('uid' => 1);
-		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('loadRecordTreeFromDatabase'));
+		$record = ['uid' => 1];
+		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', ['loadRecordTreeFromDatabase']);
 		$instance->expects($this->once())->method('loadRecordTreeFromDatabase')->with($record)->willReturn($input);
 		$result = $this->callInaccessibleMethod($instance, 'getInheritanceTree', $record);
 		$this->assertEquals($expected, $result);
@@ -101,17 +101,17 @@ class PageProviderTest extends AbstractTestCase {
 	 * @return array
 	 */
 	public function getInheritanceTreeTestValues() {
-		return array(
-			array(array(), array()),
-			array(
-				array(array(PageProvider::FIELD_ACTION_SUB => 'testsub'), array(PageProvider::FIELD_ACTION_MAIN => 'testmain')),
-				array(array(PageProvider::FIELD_ACTION_MAIN => 'testmain'))
-			),
-			array(
-				array(array(PageProvider::FIELD_ACTION_SUB => 'testsub'), array(PageProvider::FIELD_ACTION_MAIN => '')),
-				array(array(PageProvider::FIELD_ACTION_SUB => 'testsub'), array(PageProvider::FIELD_ACTION_MAIN => ''))
-			),
-		);
+		return [
+			[[], []],
+			[
+				[[PageProvider::FIELD_ACTION_SUB => 'testsub'], [PageProvider::FIELD_ACTION_MAIN => 'testmain']],
+				[[PageProvider::FIELD_ACTION_MAIN => 'testmain']]
+			],
+			[
+				[[PageProvider::FIELD_ACTION_SUB => 'testsub'], [PageProvider::FIELD_ACTION_MAIN => '']],
+				[[PageProvider::FIELD_ACTION_SUB => 'testsub'], [PageProvider::FIELD_ACTION_MAIN => '']]
+			],
+		];
 	}
 
 	/**
@@ -124,11 +124,11 @@ class PageProviderTest extends AbstractTestCase {
 	public function testGetControllerActionFromRecord(array $record, $fieldName, $expectsMessage, $expected) {
 		$instance = new PageProvider();
 		if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype'] && TRUE === empty($record[$fieldName])) {
-			$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
+			$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', ['getPageTemplateConfiguration']);
 			$instance->injectPageService($service);
 		}
 		if (TRUE === $expectsMessage) {
-			$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
+			$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', ['message']);
 			$configurationService->expects($this->once())->method('message');
 			$instance->injectConfigurationService($configurationService);
 		}
@@ -142,27 +142,27 @@ class PageProviderTest extends AbstractTestCase {
 	 * @return array
 	 */
 	public function getControllerActionFromRecordTestValues() {
-		return array(
-			array(array('doktype' => PageControllerInterface::DOKTYPE_RAW), '', FALSE, 'raw'),
-			array(array('doktype' => 0, 'tx_fed_page_controller_action' => ''), 'tx_fed_page_flexform', TRUE, 'default'),
-			array(array('doktype' => 0, 'tx_fed_page_controller_action' => 'fluidpages->action'), 'tx_fed_page_flexform', FALSE, 'action'),
-		);
+		return [
+			[['doktype' => PageControllerInterface::DOKTYPE_RAW], '', FALSE, 'raw'],
+			[['doktype' => 0, 'tx_fed_page_controller_action' => ''], 'tx_fed_page_flexform', TRUE, 'default'],
+			[['doktype' => 0, 'tx_fed_page_controller_action' => 'fluidpages->action'], 'tx_fed_page_flexform', FALSE, 'action'],
+		];
 	}
 
 	public function testGetFlexFormValuesReturnsCollectedDataWhenEncounteringNullForm() {
-		$tree = array(
+		$tree = [
 			$this->getBasicRecord(),
 			$this->getBasicRecord()
-		);
+		];
 		$form = Form::create();
 		$form->createField('Input', 'foo');
 		$record = $this->getBasicRecord();
 		$dummyProvider1 = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
 		$dummyProvider2 = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
 		$dummyProvider1->setForm($form);
-		$dummyProvider1->setFlexFormValues(array('foo' => 'bar'));
-		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getInheritanceTree', 'unsetInheritedValues', 'getForm'));
-		$mockConfigurationService = $this->getMock('FluidTYPO3\Fluidpages\Service\ConfigurationService', array('resolvePrimaryConfigurationProvider'));
+		$dummyProvider1->setFlexFormValues(['foo' => 'bar']);
+		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', ['getInheritanceTree', 'unsetInheritedValues', 'getForm']);
+		$mockConfigurationService = $this->getMock('FluidTYPO3\Fluidpages\Service\ConfigurationService', ['resolvePrimaryConfigurationProvider']);
 		$mockConfigurationService->expects($this->at(0))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider1);
 		$mockConfigurationService->expects($this->at(1))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider2);
 		$provider->expects($this->once())->method('getInheritanceTree')->will($this->returnValue($tree));
@@ -171,27 +171,27 @@ class PageProviderTest extends AbstractTestCase {
 		$provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
 		$provider->injectConfigurationService($mockConfigurationService);
 		$values = $provider->getFlexformValues($record);
-		$this->assertEquals($values, array());
+		$this->assertEquals($values, []);
 	}
 
 	/**
 	 * @test
 	 */
 	public function canGetFlexformValuesUnderInheritanceConditions() {
-		$tree = array(
+		$tree = [
 			$this->getBasicRecord(),
 			$this->getBasicRecord()
-		);
+		];
 		$form = Form::create();
 		$form->createField('Input', 'foo');
 		$record = $this->getBasicRecord();
 		$dummyProvider1 = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
 		$dummyProvider2 = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
 		$dummyProvider1->setForm($form);
-		$dummyProvider1->setFlexFormValues(array('foo' => 'bar'));
+		$dummyProvider1->setFlexFormValues(['foo' => 'bar']);
 		$dummyProvider2->setForm(Form::create());
-		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getInheritanceTree', 'unsetInheritedValues', 'getForm'));
-		$mockConfigurationService = $this->getMock('FluidTYPO3\Fluidpages\Service\ConfigurationService', array('resolvePrimaryConfigurationProvider'));
+		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', ['getInheritanceTree', 'unsetInheritedValues', 'getForm']);
+		$mockConfigurationService = $this->getMock('FluidTYPO3\Fluidpages\Service\ConfigurationService', ['resolvePrimaryConfigurationProvider']);
 		$mockConfigurationService->expects($this->at(0))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider1);
 		$mockConfigurationService->expects($this->at(1))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider2);
 		$provider->expects($this->once())->method('getInheritanceTree')->will($this->returnValue($tree));
@@ -200,7 +200,7 @@ class PageProviderTest extends AbstractTestCase {
 		$provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
 		$provider->injectConfigurationService($mockConfigurationService);
 		$values = $provider->getFlexformValues($record);
-		$this->assertEquals($values, array());
+		$this->assertEquals($values, []);
 	}
 
 	/**
@@ -210,13 +210,13 @@ class PageProviderTest extends AbstractTestCase {
 		$record = $this->getBasicRecord();
 		$provider = $this->getMock(
 			str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4)),
-			array('loadRecordFromDatabase', 'getParentFieldName', 'getParentFieldValue')
+			['loadRecordFromDatabase', 'getParentFieldName', 'getParentFieldValue']
 		);
 		$provider->expects($this->exactly(2))->method('getParentFieldName')->will($this->returnValue('somefield'));
 		$provider->expects($this->exactly(1))->method('getParentFieldValue')->will($this->returnValue(1));
 		$provider->expects($this->exactly(1))->method('loadRecordFromDatabase')->will($this->returnValue($record));
 		$output = $this->callInaccessibleMethod($provider, 'loadRecordTreeFromDatabase', $record);
-		$expected = array($record);
+		$expected = [$record];
 		$this->assertEquals($expected, $output);
 	}
 
@@ -224,9 +224,9 @@ class PageProviderTest extends AbstractTestCase {
 	 * @test
 	 */
 	public function setsDefaultValueInFieldsBasedOnInheritedValue() {
-		$row = array();
+		$row = [];
 		$className = str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4));
-		$instance = $this->getMock($className, array('getInheritedPropertyValueByDottedPath'));
+		$instance = $this->getMock($className, ['getInheritedPropertyValueByDottedPath']);
 		$instance->expects($this->once())->method('getInheritedPropertyValueByDottedPath')
 			->with($row, 'input')->will($this->returnValue('default'));
 		$form = Form::create();
@@ -246,16 +246,16 @@ class PageProviderTest extends AbstractTestCase {
 	 */
 	public function removesInheritedValuesFromFields($testValue, $inherit, $inheritEmpty, $expectsOverride) {
 		$instance = $this->createInstance();
-		$field = Form\Field\Input::create(array('type' => 'Input'));
+		$field = Form\Field\Input::create(['type' => 'Input']);
 		$field->setName('test');
 		$field->setInherit($inherit);
 		$field->setInheritEmpty($inheritEmpty);
-		$values = array('foo' => 'bar', 'test' => $testValue);
+		$values = ['foo' => 'bar', 'test' => $testValue];
 		$result = $this->callInaccessibleMethod($instance, 'unsetInheritedValues', $field, $values);
 		if (TRUE === $expectsOverride) {
 			$this->assertEquals($values, $result);
 		} else {
-			$this->assertEquals(array('foo' => 'bar'), $result);
+			$this->assertEquals(['foo' => 'bar'], $result);
 		}
 	}
 
@@ -263,11 +263,11 @@ class PageProviderTest extends AbstractTestCase {
 	 * @return array
 	 */
 	public function getRemoveInheritedTestValues() {
-		return array(
-			array('test', TRUE, TRUE, TRUE),
-			array('', TRUE, FALSE, TRUE),
-			array('', TRUE, TRUE, FALSE),
-		);
+		return [
+			['test', TRUE, TRUE, TRUE],
+			['', TRUE, FALSE, TRUE],
+			['', TRUE, TRUE, FALSE],
+		];
 	}
 
 	/**
@@ -279,7 +279,7 @@ class PageProviderTest extends AbstractTestCase {
 		$rowWithPid = $row;
 		$rowWithPid['pid'] = 1;
 		$className = str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4));
-		$instance = $this->getMock($className, array('getParentFieldName', 'getTableName', 'loadRecordFromDatabase'));
+		$instance = $this->getMock($className, ['getParentFieldName', 'getTableName', 'loadRecordFromDatabase']);
 		$instance->expects($this->once())->method('loadRecordFromDatabase')->with($row['uid'])->will($this->returnValue($rowWithPid));
 		$instance->expects($this->once())->method('getParentFieldName')->with($row)->will($this->returnValue('pid'));
 		$result = $this->callInaccessibleMethod($instance, 'getParentFieldValue', $row);
@@ -293,9 +293,9 @@ class PageProviderTest extends AbstractTestCase {
 	 * @param mixed $expected
 	 */
 	public function testGetInheritedPropertyValueByDottedPath(array $input, $path, $expected) {
-		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getInheritedConfiguration'));
+		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', ['getInheritedConfiguration']);
 		$provider->expects($this->once())->method('getInheritedConfiguration')->willReturn($input);
-		$result = $this->callInaccessibleMethod($provider, 'getInheritedPropertyValueByDottedPath', array(), $path);
+		$result = $this->callInaccessibleMethod($provider, 'getInheritedPropertyValueByDottedPath', [], $path);
 		$this->assertEquals($expected, $result);
 	}
 
@@ -303,13 +303,13 @@ class PageProviderTest extends AbstractTestCase {
 	 * @return array
 	 */
 	public function getInheritedPropertyValueByDottedPathTestValues() {
-		return array(
-			array(array(), '', NULL),
-			array(array('foo' => 'bar'), 'foo', 'bar'),
-			array(array('foo' => 'bar'), 'bar', NULL),
-			array(array('foo' => array('bar' => 'baz')), 'foo.bar', 'baz'),
-			array(array('foo' => array('bar' => 'baz')), 'foo.foo', NULL),
-		);
+		return [
+			[[], '', NULL],
+			[['foo' => 'bar'], 'foo', 'bar'],
+			[['foo' => 'bar'], 'bar', NULL],
+			[['foo' => ['bar' => 'baz']], 'foo.bar', 'baz'],
+			[['foo' => ['bar' => 'baz']], 'foo.foo', NULL],
+		];
 	}
 
 	/**
@@ -325,7 +325,7 @@ class PageProviderTest extends AbstractTestCase {
 	 * @test
 	 */
 	public function canPostProcessRecord() {
-		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getForm', 'getInheritedPropertyValueByDottedPath'));
+		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', ['getForm', 'getInheritedPropertyValueByDottedPath']);
 		$form = Form::create();
 		$form->createField('Input', 'settings.input')->setInherit(TRUE);
 		$record = $this->getBasicRecord();
@@ -334,29 +334,29 @@ class PageProviderTest extends AbstractTestCase {
 		$record[$fieldName] = Xml::EXPECTING_FLUX_REMOVALS;
 		$id = $record['uid'];
 		$parentInstance = GeneralUtility::makeInstance('TYPO3\CMS\Core\DataHandling\DataHandler');
-		$parentInstance->datamap[$tableName][$id] = array(
-			$fieldName => array(
-				'data' => array(
-					'options' => array(
-						'lDEF' => array(
-							'settings.input' => array(
+		$parentInstance->datamap[$tableName][$id] = [
+			$fieldName => [
+				'data' => [
+					'options' => [
+						'lDEF' => [
+							'settings.input' => [
 								'vDEF' => 'test'
-							),
-							'settings.input_clear' => array(
+							],
+							'settings.input_clear' => [
 								'vDEF' => 1
-							)
-						)
-					)
-				)
-			)
-		);
+							]
+						]
+					]
+				]
+			]
+		];
 		$provider->expects($this->any())->method('getForm')->willReturn($form);
 		$provider->expects($this->once())->method('getInheritedPropertyValueByDottedPath')
 			->with($parentInstance->datamap[$tableName][$id], 'settings.input')->willReturn('test');
-		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle', 'update'));
+		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', ['getSingle', 'update']);
 		$recordService->expects($this->atLeastOnce())->method('getSingle')->willReturn($parentInstance->datamap[$tableName][$id]);
 		$recordService->expects($this->once())->method('update');
-		$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
+		$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', ['message']);
 		$configurationService->expects($this->any())->method('message');
 		$provider->injectRecordService($recordService);
 		$provider->injectConfigurationService($configurationService);

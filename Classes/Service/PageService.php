@@ -119,10 +119,10 @@ class PageService implements SingletonInterface {
 			// no configuration was detected at all.
 			return NULL;
 		}
-		return array(
+		return [
 			'tx_fed_page_controller_action' => 	$resolvedMainTemplateIdentity,
 			'tx_fed_page_controller_action_sub' => 	$resolvedSubTemplateIdentity
-		);
+		];
 
 	}
 
@@ -155,7 +155,7 @@ class PageService implements SingletonInterface {
 	 */
 	public function getAvailablePageTemplateFiles($format = 'html') {
 		$typoScript = $this->configurationService->getPageConfiguration();
-		$output = array();
+		$output = [];
 		if (FALSE === is_array($typoScript)) {
 			return $output;
 		}
@@ -163,7 +163,7 @@ class PageService implements SingletonInterface {
 			if (TRUE === isset($group['enable']) && 1 > $group['enable']) {
 				continue;
 			}
-			$output[$extensionName] = array();
+			$output[$extensionName] = [];
 			$templatePaths = new TemplatePaths($group);
 			$templateRootPaths = $templatePaths->getTemplateRootPaths();
 			foreach ($templateRootPaths as $templateRootPath) {

@@ -44,7 +44,7 @@ class PageServiceTest extends UnitTestCase {
 	 * @param array|NULL $expected
 	 */
 	public function testGetPageTemplateConfiguration(array $records, $expected) {
-		$service = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+		$service = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', ['getSingle']);
 		foreach ($records as $index => $record) {
 			$service->expects($this->at($index))->method('getSingle')->willReturn($record);
 		}
@@ -60,21 +60,21 @@ class PageServiceTest extends UnitTestCase {
 	public function getPageTemplateConfigurationTestValues() {
 		$m = 'tx_fed_page_controller_action';
 		$s = 'tx_fed_page_controller_action_sub';
-		return array(
-			array(array(array()), NULL),
-			array(array(array($m => '', $s => '')), NULL),
-			array(array(array($m => 'test1->test1', $s => 'test2->test2')), array($m => 'test1->test1', $s => 'test2->test2')),
-			array(array(array($m => ''), array($s => 'test2->test2')), array($m => 'test2->test2', $s => 'test2->test2'))
-		);
+		return [
+			[[[]], NULL],
+			[[[$m => '', $s => '']], NULL],
+			[[[$m => 'test1->test1', $s => 'test2->test2']], [$m => 'test1->test1', $s => 'test2->test2']],
+			[[[$m => ''], [$s => 'test2->test2']], [$m => 'test2->test2', $s => 'test2->test2']]
+		];
 	}
 
 	/**
 	 * @return void
 	 */
 	public function testGetPageFlexFormSource() {
-		$record1 = array('pid' => 2, 'uid' => 1);
-		$record2 = array('pid' => 0, 'uid' => 3, 'tx_fed_page_flexform' => 'test');
-		$service = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+		$record1 = ['pid' => 2, 'uid' => 1];
+		$record2 = ['pid' => 0, 'uid' => 3, 'tx_fed_page_flexform' => 'test'];
+		$service = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', ['getSingle']);
 		$service->expects($this->at(0))->method('getSingle')->with('pages', '*', 1)->willReturn($record1);
 		$service->expects($this->at(1))->method('getSingle')->with('pages', '*', 2)->willReturn($record2);
 		$instance = new PageService();
@@ -91,7 +91,7 @@ class PageServiceTest extends UnitTestCase {
 	public function testGetAvailablePageTemplateFiles($typoScript, array $expected) {
 		$service = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('getPageConfiguration', 'message')
+			['getPageConfiguration', 'message']
 		);
 		$service->expects($this->once())->method('getPageConfiguration')->willReturn($typoScript);
 		$service->expects($this->any())->method('message');
@@ -105,18 +105,18 @@ class PageServiceTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getAvailablePageTemplateFilesTestValues() {
-		return array(
-			array(NULL, array()),
-			array(array('test' => array('enable' => FALSE)), array()),
-			array(
-				array('fluidpages' => array('templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/')),
-				array('fluidpages' => array('Dummy' => 'Dummy'))
-			),
-			array(
-				array('fluidpages' => array('templateRootPath' => 'EXT:fluidpages/Invalid')),
-				array('fluidpages' => array())
-			)
-		);
+		return [
+			[NULL, []],
+			[['test' => ['enable' => FALSE]], []],
+			[
+				['fluidpages' => ['templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/']],
+				['fluidpages' => ['Dummy' => 'Dummy']]
+			],
+			[
+				['fluidpages' => ['templateRootPath' => 'EXT:fluidpages/Invalid']],
+				['fluidpages' => []]
+			]
+		];
 	}
 
 }
