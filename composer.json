@@ -29,7 +29,7 @@
     "psr-4": {
       "FluidTYPO3\\Fluidpages\\": "Classes/"
     }
-  }
+  },
   "require-dev": {
     "fluidtypo3/development": "*",
     "fluidtypo3/flux": "dev-development"
