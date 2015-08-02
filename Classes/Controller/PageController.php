@@ -8,7 +8,6 @@ namespace FluidTYPO3\Fluidpages\Controller;
  * LICENSE.md file that was distributed with this source code.
  */
 
-use FluidTYPO3\Fluidpages\Provider\PageProvider;
 use FluidTYPO3\Flux\Controller\AbstractFluxController;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;

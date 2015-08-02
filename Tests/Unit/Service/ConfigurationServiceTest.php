@@ -10,6 +10,7 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Service;
 
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Flux\Core;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -37,6 +38,7 @@ class ConfigurationServiceTest extends UnitTestCase {
 	public function testConvertFileReferenceToTemplatePathAndFilename($reference, $resourceFactoryOutput, $expected) {
 		$instance = new ConfigurationService();
 		if (NULL !== $resourceFactoryOutput) {
+			/** @var ResourceFactory|\PHPUnit_Framework_MockObject_MockObject $resourceFactory */
 			$resourceFactory = $this->getMock(
 				'TYPO3\\CMS\\Core\\Resource\\ResourceFactory',
 				array('getFileObjectFromCombinedIdentifier')
@@ -54,7 +56,6 @@ class ConfigurationServiceTest extends UnitTestCase {
 	 */
 	public function getConvertFileReferenceToTemplatePathAndFilenameTestValues() {
 		$relativeReference = 'Tests/Fixtures/Templates/Page/Dummy.html';
-		$extensionReference = 'EXT:fluidpages/Tests/Fixtures/Templates/Page/Dummy.html';
 		return array(
 			array($relativeReference, NULL, GeneralUtility::getFileAbsFileName($relativeReference)),
 			array('1', $relativeReference, $relativeReference),
@@ -68,6 +69,7 @@ class ConfigurationServiceTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testGetViewConfigurationByFileReference($reference, $expectedParameter) {
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
 			array('getViewConfigurationForExtensionName')
@@ -95,6 +97,7 @@ class ConfigurationServiceTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testGetPageConfigurationReturnsEmptyArrayAndDispatchesMessageOnInvalidInput($input) {
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
 			array('message')
@@ -119,6 +122,7 @@ class ConfigurationServiceTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testGetPageConfigurationCallsGetViewConfigurationForExtensionName() {
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
 			array('getViewConfigurationForExtensionName')
@@ -132,6 +136,7 @@ class ConfigurationServiceTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testGetPageConfigurationWithoutExtensionNameReadsRegisteredProviders() {
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
 			array('getViewConfigurationForExtensionName')

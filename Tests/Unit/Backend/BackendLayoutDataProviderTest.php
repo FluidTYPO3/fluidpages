@@ -9,9 +9,11 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
  */
 
 use FluidTYPO3\Fluidpages\Backend\BackendLayoutDataProvider;
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Flux\Form\Container\Grid;
 use FluidTYPO3\Flux\Provider\Provider;
 use FluidTYPO3\Flux\Service\ContentService;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use TYPO3\CMS\Backend\View\BackendLayout\BackendLayoutCollection;
 use TYPO3\CMS\Backend\View\BackendLayout\DataProviderContext;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
@@ -47,7 +49,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 		$GLOBALS['LANG']->csConvObj->expects($this->any())->method('readLLfile')->willReturn(array());
 		$instance = new BackendLayoutDataProvider();
 		$pageUid = 1;
-		$backendLayout = array();
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
 		$configurationService = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
 			array('resolvePageProvider', 'debug', 'message')
@@ -56,6 +58,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 			$configurationService->expects($this->once())->method('resolvePageProvider')
 				->with($record)->willReturn($provider);
 		}
+		/** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $recordService */
 		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
 		$recordService->expects($this->once())->method('getSingle')->willReturn($record);
 		$instance->injectConfigurationService($configurationService);
@@ -68,6 +71,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getBackendLayoutConfigurationTestValues() {
+		/** @var Provider|\PHPUnit_Framework_MockObject_MockObject $standardProvider */
 		$standardProvider = $this->getMock(
 			'FluidTYPO3\\Flux\\Provider\\Provider',
 			array('getControllerActionFromRecord')
@@ -79,8 +83,11 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 		$gridProvider = clone $standardProvider;
 		$actionLessProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn(NULL);
 		$exceptionProvider->expects($this->any())->method('getControllerActionFromRecord')->willThrowException(new \RuntimeException());
-		$emptyGridProvider->setGrid(Grid::create());
+		/** @var Grid $grid */
+		$grid = Grid::create(array());
+		$emptyGridProvider->setGrid($grid);
 		$emptyGridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
+		/** @var Grid $grid */
 		$grid = Grid::create(array());
 		$grid->createContainer('Row', 'row')->createContainer('Column', 'column')->setColSpan(3)->setRowSpan(3)->setColumnPosition(2);
 		$gridProvider->setGrid($grid);
@@ -177,6 +184,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testGetBackendLayout() {
+		/** @var BackendLayoutDataProvider|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Backend\\BackendLayoutDataProvider',
 			array('getBackendLayoutConfiguration', 'ensureDottedKeys', 'encodeTypoScriptArray')
@@ -194,6 +202,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testAddBackendLayouts() {
+		/** @var BackendLayoutDataProvider|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Backend\\BackendLayoutDataProvider',
 			array('getBackendLayoutConfiguration', 'encodeTypoScriptArray')
