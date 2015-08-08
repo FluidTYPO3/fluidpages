@@ -8,7 +8,9 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Service;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -44,6 +46,7 @@ class PageServiceTest extends UnitTestCase {
 	 * @param array|NULL $expected
 	 */
 	public function testGetPageTemplateConfiguration(array $records, $expected) {
+		/** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
 		foreach ($records as $index => $record) {
 			$service->expects($this->at($index))->method('getSingle')->willReturn($record);
@@ -74,6 +77,7 @@ class PageServiceTest extends UnitTestCase {
 	public function testGetPageFlexFormSource() {
 		$record1 = array('pid' => 2, 'uid' => 1);
 		$record2 = array('pid' => 0, 'uid' => 3, 'tx_fed_page_flexform' => 'test');
+		/** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
 		$service->expects($this->at(0))->method('getSingle')->with('pages', '*', 1)->willReturn($record1);
 		$service->expects($this->at(1))->method('getSingle')->with('pages', '*', 2)->willReturn($record2);
@@ -89,6 +93,7 @@ class PageServiceTest extends UnitTestCase {
 	 * @param array $expected
 	 */
 	public function testGetAvailablePageTemplateFiles($typoScript, array $expected) {
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
 			array('getPageConfiguration', 'message')

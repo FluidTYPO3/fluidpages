@@ -9,10 +9,12 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
  */
 
 use FluidTYPO3\Fluidpages\Backend\PageLayoutSelector;
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 
 /**
  * Class PageLayoutSelectorTest
@@ -34,7 +36,9 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testRenderField() {
+		/** @var PageLayoutSelector $instance */
 		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector', array('renderInheritanceField', 'renderOptions'));
+		/** @var PageService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getAvailablePageTemplateFiles'));
 		$service->expects($this->once())->method('getAvailablePageTemplateFiles')->willReturn(array('foo' => array('bar')));
 		$instance->injectPageService($service);
@@ -53,6 +57,7 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 */
 	public function testRenderInheritanceField(array $parameters, array $settings, $expectsEmpty) {
 		$typoScript = array('plugin.' => array('tx_fluidpages.' => $settings));
+		/** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configurationManager */
 		$configurationManager = $this->getMock('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager', array('getConfiguration'));
 		$configurationManager->expects($this->any())->method('getConfiguration')->willReturn($typoScript);
 		$instance = new PageLayoutSelector();
@@ -80,7 +85,7 @@ class PageLayoutSelectorTest extends UnitTestCase {
 			array(array('field' => 'tx_fed_page_controller_action', 'row' => $rootPage), array('siteRootInheritance' => TRUE), FALSE),
 			// sub template field conditioning
 			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $normalPage), array(), FALSE),
-			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage), array('siteRootInheritance' => FALSE), FALSE),
+			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage), array('siteRootInheritance' => FALSE), TRUE),
 			array(array('field' => 'tx_fed_page_controller_action_sub', 'row' => $rootPage), array('siteRootInheritance' => TRUE), FALSE),
 			// pid zero pages never show inheritance field regardless of other settings
 			array(array('field' => 'tx_fed_page_controller_action', 'row' => $pidZeroPage), array(), TRUE),
@@ -124,6 +129,7 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	 */
 	public function testRenderOption($file, $form, $expectedMessageFunction, $expectsEmptyOutput) {
 		$instance = new PageLayoutSelector();
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
 			array('getPageConfiguration', 'getFormFromTemplateFile', 'message', 'debug')

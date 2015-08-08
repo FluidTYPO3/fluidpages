@@ -30,45 +30,8 @@
       "FluidTYPO3\\Fluidpages\\": "Classes/"
     }
   },
-  "autoload-dev": {
-    "psr-4": {
-      "FluidTYPO3\\Fluidpages\\Tests\\": "Tests/"
-    },
-    "classmap": [
-      "vendor/typo3/cms/typo3/sysext/extbase",
-      "vendor/typo3/cms/typo3/sysext/fluid",
-      "vendor/typo3/cms/typo3/sysext/core",
-      "vendor/typo3/cms/typo3/sysext/backend",
-      "vendor/typo3/cms/typo3/sysext/frontend",
-      "vendor/typo3/cms/typo3/sysext/lang"
-    ]
-  },
   "require-dev": {
     "fluidtypo3/development": "*",
     "fluidtypo3/flux": "dev-development"
-  },
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "typo3/cms",
-                "version": "6.2.11",
-                "dist": {
-                    "url": "https://github.com/TYPO3/TYPO3.CMS/archive/6.2.11.zip",
-                    "type": "zip"
-                }
-            }
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "typo3/cms",
-                "version": "7.1.0",
-                "dist": {
-                    "url": "https://github.com/TYPO3/TYPO3.CMS/archive/7.1.0.zip",
-                    "type": "zip"
-                }
-            }
-        }
-    ]
+  }
 }

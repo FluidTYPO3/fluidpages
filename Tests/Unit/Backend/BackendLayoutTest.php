@@ -9,12 +9,14 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
  */
 
 use FluidTYPO3\Fluidpages\Backend\BackendLayout;
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Flux\Form\Container\Grid;
 use FluidTYPO3\Flux\Provider\Provider;
 use FluidTYPO3\Flux\Service\ContentService;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
+use TYPO3\CMS\Backend\Form\FormEngine;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Lang\LanguageService;
 
 /**
  * Class BackendLayoutTest
@@ -46,6 +48,7 @@ class BackendLayoutTest extends UnitTestCase {
 		$instance = new BackendLayout();
 		$pageUid = 1;
 		$backendLayout = array();
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
 		$configurationService = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
 			array('resolvePrimaryConfigurationProvider', 'debug', 'message')
@@ -55,6 +58,7 @@ class BackendLayoutTest extends UnitTestCase {
 			$configurationService->expects($this->once())->method('resolvePrimaryConfigurationProvider')
 				->with('pages', 'tx_fed_page_flexform', $record)->willReturn($provider);
 		}
+		/** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $recordService */
 		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
 		$recordService->expects($this->once())->method('getSingle')->willReturn($record);
 		$instance->injectConfigurationService($configurationService);
@@ -67,6 +71,7 @@ class BackendLayoutTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getPostProcessBackendLayoutTestValues() {
+		/** @var Provider|\PHPUnit_Framework_MockObject_MockObject $standardProvider */
 		$standardProvider = $this->getMock(
 			'FluidTYPO3\\Flux\\Provider\\Provider',
 			array('getControllerActionFromRecord')
@@ -78,8 +83,11 @@ class BackendLayoutTest extends UnitTestCase {
 		$gridProvider = clone $standardProvider;
 		$actionLessProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn(NULL);
 		$exceptionProvider->expects($this->any())->method('getControllerActionFromRecord')->willThrowException(new \RuntimeException());
-		$emptyGridProvider->setGrid(Grid::create());
+		/** @var Grid $grid */
+		$grid = Grid::create();
+		$emptyGridProvider->setGrid($grid);
 		$emptyGridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
+		/** @var Grid $grid */
 		$grid = Grid::create(array());
 		$grid->createContainer('Row', 'row')->createContainer('Column', 'column')->setColSpan(3)->setRowSpan(3)->setColumnPosition(2);
 		$gridProvider->setGrid($grid);
@@ -134,6 +142,7 @@ class BackendLayoutTest extends UnitTestCase {
 	public function testPostProcessColPosListItemsParsedPerformsNoOperation() {
 		$id = 1;
 		$tca = array('foo' => 'bar');
+		/** @var FormEngine $mock */
 		$mock = $this->getMock('TYPO3\CMS\Backend\Form\FormEngine', array('fake'), array(), '', FALSE);
 		$instance = new BackendLayout();
 		$instance->postProcessColPosListItemsParsed($id, $tca, $mock);

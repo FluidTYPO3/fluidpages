@@ -9,7 +9,6 @@ namespace FluidTYPO3\Fluidpages\Service;
  */
 
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
-use FluidTYPO3\Flux\Utility\PathUtility;
 use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -120,8 +119,8 @@ class PageService implements SingletonInterface {
 			return NULL;
 		}
 		return array(
-			'tx_fed_page_controller_action' => 	$resolvedMainTemplateIdentity,
-			'tx_fed_page_controller_action_sub' => 	$resolvedSubTemplateIdentity
+			'tx_fed_page_controller_action' => $resolvedMainTemplateIdentity,
+			'tx_fed_page_controller_action_sub' => $resolvedSubTemplateIdentity
 		);
 
 	}
