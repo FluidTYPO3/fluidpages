@@ -1,5 +1,17 @@
 # Fluidpages Change log
 
+upcoming
+------------------
+
+- [#261](https://github.com/FluidTYPO3/fluidpages/pull/261) Multi-domain installations can rely on static TS inclusion of provider extension
+	- In other words: no more output of any page layouts on those page-tree branches, where no TS from provider extension included
+
+
+3.2.3 - 2015-05-20
+------------------
+
+- [#257](https://github.com/FluidTYPO3/fluidpages/pull/257) Runtime cache for inherited values implemented, which speeds up BE and FE page load on deep pages of a page tree
+
 3.2.2 - 2015-04-26
 ------------------
 

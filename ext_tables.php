@@ -64,8 +64,8 @@ $GLOBALS['TCA']['pages_language_overlay']['columns']['doktype']['config']['items
 	$doktypeIcon
 );
 
-$GLOBALS['TCA']['pages']['types'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW]['showitem'] =
-	'--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.standard;standard,
+$GLOBALS['TCA']['pages']['types'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW]['showitem'] = '
+--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.standard;standard,
 	--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.title;title,
 	--div--;LLL:EXT:cms/locallang_tca.xlf:pages.tabs.access,
 	--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.visibility;visibility,

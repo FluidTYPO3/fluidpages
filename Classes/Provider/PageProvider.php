@@ -15,9 +15,7 @@ use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Provider\AbstractProvider;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
-use FluidTYPO3\Flux\Utility\PathUtility;
 use FluidTYPO3\Flux\Utility\RecursiveArrayUtility;
-use FluidTYPO3\Flux\Utility\ResolveUtility;
 use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -242,7 +240,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 					$sheetName = $field->getParent()->getName();
 					$inherit = (boolean) $field->getInherit();
 					$inheritEmpty = (boolean) $field->getInheritEmpty();
-					if (TRUE === isset($record[$tableFieldName]['data'])) {
+					if (TRUE === isset($record[$tableFieldName]['data']) && TRUE === is_array($record[$tableFieldName]['data'])) {
 						$value = $record[$tableFieldName]['data'][$sheetName]['lDEF'][$fieldName]['vDEF'];
 						$inheritedValue = $this->getInheritedPropertyValueByDottedPath($record, $fieldName);
 						$empty = (TRUE === empty($value) && $value !== '0' && $value !== 0);
@@ -310,6 +308,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 			$tree = $this->getInheritanceTree($row);
 			$data = array();
 			foreach ($tree as $branch) {
+				/** @var SubPageProvider $provider */
 				$provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
 				$form = $provider->getForm($branch);
 				if (NULL === $form) {

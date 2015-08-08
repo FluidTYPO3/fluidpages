@@ -10,15 +10,17 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Provider;
 
 use FluidTYPO3\Fluidpages\Controller\PageControllerInterface;
 use FluidTYPO3\Fluidpages\Provider\PageProvider;
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Fluidpages\Tests\Fixtures\Provider\DummyPageProvider;
 use FluidTYPO3\Flux\Form;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Records;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Xml;
 use FluidTYPO3\Flux\Tests\Unit\AbstractTestCase;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Class PageProviderTest
@@ -37,6 +39,7 @@ class PageProviderTest extends AbstractTestCase {
 	}
 
 	public function testGetExtensionKey() {
+		/** @var PageProvider|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getControllerExtensionKeyFromRecord'));
 		$instance->expects($this->once())->method('getControllerExtensionKeyFromRecord')->willReturn('fluidpages');
 		$result = $instance->getExtensionKey(array());
@@ -44,6 +47,7 @@ class PageProviderTest extends AbstractTestCase {
 	}
 
 	public function testGetExtensionKeyWithoutSelection() {
+		/** @var PageProvider|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getControllerExtensionKeyFromRecord'));
 		$instance->expects($this->once())->method('getControllerExtensionKeyFromRecord')->willReturn(NULL);
 		$result = $instance->getExtensionKey(array());
@@ -54,6 +58,7 @@ class PageProviderTest extends AbstractTestCase {
 		$expected = ExtensionManagementUtility::extPath('fluidpages', 'Tests/Fixtures/Templates/Page/Dummy.html');
 		$fieldName = 'tx_fed_page_controller_action';
 		$dataFieldName = 'tx_fed_page_flexform';
+		/** @var PageService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
 		$instance = new PageProvider();
 		$instance->setTemplatePaths(array('templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/'));
@@ -68,7 +73,9 @@ class PageProviderTest extends AbstractTestCase {
 	}
 
 	public function testGetFormCallsSetDefaultValuesInFieldsWithInheritedValues() {
+		/** @var Form $form */
 		$form = Form::create();
+		/** @var PageProvider|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('setDefaultValuesInFieldsWithInheritedValues'));
 		$instance->injectPageService(new PageService());
 		$instance->expects($this->once())->method('setDefaultValuesInFieldsWithInheritedValues')->willReturn($form);
@@ -77,6 +84,7 @@ class PageProviderTest extends AbstractTestCase {
 	}
 
 	public function testGetControllerExtensionKeyFromRecordReturnsPresetKeyOnUnrecognisedAction() {
+		/** @var PageProvider|\PHPUnit_Framework_MockObject_MockObject $instance */
 		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getControllerActionReferenceFromRecord'));
 		$instance->expects($this->once())->method('getControllerActionReferenceFromRecord')->willReturn('invalid');
 		$instance->setExtensionKey('fallback');
@@ -124,10 +132,12 @@ class PageProviderTest extends AbstractTestCase {
 	public function testGetControllerActionFromRecord(array $record, $fieldName, $expectsMessage, $expected) {
 		$instance = new PageProvider();
 		if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype'] && TRUE === empty($record[$fieldName])) {
+			/** @var PageService $service */
 			$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
 			$instance->injectPageService($service);
 		}
 		if (TRUE === $expectsMessage) {
+			/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
 			$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
 			$configurationService->expects($this->once())->method('message');
 			$instance->injectConfigurationService($configurationService);
@@ -154,14 +164,19 @@ class PageProviderTest extends AbstractTestCase {
 			$this->getBasicRecord(),
 			$this->getBasicRecord()
 		);
+		/** @var Form $form */
 		$form = Form::create();
 		$form->createField('Input', 'foo');
 		$record = $this->getBasicRecord();
+		/** @var DummyPageProvider $dummyProvider1 */
 		$dummyProvider1 = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
+		/** @var DummyPageProvider $dummyProvider2 */
 		$dummyProvider2 = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
 		$dummyProvider1->setForm($form);
 		$dummyProvider1->setFlexFormValues(array('foo' => 'bar'));
+		/** @var PageProvider|\PHPUnit_Framework_MockObject_MockObject $provider */
 		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getInheritanceTree', 'unsetInheritedValues', 'getForm'));
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $mockConfigurationService */
 		$mockConfigurationService = $this->getMock('FluidTYPO3\Fluidpages\Service\ConfigurationService', array('resolvePrimaryConfigurationProvider'));
 		$mockConfigurationService->expects($this->at(0))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider1);
 		$mockConfigurationService->expects($this->at(1))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider2);
@@ -182,15 +197,22 @@ class PageProviderTest extends AbstractTestCase {
 			$this->getBasicRecord(),
 			$this->getBasicRecord()
 		);
+		/** @var Form $form */
 		$form = Form::create();
 		$form->createField('Input', 'foo');
 		$record = $this->getBasicRecord();
+		/** @var DummyPageProvider $dummyProvider1 */
 		$dummyProvider1 = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
+		/** @var DummyPageProvider $dummyProvider2 */
 		$dummyProvider2 = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
 		$dummyProvider1->setForm($form);
 		$dummyProvider1->setFlexFormValues(array('foo' => 'bar'));
-		$dummyProvider2->setForm(Form::create());
+		/** @var Form $form2 */
+		$form2 = Form::create();
+		$dummyProvider2->setForm($form2);
+		/** @var PageProvider|\PHPUnit_Framework_MockObject_MockObject $provider */
 		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getInheritanceTree', 'unsetInheritedValues', 'getForm'));
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $mockConfigurationService */
 		$mockConfigurationService = $this->getMock('FluidTYPO3\Fluidpages\Service\ConfigurationService', array('resolvePrimaryConfigurationProvider'));
 		$mockConfigurationService->expects($this->at(0))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider1);
 		$mockConfigurationService->expects($this->at(1))->method('resolvePrimaryConfigurationProvider')->willReturn($dummyProvider2);
@@ -325,6 +347,7 @@ class PageProviderTest extends AbstractTestCase {
 	 * @test
 	 */
 	public function canPostProcessRecord() {
+		/** @var PageProvider|\PHPUnit_Framework_MockObject_MockObject $provider */
 		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getForm', 'getInheritedPropertyValueByDottedPath'));
 		$form = Form::create();
 		$form->createField('Input', 'settings.input')->setInherit(TRUE);
@@ -333,6 +356,7 @@ class PageProviderTest extends AbstractTestCase {
 		$tableName = $provider->getTableName($record);
 		$record[$fieldName] = Xml::EXPECTING_FLUX_REMOVALS;
 		$id = $record['uid'];
+		/** @var DataHandler $parentInstance */
 		$parentInstance = GeneralUtility::makeInstance('TYPO3\CMS\Core\DataHandling\DataHandler');
 		$parentInstance->datamap[$tableName][$id] = array(
 			$fieldName => array(
@@ -353,9 +377,11 @@ class PageProviderTest extends AbstractTestCase {
 		$provider->expects($this->any())->method('getForm')->willReturn($form);
 		$provider->expects($this->once())->method('getInheritedPropertyValueByDottedPath')
 			->with($parentInstance->datamap[$tableName][$id], 'settings.input')->willReturn('test');
+		/** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $recordService */
 		$recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle', 'update'));
 		$recordService->expects($this->atLeastOnce())->method('getSingle')->willReturn($parentInstance->datamap[$tableName][$id]);
 		$recordService->expects($this->once())->method('update');
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
 		$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
 		$configurationService->expects($this->any())->method('message');
 		$provider->injectRecordService($recordService);

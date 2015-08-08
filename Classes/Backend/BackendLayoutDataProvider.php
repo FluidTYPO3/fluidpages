@@ -229,7 +229,7 @@ class BackendLayoutDataProvider implements DataProviderInterface {
 	 * @return boolean
 	 */
 	protected function isPageModuleLanguageView() {
-		$module = GeneralUtility::_GET('M');
+		$module = GeneralUtility::_GET('M') ? GeneralUtility::_GET('M') : 'web_layout';
 		$function = TRUE === isset($GLOBALS['SOBE']->MOD_SETTINGS['function']) ? $GLOBALS['SOBE']->MOD_SETTINGS['function'] : NULL;
 		return ('web_layout' === $module && 2 === (integer) $function);
 	}

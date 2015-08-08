@@ -5,6 +5,7 @@
  *
  * Performs update tasks for extension Fluidpages
  */
+// @codingStandardsIgnoreStart
 class ext_update {
 
 	/**

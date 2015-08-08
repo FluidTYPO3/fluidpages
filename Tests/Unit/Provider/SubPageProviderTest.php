@@ -10,14 +10,11 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Provider;
 
 use FluidTYPO3\Fluidpages\Controller\PageControllerInterface;
 use FluidTYPO3\Fluidpages\Provider\SubPageProvider;
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
-use FluidTYPO3\Flux\Tests\Fixtures\Data\Records;
-use FluidTYPO3\Flux\Tests\Fixtures\Data\Xml;
 use FluidTYPO3\Flux\Tests\Unit\AbstractTestCase;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Class SubPageProviderTest
@@ -34,10 +31,12 @@ class SubPageProviderTest extends AbstractTestCase {
 	public function testGetControllerActionFromRecord(array $record, $fieldName, $expectsMessage, $expected) {
 		$instance = new SubPageProvider();
 		if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype']) {
+			/** @var PageService $service */
 			$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
 			$instance->injectPageService($service);
 		}
 		if (TRUE === $expectsMessage) {
+			/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
 			$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
 			$configurationService->expects($this->once())->method('message');
 			$instance->injectConfigurationService($configurationService);
@@ -63,6 +62,7 @@ class SubPageProviderTest extends AbstractTestCase {
 		$expected = ExtensionManagementUtility::extPath('fluidpages', 'Tests/Fixtures/Templates/Page/Dummy.html');
 		$dataFieldName = 'tx_fed_page_flexform_sub';
 		$fieldName = 'tx_fed_page_controller_action_sub';
+		/** @var PageService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
 		$instance = new SubPageProvider();
 		$instance->setTemplatePaths(array('templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/'));

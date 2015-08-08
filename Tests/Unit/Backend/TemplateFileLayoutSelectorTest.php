@@ -9,6 +9,7 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
  */
 
 use FluidTYPO3\Fluidpages\Backend\TemplateFileLayoutSelector;
+use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -35,6 +36,7 @@ class TemplateFileLayoutSelectorTest extends UnitTestCase {
 		$parameters = array('items' => array());
 		$instance = new TemplateFileLayoutSelector();
 		$parent = '';
+		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('getViewConfigurationByFileReference'));
 		$service->expects($this->once())->method('getViewConfigurationByFileReference')->willReturn(array(
 			'layoutRootPaths' => array($layoutRootPath)

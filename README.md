@@ -3,7 +3,7 @@
 Fluidpages: Fluid Page Templates
 ================================
 
-[![Build Status](https://img.shields.io/jenkins/s/https/jenkins.fluidtypo3.org/fluidpages.svg?style=flat-square&label=package)](https://jenkins.fluidtypo3.org/job/fluidpages) [![Coverage Status](https://img.shields.io/coveralls/FluidTYPO3/fluidpages/development.svg?style=flat-square)](https://coveralls.io/r/FluidTYPO3/fluidpages) [![Documentation](http://img.shields.io/badge/documentation-online-blue.svg?style=flat-square)](https://fluidtypo3.org/templating-manual/introduction.html) [![Build Status](https://img.shields.io/jenkins/s/https/jenkins.fluidtypo3.org/fluidtypo3-testing.svg?style=flat-square&label=framework)](https://jenkins.fluidtypo3.org/job/fluidtypo3-testing/) [![Coverage Status](https://img.shields.io/coveralls/FluidTYPO3/fluidtypo3-testing/master.svg?style=flat-square)](https://coveralls.io/r/FluidTYPO3/fluidtypo3-testing)
+[![Build Status](https://img.shields.io/travis/FluidTYPO3/fluidpages.svg?style=flat-square&label=package)](https://travis-ci.org/FluidTYPO3/fluidpages) [![Coverage Status](https://img.shields.io/coveralls/FluidTYPO3/fluidpages/development.svg?style=flat-square)](https://coveralls.io/r/FluidTYPO3/fluidpages) [![Documentation](http://img.shields.io/badge/documentation-online-blue.svg?style=flat-square)](https://fluidtypo3.org/templating-manual/introduction.html) [![Build Status](https://img.shields.io/travis/FluidTYPO3/fluidtypo3-testing.svg?style=flat-square&label=framework)](https://travis-ci.org/FluidTYPO3/fluidtypo3-testing/) [![Coverage Status](https://img.shields.io/coveralls/FluidTYPO3/fluidtypo3-testing/master.svg?style=flat-square)](https://coveralls.io/r/FluidTYPO3/fluidtypo3-testing)
 
 ## What does it do?
 
