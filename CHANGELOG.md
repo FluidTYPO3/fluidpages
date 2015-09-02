@@ -1,10 +1,21 @@
 # Fluidpages Change log
 
-upcoming
+3.3.1 - 2015-08-08
 ------------------
+
+- No important changes
+
+3.3.0 - 2015-08-08
+------------------
+
+- Support of TYPO3 7.4 added
+
+- Support of upcoming Flux 7.3 added
 
 - [#261](https://github.com/FluidTYPO3/fluidpages/pull/261) Multi-domain installations can rely on static TS inclusion of provider extension
 	- In other words: no more output of any page layouts on those page-tree branches, where no TS from provider extension included
+
+- [#259](https://github.com/FluidTYPO3/fluidpages/pull/259) `plugin.tx_fluidpages.siteRootInheritance = 0` also affects sub-pages selector now
 
 
 3.2.3 - 2015-05-20
