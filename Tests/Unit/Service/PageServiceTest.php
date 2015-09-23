@@ -91,21 +91,25 @@ class PageServiceTest extends UnitTestCase {
 	/**
 	 * @dataProvider getAvailablePageTemplateFilesTestValues
 	 * @param string|array $typoScript
-	 * @param array $expected
+	 * @param mixed $expected
 	 */
-	public function testGetAvailablePageTemplateFiles($typoScript, array $expected) {
+	public function testGetAvailablePageTemplateFiles($typoScript, $expected) {
 		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
 			array('getPageConfiguration', 'message', 'getFormFromTemplateFile')
 		);
-		$service->expects($this->any())->method('getFormFromTemplateFile')->willReturn(Form::create((array) reset($typoScript)));
+		$service->expects($this->any())->method('getFormFromTemplateFile')->willReturn(Form::create());
 		$service->expects($this->once())->method('getPageConfiguration')->willReturn($typoScript);
 		$service->expects($this->any())->method('message');
 		$instance = new PageService();
 		$instance->injectConfigurationService($service);
 		$result = $instance->getAvailablePageTemplateFiles();
-		$this->assertEquals($expected, $result);
+		if (NULL === $expected) {
+			$this->assertEmpty($result);
+		} else {
+			$this->assertNotEmpty($result);
+		}
 	}
 
 	/**
@@ -113,15 +117,15 @@ class PageServiceTest extends UnitTestCase {
 	 */
 	public function getAvailablePageTemplateFilesTestValues() {
 		return array(
-			array(array(), array()),
-			array(array('test' => array('enable' => FALSE)), array()),
+			array(array(), NULL),
+			array(array('test' => array('enable' => FALSE)), NULL),
 			array(
-				array('fluidpages' => array('templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/')),
-				array('fluidpages' => array('Dummy' => 'Dummy'))
+				array('fluidpages' => array('templateRootPaths' => array('Dummy'))),
+				array('fluidpages' => array('Dummy'))
 			),
 			array(
-				array('fluidpages' => array('templateRootPath' => 'EXT:fluidpages/Invalid')),
-				array('fluidpages' => array())
+				array('fluidpages' => array('templateRootPaths' => array('EXT:fluidpages/Invalid'))),
+				array('fluidpages' => NULL)
 			)
 		);
 	}
