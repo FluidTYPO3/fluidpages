@@ -10,6 +10,7 @@ namespace FluidTYPO3\Fluidpages\Service;
 
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\View\TemplatePaths;
+use FluidTYPO3\Flux\View\ViewContext;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -155,10 +156,7 @@ class PageService implements SingletonInterface {
 	public function getAvailablePageTemplateFiles($format = 'html') {
 		$typoScript = $this->configurationService->getPageConfiguration();
 		$output = array();
-		if (FALSE === is_array($typoScript)) {
-			return $output;
-		}
-		foreach ($typoScript as $extensionName => $group) {
+		foreach ((array) $typoScript as $extensionName => $group) {
 			if (TRUE === isset($group['enable']) && 1 > $group['enable']) {
 				continue;
 			}
@@ -174,15 +172,19 @@ class PageService implements SingletonInterface {
 				}
 				$files = scandir($configuredPath);
 				foreach ($files as $key => $file) {
-					$pathinfo = pathinfo($file);
-					$extension = $pathinfo['extension'];
-					$filename = $pathinfo['filename'];
-					if ('.' === substr($file, 0, 1)) {
-						unset($files[$key]);
-					} else if (strtolower($extension) !== strtolower($format)) {
-						unset($files[$key]);
-					} else {
-						$output[$extensionName][$filename] = $filename;
+					$viewContext = new ViewContext($file, $extensionName, 'Page');
+					$form = $this->configurationService->getFormFromTemplateFile($viewContext);
+					if (TRUE === $form->getEnabled()) {
+						$pathinfo = pathinfo($file);
+						$extension = $pathinfo['extension'];
+						$filename = $pathinfo['filename'];
+						if ('.' === substr($file, 0, 1)) {
+							unset($files[$key]);
+						} else if (strtolower($extension) !== strtolower($format)) {
+							unset($files[$key]);
+						} else {
+							$output[$extensionName][$filename] = $filename;
+						}
 					}
 				}
 			}

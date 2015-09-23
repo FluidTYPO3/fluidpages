@@ -10,6 +10,7 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Service;
 
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
@@ -96,8 +97,9 @@ class PageServiceTest extends UnitTestCase {
 		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock(
 			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('getPageConfiguration', 'message')
+			array('getPageConfiguration', 'message', 'getFormFromTemplateFile')
 		);
+		$service->expects($this->any())->method('getFormFromTemplateFile')->willReturn(Form::create((array) reset($typoScript)));
 		$service->expects($this->once())->method('getPageConfiguration')->willReturn($typoScript);
 		$service->expects($this->any())->method('message');
 		$instance = new PageService();
@@ -111,7 +113,7 @@ class PageServiceTest extends UnitTestCase {
 	 */
 	public function getAvailablePageTemplateFilesTestValues() {
 		return array(
-			array(NULL, array()),
+			array(array(), array()),
 			array(array('test' => array('enable' => FALSE)), array()),
 			array(
 				array('fluidpages' => array('templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/')),
