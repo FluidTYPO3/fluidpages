@@ -12,6 +12,7 @@ use FluidTYPO3\Flux\Controller\AbstractFluxController;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
+use TYPO3\CMS\Extbase\Mvc\Web\Response;
 
 /**
  * Page Controller
@@ -41,6 +42,11 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	protected $configurationService;
 
 	/**
+	 * @var Response
+	 */
+	protected $response;
+
+	/**
 	 * @param PageService $pageService
 	 */
 	public function injectPageService(PageService $pageService) {
@@ -60,8 +66,12 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	 * @return void
 	 */
 	public function initializeView(ViewInterface $view) {
-		$this->configurationManager->getContentObject()->data = $this->getRecord();
+		$record = $this->getRecord();
+		$this->configurationManager->getContentObject()->data = $record;
 		parent::initializeView($view);
+		$this->response->addAdditionalHeaderData(
+			(string) $this->view->renderStandaloneSection('HeaderCode', $this->provider->getTemplateVariables($record), TRUE)
+		);
 	}
 
 	/**
