@@ -165,8 +165,9 @@ class PageLayoutSelector {
 		try {
 			$extension = $form->getExtensionName();
 			$thumbnail = MiscellaneousUtility::getIconForTemplate($form);
+			$template = pathinfo($form->getOption(Form::OPTION_TEMPLATEFILE), PATHINFO_FILENAME);
 			$label = $form->getLabel();
-			$optionValue = $extension . '->' . $template;
+			$optionValue = $extension . '->' . lcfirst($template);
 			$selected = ($optionValue == $value ? ' checked="checked"' : '');
 			$option = '<label style="padding: 0.5em; border: 1px solid #CCC; display: inline-block; vertical-align: bottom; margin: 0 1em 1em 0; cursor: pointer; ' . ($selected ? 'background-color: #DDD;' : '')  . '">';
 			$option .= '<img src="' . $thumbnail . '" alt="' . $label . '" style="margin: 0.5em 0 0.5em 0; max-width: 196px; max-height: 128px;"/><br />';
