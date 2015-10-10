@@ -174,6 +174,8 @@ class PageService implements SingletonInterface {
 				}
 				$files = scandir($configuredPath);
 				foreach ($files as $key => $file) {
+					$pathinfo = pathinfo($file);
+					$extension = $pathinfo['extension'];
 					if ('.' === substr($file, 0, 1)) {
 						continue;
 					} else if (strtolower($extension) !== strtolower($format)) {
@@ -198,8 +200,6 @@ class PageService implements SingletonInterface {
 						continue;
 					}
 
-					$pathinfo = pathinfo($file);
-					$extension = $pathinfo['extension'];
 					$filename = $pathinfo['filename'];
 					$output[$extensionName][$filename] = $form;
 				}
