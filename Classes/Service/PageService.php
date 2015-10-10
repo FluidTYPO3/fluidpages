@@ -174,6 +174,11 @@ class PageService implements SingletonInterface {
 				}
 				$files = scandir($configuredPath);
 				foreach ($files as $key => $file) {
+					if ('.' === substr($file, 0, 1)) {
+						continue;
+					} else if (strtolower($extension) !== strtolower($format)) {
+						continue;
+					}
 					$viewContext = new ViewContext($configuredPath . $file, $extensionName, 'Page');
 					$viewContext->setSectionName('Configuration');
 					$viewContext->setTemplatePaths($templatePaths);
@@ -196,13 +201,7 @@ class PageService implements SingletonInterface {
 					$pathinfo = pathinfo($file);
 					$extension = $pathinfo['extension'];
 					$filename = $pathinfo['filename'];
-					if ('.' === substr($file, 0, 1)) {
-						unset($files[$key]);
-					} else if (strtolower($extension) !== strtolower($format)) {
-						unset($files[$key]);
-					} else {
-						$output[$extensionName][$filename] = $form;
-					}
+					$output[$extensionName][$filename] = $form;
 				}
 			}
 		}
