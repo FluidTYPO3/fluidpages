@@ -1,5 +1,17 @@
 # Fluidpages Change log
 
+Upcoming
+------------------
+
+- :exclamation: [#278](https://github.com/FluidTYPO3/fluidpages/pull/278) Allow raw content be put into <head> section of a template
+	- New section `HeaderCode` should be used in your page templates for this
+	- Beware, that if you used such section name for your own purposes, you need to rename it 
+
+- *'enabled'* flux form attribute is respected, when building list of available page templates
+	- [Source commit with more info](https://github.com/FluidTYPO3/fluidpages/commit/32d4765aaad8df2f1516b0bb93cc8956f66c1f36)
+
+- [#279](https://github.com/FluidTYPO3/fluidpages/pull/279) Avoid error `is not a valid template resource URI ...Resources/Private/Templates/Page/.`
+ 
 3.3.1 - 2015-08-08
 ------------------
 
@@ -50,7 +62,7 @@
   - `plugin.tx_fed.page.` support removed
   - [Source commit with more info](https://github.com/FluidTYPO3/fluidpages/commit/b5fd17bd69315589ea77a77202fc5eb0255cf0f1)
 
-- :exclamation: `\FluidTYPO3\Fluidpages\Controller\AbstractPageController` deprectaed
+- :exclamation: `\FluidTYPO3\Fluidpages\Controller\AbstractPageController` deprecated
   - Extend `\FluidTYPO3\Fluidpages\Controller\PageController` instead
   - [Source commit with more info](https://github.com/FluidTYPO3/fluidpages/commit/5da5439a161b880b7db11dcffa369944d0766787)
 
