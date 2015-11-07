@@ -2,7 +2,8 @@
   "name": "fluidtypo3/fluidpages",
   "description": "The fluidpages package from FluidTYPO3",
   "require": {
-    "fluidtypo3/flux": "*"
+    "fluidtypo3/flux": "*",
+    "php": ">=5.5.0"
   },
   "type": "typo3-cms-extension",
   "keywords": [
