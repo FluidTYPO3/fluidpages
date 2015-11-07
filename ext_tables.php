@@ -141,6 +141,7 @@ if (FALSE === empty($additionalDoktypes)) {
 		'displayCond' => 'FIELD:tx_fluidpages_templatefile:!=:',
 		'config' => array (
 			'type' => 'select',
+			'renderType' => 'selectSingle',
 			'itemsProcFunc' => 'FluidTYPO3\Fluidpages\Backend\TemplateFileLayoutSelector->addLayoutOptions',
 			'arguments' => array(
 				'referring_field' => 'tx_fluidpages_templatefile'
