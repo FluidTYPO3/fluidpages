@@ -3,12 +3,21 @@
 Upcoming
 ------------------
 
+- :exclamation: Support of [TYPO3 6.2 dropped](https://github.com/FluidTYPO3/fluidpages/commit/b225773cd2bfe8b51e148178e26a9da36d44cdac)
+	- For TYPO3 6.2 based projects there is a [*legacy*](https://github.com/FluidTYPO3/fluidpages/tree/legacy) branch
+
+- :exclamation: PHP 5.5 is [minimum required](https://github.com/FluidTYPO3/fluidpages/commit/cca22bbafad49a9cce9ae5cf7c3b6a23e8291d40)
+
 - :exclamation: [#278](https://github.com/FluidTYPO3/fluidpages/pull/278) Allow raw content be put into <head> section of a template
 	- New section `HeaderCode` should be used in your page templates for this
 	- Beware, that if you used such section name for your own purposes, you need to rename it 
 
 - *'enabled'* flux form attribute is respected, when building list of available page templates
 	- [Source commit with more info](https://github.com/FluidTYPO3/fluidpages/commit/32d4765aaad8df2f1516b0bb93cc8956f66c1f36)
+
+- [#284](https://github.com/FluidTYPO3/fluidpages/pull/284) Fixed issue with non-respected overloads of `templateRootPaths`
+
+- [#281](https://github.com/FluidTYPO3/fluidpages/pull/281) TCA element browser wizard for RawDoktype aligned with TYPO3 7
 
 - [#279](https://github.com/FluidTYPO3/fluidpages/pull/279) Avoid error `is not a valid template resource URI ...Resources/Private/Templates/Page/.`
  
