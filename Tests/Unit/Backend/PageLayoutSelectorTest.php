@@ -106,7 +106,10 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	public function testRenderOptions($extension, $expectedTitle) {
 		$instance = $this->getMock('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector', array('renderOption'));
 		$instance->expects($this->any())->method('renderOption')->willReturn('');
-		$result = $this->callInaccessibleMethod($instance, 'renderOptions', $extension, array('foo' => 'bar'), array());
+		$forms = array(
+			Form::create(array('extensionName' => $extension))
+		);
+		$result = $this->callInaccessibleMethod($instance, 'renderOptions', $extension, $forms, array());
 		$this->assertContains($expectedTitle, $result);
 	}
 
@@ -121,55 +124,15 @@ class PageLayoutSelectorTest extends UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider getRenderOptionTestValues
-	 * @param string $file
-	 * @param Form|NULL $form
-	 * @param $expectedMessageFunction
-	 * @param $expectsEmptyOutput
+	 * @test
 	 */
-	public function testRenderOption($file, $form, $expectedMessageFunction, $expectsEmptyOutput) {
-		$instance = new PageLayoutSelector();
-		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $service */
-		$service = $this->getMock(
-			'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
-			array('getPageConfiguration', 'getFormFromTemplateFile', 'message', 'debug')
-		);
-		$service->expects($this->any())->method('getPageConfiguration')->willReturn(array(
-			'templateRootPaths' => array('EXT:fluidpages/Tests/Fixtures/Templates/')
-		));
-		$service->expects($this->any())->method('getFormFromTemplateFile')->willReturn($form);
-		if (NULL !== $expectedMessageFunction) {
-			$service->expects($this->once())->method($expectedMessageFunction);
-		}
-		$instance->injectConfigurationService($service);
-		$result = $this->callInaccessibleMethod($instance, 'renderOption', 'fluidpages', $file, array());
-		if (TRUE === $expectsEmptyOutput) {
-			$this->assertEmpty($result);
-		} else {
-			$this->assertNotEmpty($result);
-		}
-
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getRenderOptionTestValues() {
-		$validFile = 'Dummy';
-		$disabledForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled'));
-		$disabledForm->expects($this->once())->method('getEnabled')->willReturn(FALSE);
-		$exceptionForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled'));
-		$exceptionForm->expects($this->once())->method('getEnabled')->willThrowException(new \RuntimeException('test'));
-		$correctForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getEnabled', 'getLabel'));
-		$correctForm->expects($this->once())->method('getEnabled')->willReturn(TRUE);
+	public function testRenderOption() {
+		$correctForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getLabel'));
 		$correctForm->expects($this->once())->method('getLabel')->willReturn('label');
-		return array(
-			array('/does/not/exist', NULL, 'message', TRUE),
-			array($validFile, NULL, 'message', TRUE),
-			array($validFile, $disabledForm, 'message', TRUE),
-			array($validFile, $exceptionForm, 'debug', TRUE),
-			array($validFile, $correctForm, NULL, FALSE)
-		);
+		$instance = new PageLayoutSelector();
+		$result = $this->callInaccessibleMethod($instance, 'renderOption', $correctForm, array());
+		$this->assertNotEmpty($result);
+
 	}
 
 }

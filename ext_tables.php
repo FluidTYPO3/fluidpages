@@ -123,7 +123,13 @@ if (FALSE === empty($additionalDoktypes)) {
 					'type' => 'popup',
 					'title' => 'LLL:EXT:cms/locallang_ttc.xml:header_link_formlabel',
 					'icon' => 'link_popup.gif',
-					'script' => 'browse_links.php?mode=wizard&act=file',
+					'module' => array(
+						'name' => 'wizard_element_browser',
+						'urlParameters' => array(
+							'mode' => 'wizard',
+							'act' => 'file'
+						)
+					),
 					'JSopenParams' => 'height=300,width=500,status=0,menubar=0,scrollbars=1',
 				),
 			)
@@ -135,6 +141,7 @@ if (FALSE === empty($additionalDoktypes)) {
 		'displayCond' => 'FIELD:tx_fluidpages_templatefile:!=:',
 		'config' => array (
 			'type' => 'select',
+			'renderType' => 'selectSingle',
 			'itemsProcFunc' => 'FluidTYPO3\Fluidpages\Backend\TemplateFileLayoutSelector->addLayoutOptions',
 			'arguments' => array(
 				'referring_field' => 'tx_fluidpages_templatefile'

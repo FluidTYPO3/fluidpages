@@ -8,8 +8,10 @@ namespace FluidTYPO3\Fluidpages\Service;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\View\TemplatePaths;
+use FluidTYPO3\Flux\View\ViewContext;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -146,19 +148,17 @@ class PageService implements SingletonInterface {
 	}
 
 	/**
-	 * Gets a list of usable Page Templates from defined page template TypoScript
+	 * Gets a list of usable Page Templates from defined page template TypoScript.
+	 * Returns a list of Form instances indexed by the path ot the template file.
 	 *
 	 * @param string $format
-	 * @return array
+	 * @return Form[]
 	 * @api
 	 */
 	public function getAvailablePageTemplateFiles($format = 'html') {
 		$typoScript = $this->configurationService->getPageConfiguration();
 		$output = array();
-		if (FALSE === is_array($typoScript)) {
-			return $output;
-		}
-		foreach ($typoScript as $extensionName => $group) {
+		foreach ((array) $typoScript as $extensionName => $group) {
 			if (TRUE === isset($group['enable']) && 1 > $group['enable']) {
 				continue;
 			}
@@ -176,14 +176,35 @@ class PageService implements SingletonInterface {
 				foreach ($files as $key => $file) {
 					$pathinfo = pathinfo($file);
 					$extension = $pathinfo['extension'];
-					$filename = $pathinfo['filename'];
 					if ('.' === substr($file, 0, 1)) {
-						unset($files[$key]);
+						continue;
 					} else if (strtolower($extension) !== strtolower($format)) {
-						unset($files[$key]);
-					} else {
-						$output[$extensionName][$filename] = $filename;
+						continue;
 					}
+					$filename = $pathinfo['filename'];
+					if (isset($output[$extensionName][$filename])) {
+						continue;
+					}
+					$viewContext = new ViewContext($configuredPath . $file, $extensionName, 'Page');
+					$viewContext->setSectionName('Configuration');
+					$viewContext->setTemplatePaths($templatePaths);
+					$form = $this->configurationService->getFormFromTemplateFile($viewContext);
+					if (FALSE === $form instanceof Form) {
+						$this->configurationService->message(
+							'Template file ' . $templatePathAndFilename . ' contains an unparsable Form definition',
+							GeneralUtility::SYSLOG_SEVERITY_FATAL
+						);
+						continue;
+					}
+					if (FALSE === $form->getEnabled()) {
+						$this->configurationService->message(
+							'Template file ' . $templatePathAndFilename . ' is disabled by configuration',
+							GeneralUtility::SYSLOG_SEVERITY_NOTICE
+						);
+						continue;
+					}
+					$form->setOption(Form::OPTION_TEMPLATEFILE, $file);
+					$output[$extensionName][$filename] = $form;
 				}
 			}
 		}

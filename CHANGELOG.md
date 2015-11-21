@@ -1,10 +1,42 @@
 # Fluidpages Change log
 
-upcoming
+Upcoming
 ------------------
+
+- :exclamation: Support of [TYPO3 6.2 dropped](https://github.com/FluidTYPO3/fluidpages/commit/b225773cd2bfe8b51e148178e26a9da36d44cdac)
+	- For TYPO3 6.2 based projects there is a [*legacy*](https://github.com/FluidTYPO3/fluidpages/tree/legacy) branch
+
+- :exclamation: PHP 5.5 is [minimum required](https://github.com/FluidTYPO3/fluidpages/commit/cca22bbafad49a9cce9ae5cf7c3b6a23e8291d40)
+
+- :exclamation: [#278](https://github.com/FluidTYPO3/fluidpages/pull/278) Allow raw content be put into <head> section of a template
+	- New section `HeaderCode` should be used in your page templates for this
+	- Beware, that if you used such section name for your own purposes, you need to rename it 
+
+- *'enabled'* flux form attribute is respected, when building list of available page templates
+	- [Source commit with more info](https://github.com/FluidTYPO3/fluidpages/commit/32d4765aaad8df2f1516b0bb93cc8956f66c1f36)
+
+- [#284](https://github.com/FluidTYPO3/fluidpages/pull/284) Fixed issue with non-respected overloads of `templateRootPaths`
+
+- [#281](https://github.com/FluidTYPO3/fluidpages/pull/281) TCA element browser wizard for RawDoktype aligned with TYPO3 7
+
+- [#279](https://github.com/FluidTYPO3/fluidpages/pull/279) Avoid error `is not a valid template resource URI ...Resources/Private/Templates/Page/.`
+ 
+3.3.1 - 2015-08-08
+------------------
+
+- No important changes
+
+3.3.0 - 2015-08-08
+------------------
+
+- Support of TYPO3 7.4 added
+
+- Support of upcoming Flux 7.3 added
 
 - [#261](https://github.com/FluidTYPO3/fluidpages/pull/261) Multi-domain installations can rely on static TS inclusion of provider extension
 	- In other words: no more output of any page layouts on those page-tree branches, where no TS from provider extension included
+
+- [#259](https://github.com/FluidTYPO3/fluidpages/pull/259) `plugin.tx_fluidpages.siteRootInheritance = 0` also affects sub-pages selector now
 
 
 3.2.3 - 2015-05-20
@@ -39,7 +71,7 @@ upcoming
   - `plugin.tx_fed.page.` support removed
   - [Source commit with more info](https://github.com/FluidTYPO3/fluidpages/commit/b5fd17bd69315589ea77a77202fc5eb0255cf0f1)
 
-- :exclamation: `\FluidTYPO3\Fluidpages\Controller\AbstractPageController` deprectaed
+- :exclamation: `\FluidTYPO3\Fluidpages\Controller\AbstractPageController` deprecated
   - Extend `\FluidTYPO3\Fluidpages\Controller\PageController` instead
   - [Source commit with more info](https://github.com/FluidTYPO3/fluidpages/commit/5da5439a161b880b7db11dcffa369944d0766787)
 
