@@ -145,48 +145,29 @@ class PageLayoutSelector {
 
 			$packageLabel = LocalizationUtility::translate('pages.tx_fed_page_package', 'Fluidpages');
 			$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
-			foreach ($group as $template) {
-				$selector .= $this->renderOption($extension, $template, $parameters);
+			foreach ($group as $form) {
+				$selector .= $this->renderOption($form, $parameters);
 			}
 		}
 		return $selector;
 	}
 
 	/**
-	 * @param string $extension
-	 * @param string $template
+	 * @param Form $form
 	 * @param array $parameters
 	 * @return string
 	 */
-	protected function renderOption($extension, $template, array $parameters) {
+	protected function renderOption(Form $form, array $parameters) {
 		$name = $parameters['itemFormElName'];
 		$value = $parameters['itemFormElValue'];
 		$onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
 		$selector = '';
 		try {
-			$extensionName = ExtensionNamingUtility::getExtensionKey($extension);
-			$paths = $this->configurationService->getPageConfiguration($extensionName);
-			$templatePaths = new TemplatePaths($paths);
-			$templatePathAndFilename = $templatePaths->resolveTemplateFileForControllerAndActionAndFormat('Page', $template);
-			if (FALSE === file_exists($templatePathAndFilename)) {
-				$this->configurationService->message('Missing template file: ' . $templatePathAndFilename, GeneralUtility::SYSLOG_SEVERITY_WARNING);
-				return '';
-			}
-			$viewContext = new ViewContext($templatePathAndFilename, $extensionName);
-			$viewContext->setTemplatePaths($templatePaths);
-			$viewContext->setSectionName('Configuration');
-			$form = $this->configurationService->getFormFromTemplateFile($viewContext);
-			if (FALSE === $form instanceof Form) {
-				$this->configurationService->message('Template file ' . $templatePathAndFilename . ' contains an unparsable Form definition', GeneralUtility::SYSLOG_SEVERITY_FATAL);
-				return '';
-			}
-			if (FALSE === $form->getEnabled()) {
-				$this->configurationService->message('Template file ' . $templatePathAndFilename . ' is disabled by configuration', GeneralUtility::SYSLOG_SEVERITY_NOTICE);
-				return '';
-			}
+			$extension = $form->getExtensionName();
 			$thumbnail = MiscellaneousUtility::getIconForTemplate($form);
+			$template = pathinfo($form->getOption(Form::OPTION_TEMPLATEFILE), PATHINFO_FILENAME);
 			$label = $form->getLabel();
-			$optionValue = $extension . '->' . $template;
+			$optionValue = $extension . '->' . lcfirst($template);
 			$selected = ($optionValue == $value ? ' checked="checked"' : '');
 			$option = '<label style="padding: 0.5em; border: 1px solid #CCC; display: inline-block; vertical-align: bottom; margin: 0 1em 1em 0; cursor: pointer; ' . ($selected ? 'background-color: #DDD;' : '')  . '">';
 			$option .= '<img src="' . $thumbnail . '" alt="' . $label . '" style="margin: 0.5em 0 0.5em 0; max-width: 196px; max-height: 128px;"/><br />';

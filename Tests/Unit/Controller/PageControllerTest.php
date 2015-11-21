@@ -18,6 +18,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use FluidTYPO3\Fluidpages\Tests\Fixtures\Controller\DummyPageController;
 use FluidTYPO3\Flux\Provider\Provider;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
+use TYPO3\CMS\Extbase\Mvc\Web\Response;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -50,7 +51,7 @@ class PageControllerTest extends UnitTestCase {
 
 	public function testInitializeView() {
 		/** @var PageController|\PHPUnit_Framework_MockObject_MockObject $instance */
-		$instance = $this->getMock(
+		$instance = $this->getAccessibleMock(
 			'FluidTYPO3\\Fluidpages\\Controller\\PageController',
 			array(
 				'getRecord', 'initializeProvider', 'initializeSettings', 'initializeOverriddenSettings',
@@ -68,8 +69,10 @@ class PageControllerTest extends UnitTestCase {
 		$instance->expects($this->once())->method('getRecord')->willReturn(array('uid' => 0));
 		$GLOBALS['TSFE'] = (object) array('page' => 'page', 'fe_user' => (object) array('user' => 'user'));
 		/** @var StandaloneView $view */
-		$view = $this->getMock('TYPO3\\CMS\\Fluid\\View\\StandaloneView', array('assign'));
+		$view = $this->getMock('FluidTYPO3\\Flux\\View\\ExposedTemplateView', array('assign', 'renderStandaloneSection'));
 		$instance->injectConfigurationManager($configurationManager);
+		$instance->_set('response', $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response'));
+		$instance->_set('provider', $this->getMock('FluidTYPO3\\Flux\\Provider\\ProviderInterface'));
 		$instance->initializeView($view);
 	}
 
