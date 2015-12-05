@@ -23,8 +23,34 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Class that renders a Page template selection field.
+ * You can use the following PageTSConfig to control the behaviour of this field
+ * TCEFORM.pages.tx_fed_page_controller_action {
+ * 		keepItems = MyVendor.MyExtension->myAction1,MyVendor.MyExtension->myAction2
+ * 		removeItems = MyVendor.MyExtension->myAction2,MyVendor.MyExtension->myAction4
+ * 		default = MyVendor.MyExtension->youAreTheChoosenAction,
+ * 		hideTitle = 0
+ * 		hideInheritanceField = 1
+ * }
  */
 class PageLayoutSelector {
+
+	/**
+	 * @var array
+	 */
+	protected $templates = array(
+		'selector' => '<div style="margin: 15px;"><div class="row"> %s %s </div></div>',
+		'field' => '<label class="col-xs-6 col-sm-4 col-md-3 img-thumbnail" style="padding-top:15px; padding-bottom:15px;cursor: pointer; %s">
+						<div class="media">
+  							<img class="img-responsive  media-object" src="%s" alt="%s" /><br />
+							<div class="media-body">
+								<input class="hidden" type="radio" value="%s" %s name="%s" %s />
+								<h4 class="media-heading text-center">%s</h4>
+							</div>
+					</div>
+					</label>',
+		'inheritanceField' => '<label class="col-xs-12 img-thumbnail"><input type="radio" name="%s" %s " value="" %s/>  %s</label>',
+		'title' => '<h4 class="small">%s: %s</h4>'
+	);
 
 	/**
 	 * @var BackendConfigurationManager
@@ -89,12 +115,11 @@ class PageLayoutSelector {
 	 */
 	public function renderField(&$parameters, &$pObj) {
 		$availableTemplates = $this->pageService->getAvailablePageTemplateFiles();
-		$selector = '<div>';
-		$selector .= $this->renderInheritanceField($parameters);
+		$options = '';
 		foreach ($availableTemplates as $extension => $group) {
-			$selector .= $this->renderOptions($extension, $group, $parameters);
+			$options .= $this->renderOptions($extension, $group, $parameters);
 		}
-		$selector .= '</div>';
+		$selector = sprintf($this->templates['selector'], $this->renderInheritanceField($parameters), $options);
 		return $selector;
 	}
 
@@ -108,18 +133,19 @@ class PageLayoutSelector {
 		$pageIsSiteRoot = (boolean) ($parameters['row']['is_siteroot']);
 		$name = $parameters['itemFormElName'];
 		$value = $parameters['itemFormElValue'];
+		$fieldTSConfig = $parameters['fieldTSConfig'];
+		$default = isset($fieldTSConfig['default']) ? $fieldTSConfig['default'] : NULL;
 		$typoScript = $this->configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
 		$settings = GeneralUtility::removeDotsFromTS((array) $typoScript['plugin.']['tx_fluidpages.']);
 		$hideInheritFieldSiteRoot = (boolean) (TRUE === isset($settings['siteRootInheritance']) ? 1 > $settings['siteRootInheritance'] : FALSE);
-		$forceDisplayInheritSiteRoot = (boolean) ('tx_fed_page_controller_action_sub' === $parameters['field'] && FALSE === $hideInheritFieldSiteRoot);
+		$tsHideInheritanceField = isset($fieldTSConfig['hideInheritanceField']) ? (boolean) $fieldTSConfig['hideInheritanceField'] : FALSE;
+		$forceDisplayInheritSiteRoot = (boolean) ('tx_fed_page_controller_action_sub' === $parameters['field'] && (FALSE === $hideInheritFieldSiteRoot || FALSE === $tsHideInheritanceField));
 		$forceHideInherit = (boolean) (0 === intval($parameters['row']['pid']));
 		if (FALSE === $forceHideInherit) {
 			if (FALSE === $pageIsSiteRoot || TRUE === $forceDisplayInheritSiteRoot || FALSE === $hideInheritFieldSiteRoot) {
 				$emptyLabel = LocalizationUtility::translate('pages.tx_fed_page_controller_action.default', 'Fluidpages');
-				$selected = TRUE === empty($value) ? ' checked="checked" ' : NULL;
-				$selector .= '<label>';
-				$selector .= '<input type="radio" name="' . $name . '" ' . $onChange . '" value="" ' . $selected . '/> ' . $emptyLabel . LF;
-				$selector .= '</label>' . LF;
+				$selected = TRUE === empty($value) && TRUE === empty($default) ? ' checked="checked" ' : NULL;
+				$selector  = sprintf($this->templates['inheritanceField'], $name, $onChange, $selected, $emptyLabel);
 			}
 		}
 		return $selector;
@@ -144,7 +170,12 @@ class PageLayoutSelector {
 			}
 
 			$packageLabel = LocalizationUtility::translate('pages.tx_fed_page_package', 'Fluidpages');
-			$selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' . $groupTitle . '</h4>' . LF;
+			$fieldTSConfig = $parameters['fieldTSConfig'];
+			$hideTitle = isset($fieldTSConfig['hideTitle']) ? $fieldTSConfig['hideTitle'] : NULL;
+			if (TRUE === empty($hideTitle)) {
+				$selector .= sprintf($this->templates['title'], $packageLabel, $groupTitle);
+			}
+
 			foreach ($group as $form) {
 				$selector .= $this->renderOption($form, $parameters);
 			}
@@ -160,6 +191,10 @@ class PageLayoutSelector {
 	protected function renderOption(Form $form, array $parameters) {
 		$name = $parameters['itemFormElName'];
 		$value = $parameters['itemFormElValue'];
+		$fieldTSConfig = $parameters['fieldTSConfig'];
+		$keepItems =  isset($fieldTSConfig['keepItems']) ? explode(',', $fieldTSConfig['keepItems']) : NULL;
+		$removeItems =  isset($fieldTSConfig['removeItems']) ? explode(',', $fieldTSConfig['removeItems']) : NULL;
+		$default = isset($fieldTSConfig['default']) ? $fieldTSConfig['default'] : NULL;
 		$onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
 		$selector = '';
 		try {
@@ -168,16 +203,50 @@ class PageLayoutSelector {
 			$template = pathinfo($form->getOption(Form::OPTION_TEMPLATEFILE), PATHINFO_FILENAME);
 			$label = $form->getLabel();
 			$optionValue = $extension . '->' . lcfirst($template);
-			$selected = ($optionValue == $value ? ' checked="checked"' : '');
-			$option = '<label style="padding: 0.5em; border: 1px solid #CCC; display: inline-block; vertical-align: bottom; margin: 0 1em 1em 0; cursor: pointer; ' . ($selected ? 'background-color: #DDD;' : '')  . '">';
-			$option .= '<img src="' . $thumbnail . '" alt="' . $label . '" style="margin: 0.5em 0 0.5em 0; max-width: 196px; max-height: 128px;"/><br />';
-			$option .= '<input type="radio" value="' . $optionValue . '"' . $selected . ' name="' . $name . '" ' . $onChange . ' /> ' . $label;
-			$option .= '</label>';
-			$selector .= $option . LF;
+			$selected = FALSE;
+			if (TRUE === empty($value)) {
+				if (FALSE === empty($default)) {
+					$selected = ($optionValue == $default ? ' checked="checked"' : '');
+				}
+
+			} else {
+				$selected = ($optionValue == $value ? ' checked="checked"' : '');
+			}
+
+			$option = $this->getField($selected, $thumbnail, $label, $optionValue, $name, $onChange);
+			if (FALSE === empty($keepItems)) {
+				if (TRUE === in_array($optionValue, $keepItems)) {
+					$selector .= $option . LF;
+				}
+
+			}  elseif (FALSE === empty($removeItems)) {
+				if (TRUE === in_array($optionValue, $removeItems)) {
+					$selector .= $option . LF;
+				}
+
+			} else {
+				$selector .= $option . LF;
+			}
+
 		} catch (\RuntimeException $error) {
 			$this->configurationService->debug($error);
 		}
 		return $selector;
+	}
+
+	/**
+	 * @param $selected
+	 * @param $thumbnail
+	 * @param $label
+	 * @param $optionValue
+	 * @param $name
+	 * @param $onChange
+	 *
+	 * @return string
+	 */
+	protected function getField($selected, $thumbnail, $label, $optionValue, $name, $onChange) {
+		$color = $selected ? 'background-color: #ebf3fb; border-color:#6daae0; ' : '';
+		return sprintf($this->templates['field'], $color, $thumbnail, $label, $optionValue, $selected, $name, $onChange, $label);
 	}
 
 }
