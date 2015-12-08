@@ -214,12 +214,53 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 */
 	public function getFlexFormValues(array $row) {
 		$fieldName = $this->getFieldName($row);
- 		$form = $this->getForm($row);
-		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
+		$form = $this->getForm($row);
+
+		$immediateConfiguration = $this->getFlexFormValuesSingle($row);
 		$inheritedConfiguration = $this->getInheritedConfiguration($row);
 		$merged = RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
+
 		return $merged;
  	}
+
+	/**
+	 * @param array $row source record row
+	 * @param array $configuration to be overlayed
+	 */
+	public function overlayFlexFormValues($row, $configuration, $form) {
+		if ($GLOBALS['TSFE']->sys_language_uid > 0) {
+			$overlays = $this->recordService->get('pages_language_overlay', '*', 'sys_language_uid = ' . $GLOBALS['TSFE']->sys_language_uid . ' AND pid = ' . $row['uid']);
+			$fieldName = $this->getFieldName($row);
+			if (count($overlays) > 0) {
+				foreach ($overlays as $overlay) {
+					$overlayConfiguration = $this->configurationService->convertFlexFormContentToArray($overlay[$fieldName], $form, NULL, NULL);
+					$configuration = RecursiveArrayUtility::merge($configuration, $overlayConfiguration);
+				}
+			}
+		}
+		return $configuration;
+	}
+
+	/**
+	 * @param array $row
+	 * @return array
+	 */
+	public function getFlexFormValuesSingle(array $row) {
+		$fieldName = $this->getFieldName($row);
+		$form = $this->getForm($row);
+
+		// legacy language handling, this was deprecated in TYPO3 7.6 (Deprecation: #70138 - Flex form language handling)
+		// this should stay here for a little while and be removed at some point in the future
+		$languageRef = NULL;
+		if ($GLOBALS['TSFE']->sys_language_uid > 0) {
+			$languageRef = 'l' . $GLOBALS['TSFE']->config['config']['language'];
+		}
+		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, $languageRef, NULL);
+
+		// replacement for the deprecated language handling (Deprecation: #70138 - Flex form language handling)
+		$immediateConfiguration = $this->overlayFlexFormValues($row, $immediateConfiguration, $form);
+		return $immediateConfiguration;
+	}
 
 	/**
 	 * @param string $operation

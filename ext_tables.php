@@ -155,3 +155,30 @@ if (FALSE === empty($additionalDoktypes)) {
 $GLOBALS['TCA']['pages']['ctrl']['requestUpdate'] .= ',tx_fluidpages_templatefile';
 
 unset($doktypes, $additionalDoktypes, $doktypeIcon);
+
+if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay'])
+	&& TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay']) {
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages_language_overlay', array(
+		'tx_fed_page_flexform' => Array (
+			'exclude' => 1,
+			'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform',
+			'config' => array (
+				'type' => 'flex',
+			)
+		),
+		'tx_fed_page_flexform_sub' => Array (
+			'exclude' => 1,
+			'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform_sub',
+			'config' => array (
+				'type' => 'flex',
+			)
+		),
+	));
+
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+		'pages_language_overlay',
+		'--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_configuration,tx_fed_page_flexform,tx_fed_page_flexform_sub'
+	);
+
+	$GLOBALS['TYPO3_CONF_VARS']['FE']['pageOverlayFields'] .= ',tx_fed_page_flexform,tx_fed_page_flexform_sub';
+}

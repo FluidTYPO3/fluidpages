@@ -12,7 +12,7 @@ use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
 
 /**
- * Page SubConfiguration Provider
+ * PageLanguageOverlay SubConfiguration Provider
  *
  * This Provider has a slightly lower priority
  * than the main PageProvider but will trigger
@@ -23,7 +23,7 @@ use FluidTYPO3\Flux\Provider\ProviderInterface;
  * that define a specific action to use and the
  * SubPageProvider act on all other page records.
  */
-class SubPageProvider extends PageProvider implements ProviderInterface {
+class SubPageLanguageOverlayProvider extends PageLanguageOverlayProvider implements ProviderInterface {
 
 	/**
 	 * @var string
@@ -39,6 +39,17 @@ class SubPageProvider extends PageProvider implements ProviderInterface {
 			$row = $this->pageService->getPageTemplateConfiguration($row['uid']);
 		}
 		return $row[self::FIELD_ACTION_SUB];
+	}
+
+	/**
+	 * @param array $row
+	 * @return array
+	 */
+	public function getFlexFormValuesSingle(array $row) {
+		$fieldName = $this->getFieldName($row);
+		$form = $this->getForm($row);
+		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
+		return $immediateConfiguration;
 	}
 
 }
