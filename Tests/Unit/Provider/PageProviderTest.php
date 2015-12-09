@@ -201,6 +201,8 @@ class PageProviderTest extends AbstractTestCase {
 		$form = Form::create();
 		$form->createField('Input', 'foo');
 		$record = $this->getBasicRecord();
+		// use a new uid to prevent caching issues
+		$record['uid'] = $record['uid'] + 1;
 		/** @var DummyPageProvider $dummyProvider1 */
 		$dummyProvider1 = $this->objectManager->get('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\Provider\\DummyPageProvider');
 		/** @var DummyPageProvider $dummyProvider2 */

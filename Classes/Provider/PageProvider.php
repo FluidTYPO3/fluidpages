@@ -304,7 +304,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		$tableName = $this->getTableName($row);
 		$tableFieldName = $this->getFieldName($row);
 		$cacheKey = $tableName . $tableFieldName . $row['uid'];
-		if (TRUE === empty(self::$cache[$cacheKey])) {
+		if (FALSE === isset(self::$cache[$cacheKey])) {
 			$tree = $this->getInheritanceTree($row);
 			$data = array();
 			foreach ($tree as $branch) {
