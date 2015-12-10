@@ -250,9 +250,11 @@ class PageProviderTest extends AbstractTestCase {
 	public function setsDefaultValueInFieldsBasedOnInheritedValue() {
 		$row = array();
 		$className = str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4));
-		$instance = $this->getMock($className, array('getInheritedPropertyValueByDottedPath'));
+		$instance = $this->getMock($className, array('getInheritedPropertyValueByDottedPath', 'getInheritedConfiguration'));
 		$instance->expects($this->once())->method('getInheritedPropertyValueByDottedPath')
-			->with($row, 'input')->will($this->returnValue('default'));
+			->with(array(), 'input')->will($this->returnValue('default'));
+		$instance->expects($this->once())->method('getInheritedConfiguration')
+			->with($row)->will($this->returnValue(array()));
 		$form = Form::create();
 		$field = $form->createField('Input', 'input');
 		$returnedForm = $this->callInaccessibleMethod($instance, 'setDefaultValuesInFieldsWithInheritedValues', $form, $row);
@@ -318,8 +320,7 @@ class PageProviderTest extends AbstractTestCase {
 	 */
 	public function testGetInheritedPropertyValueByDottedPath(array $input, $path, $expected) {
 		$provider = $this->getMock('FluidTYPO3\\Fluidpages\\Provider\\PageProvider', array('getInheritedConfiguration'));
-		$provider->expects($this->once())->method('getInheritedConfiguration')->willReturn($input);
-		$result = $this->callInaccessibleMethod($provider, 'getInheritedPropertyValueByDottedPath', array(), $path);
+		$result = $this->callInaccessibleMethod($provider, 'getInheritedPropertyValueByDottedPath', $input, $path);
 		$this->assertEquals($expected, $result);
 	}
 
