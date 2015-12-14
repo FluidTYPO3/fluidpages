@@ -286,9 +286,10 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return Form
 	 */
 	protected function setDefaultValuesInFieldsWithInheritedValues(Form $form, array $row) {
+		$inheritedConfiguration = $this->getInheritedConfiguration($row);
 		foreach ($form->getFields() as $field) {
 			$name = $field->getName();
-			$inheritedValue = $this->getInheritedPropertyValueByDottedPath($row, $name);
+			$inheritedValue = $this->getInheritedPropertyValueByDottedPath($inheritedConfiguration, $name);
 			if (NULL !== $inheritedValue && TRUE === $field instanceof Form\FieldInterface) {
 				$field->setDefault($inheritedValue);
 			}
@@ -327,12 +328,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * @param array $row
+	 * @param array $inheritedConfiguration
 	 * @param string $propertyPath
 	 * @return mixed
 	 */
-	protected function getInheritedPropertyValueByDottedPath(array $row, $propertyPath) {
-		$inheritedConfiguration = $this->getInheritedConfiguration($row);
+	protected function getInheritedPropertyValueByDottedPath($inheritedConfiguration, $propertyPath) {
 		if (TRUE === empty($propertyPath)) {
 			return NULL;
 		} elseif (FALSE === strpos($propertyPath, '.')) {
