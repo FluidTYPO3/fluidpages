@@ -3,3 +3,6 @@ autoload = 1
 
   # cat=basic/enable; type=input; label=Doktypes: CSV list of doktypes to add the page layout selectors to in addition to the default standard pages and shortcuts (0,1,4). Possible use cases are sysfolders (254) or custom page types.
 doktypes =
+
+  # cat=basic/enable; type=boolean; label=Enable translation of Page Configuration through the Pages Language Overlays.
+pagesLanguageConfigurationOverlay = 0
