@@ -35,7 +35,7 @@ class PageProviderTest extends AbstractTestCase {
 			->get('FluidTYPO3\\Fluidpages\\Provider\\PageProvider');
 		$this->assertAttributeInstanceOf('TYPO3\\CMS\\Core\\Configuration\\FlexForm\\FlexFormTools', 'flexformTool', $instance);
 		$this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\PageService', 'pageService', $instance);
-		$this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', 'configurationService', $instance);
+		$this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', 'pageConfigurationService', $instance);
 	}
 
 	public function testGetExtensionKey() {
@@ -140,7 +140,7 @@ class PageProviderTest extends AbstractTestCase {
 			/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
 			$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
 			$configurationService->expects($this->once())->method('message');
-			$instance->injectConfigurationService($configurationService);
+			$instance->injectPageConfigurationService($configurationService);
 		}
 		// make sure PageProvider is now using the right field name
 		$instance->trigger($record, NULL, $fieldName);
@@ -184,7 +184,7 @@ class PageProviderTest extends AbstractTestCase {
 		$provider->expects($this->any())->method('unsetInheritedValues');
 		$provider->expects($this->any())->method('getForm')->willReturn(Form::create());
 		$provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
-		$provider->injectConfigurationService($mockConfigurationService);
+		$provider->injectPageConfigurationService($mockConfigurationService);
 		$values = $provider->getFlexformValues($record);
 		$this->assertEquals($values, array());
 	}
@@ -222,7 +222,7 @@ class PageProviderTest extends AbstractTestCase {
 		$provider->expects($this->any())->method('unsetInheritedValues');
 		$provider->expects($this->any())->method('getForm')->willReturn(Form::create());
 		$provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
-		$provider->injectConfigurationService($mockConfigurationService);
+		$provider->injectPageConfigurationService($mockConfigurationService);
 		$values = $provider->getFlexformValues($record);
 		$this->assertEquals($values, array());
 	}
@@ -388,7 +388,7 @@ class PageProviderTest extends AbstractTestCase {
 		$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
 		$configurationService->expects($this->any())->method('message');
 		$provider->injectRecordService($recordService);
-		$provider->injectConfigurationService($configurationService);
+		$provider->injectPageConfigurationService($configurationService);
 		$provider->postProcessRecord('update', $id, $record, $parentInstance);
 		$this->assertIsString($record[$fieldName]);
 		$this->assertNotContains('settings.input', $record[$fieldName]);

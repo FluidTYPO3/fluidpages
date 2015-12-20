@@ -75,7 +75,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	/**
 	 * @var ConfigurationService
 	 */
-	protected $configurationService;
+	protected $pageConfigurationService;
 
 	/**
 	 * @var array
@@ -117,11 +117,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * @param ConfigurationService $configurationService
+	 * @param ConfigurationService $pageConfigurationService
 	 * @return void
 	 */
-	public function injectConfigurationService(ConfigurationService $configurationService) {
-		$this->configurationService = $configurationService;
+	public function injectPageConfigurationService(ConfigurationService $pageConfigurationService) {
+		$this->pageConfigurationService = $pageConfigurationService;
 	}
 
 	/**
@@ -189,7 +189,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		}
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		if (TRUE === empty($action)) {
-			$this->configurationService->message('No page template selected and no template was inherited from parent page(s)');
+			$this->pageConfigurationService->message('No page template selected and no template was inherited from parent page(s)');
 			return 'default';
 		}
 		$controllerActionName = array_pop(explode('->', $action));
@@ -215,13 +215,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	public function getFlexFormValues(array $row) {
 		$fieldName = $this->getFieldName($row);
 		$form = $this->getForm($row);
-
 		$immediateConfiguration = $this->getFlexFormValuesSingle($row);
 		$inheritedConfiguration = $this->getInheritedConfiguration($row);
 		$merged = RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
-
 		return $merged;
- 	}
+	}
 
 	/**
 	 * @param array $row source record row
@@ -233,7 +231,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 			$fieldName = $this->getFieldName($row);
 			if (count($overlays) > 0) {
 				foreach ($overlays as $overlay) {
-					$overlayConfiguration = $this->configurationService->convertFlexFormContentToArray($overlay[$fieldName], $form, NULL, NULL);
+					$overlayConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray($overlay[$fieldName], $form, NULL, NULL);
 					$configuration = RecursiveArrayUtility::merge($configuration, $overlayConfiguration);
 				}
 			}
@@ -255,7 +253,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		if ($GLOBALS['TSFE']->sys_language_uid > 0) {
 			$languageRef = 'l' . $GLOBALS['TSFE']->config['config']['language'];
 		}
-		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, $languageRef, NULL);
+		$immediateConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray($row[$fieldName], $form, $languageRef, NULL);
 
 		// replacement for the deprecated language handling (Deprecation: #70138 - Flex form language handling)
 		$immediateConfiguration = $this->overlayFlexFormValues($row, $immediateConfiguration, $form);
@@ -351,7 +349,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 			$data = array();
 			foreach ($tree as $branch) {
 				/** @var SubPageProvider $provider */
-				$provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
+				$provider = $this->pageConfigurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
 				$form = $provider->getForm($branch);
 				if (NULL === $form) {
 					break;
