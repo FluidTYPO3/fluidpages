@@ -35,9 +35,11 @@ class PagePreviewRenderer {
         $row = $recordService->getSingle('pages', '*', $pageLayoutController->id);
         $form = $pageProvider->getForm($row);
 
-        $form->setOption(PreviewView::OPTION_PREVIEW, array(
-            PreviewView::OPTION_MODE => PreviewView::MODE_NONE
-        ));
+        if ($form) {
+            $form->setOption(PreviewView::OPTION_PREVIEW, array(
+                PreviewView::OPTION_MODE => PreviewView::MODE_NONE
+            ));
+        }
 
         list($previewHeader, $previewContent, $continueDrawing) = $pageProvider->getPreview($row);
 
