@@ -35,10 +35,11 @@ class SubPageLanguageOverlayProvider extends PageLanguageOverlayProvider impleme
 	 * @return string
 	 */
 	public function getControllerActionReferenceFromRecord(array $row) {
-		if (TRUE === empty($row[self::FIELD_ACTION_SUB])) {
-			$row = $this->pageService->getPageTemplateConfiguration($row['uid']);
+		$pageRow = $this->recordService->getSingle('pages', '*', $row['pid']);
+		if (TRUE === empty($pageRow[self::FIELD_ACTION_SUB])) {
+			$pageRow = $this->pageService->getPageTemplateConfiguration($pageRow['uid']);
 		}
-		return $row[self::FIELD_ACTION_SUB];
+		return $pageRow[self::FIELD_ACTION_SUB];
 	}
 
 	/**
@@ -51,5 +52,4 @@ class SubPageLanguageOverlayProvider extends PageLanguageOverlayProvider impleme
 		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
 		return $immediateConfiguration;
 	}
-
 }
