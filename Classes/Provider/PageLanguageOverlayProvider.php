@@ -47,4 +47,13 @@ class PageLanguageOverlayProvider extends PageProvider implements ProviderInterf
 		return $records;
 	}
 
+	/**
+	 * @param array $row
+	 * @return string
+	 */
+	public function getControllerActionReferenceFromRecord(array $row) {
+		$pageRow = $this->recordService->getSingle('pages', '*', $row['pid']);
+		return parent::getControllerActionReferenceFromRecord($pageRow);
+	}
+
 }
