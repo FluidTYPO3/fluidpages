@@ -85,7 +85,7 @@ $GLOBALS['TCA']['pages']['types'][\FluidTYPO3\Fluidpages\Controller\PageControll
 	--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.storage;storage,
 	--div--;LLL:EXT:lang/locallang_tca.xlf:sys_category.tabs.category, categories';
 
-$GLOBALS['TBE_STYLES']['spritemanager']['singleIcons']['tcarecords-pages-' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = $iconFile;
+$GLOBALS['TBE_STYLES']['spritemanager']['singleIcons']['tcarecords-pages-' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = $doktypeIcon;
 $GLOBALS['TCA']['pages']['ctrl']['typeicon_classes'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = 'tcarecords-pages-' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW;
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig(
