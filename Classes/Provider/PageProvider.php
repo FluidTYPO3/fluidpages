@@ -75,7 +75,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	/**
 	 * @var ConfigurationService
 	 */
-	protected $configurationService;
+	protected $pageConfigurationService;
 
 	/**
 	 * @var array
@@ -117,11 +117,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * @param ConfigurationService $configurationService
+	 * @param ConfigurationService $pageConfigurationService
 	 * @return void
 	 */
-	public function injectConfigurationService(ConfigurationService $configurationService) {
-		$this->configurationService = $configurationService;
+	public function injectPageConfigurationService(ConfigurationService $pageConfigurationService) {
+		$this->pageConfigurationService = $pageConfigurationService;
 	}
 
 	/**
@@ -189,7 +189,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		}
 		$action = $this->getControllerActionReferenceFromRecord($row);
 		if (TRUE === empty($action)) {
-			$this->configurationService->message('No page template selected and no template was inherited from parent page(s)');
+			$this->pageConfigurationService->message('No page template selected and no template was inherited from parent page(s)');
 			return 'default';
 		}
 		$controllerActionName = array_pop(explode('->', $action));
@@ -214,12 +214,51 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 */
 	public function getFlexFormValues(array $row) {
 		$fieldName = $this->getFieldName($row);
- 		$form = $this->getForm($row);
-		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
+		$form = $this->getForm($row);
+		$immediateConfiguration = $this->getFlexFormValuesSingle($row);
 		$inheritedConfiguration = $this->getInheritedConfiguration($row);
 		$merged = RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
 		return $merged;
- 	}
+	}
+
+	/**
+	 * @param array $row source record row
+	 * @param array $configuration to be overlayed
+	 */
+	public function overlayFlexFormValues($row, $configuration, $form) {
+		if ($GLOBALS['TSFE']->sys_language_uid > 0) {
+			$overlays = $this->recordService->get('pages_language_overlay', '*', 'sys_language_uid = ' . $GLOBALS['TSFE']->sys_language_uid . ' AND pid = ' . $row['uid']);
+			$fieldName = $this->getFieldName($row);
+			if (count($overlays) > 0) {
+				foreach ($overlays as $overlay) {
+					$overlayConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray($overlay[$fieldName], $form, NULL, NULL);
+					$configuration = RecursiveArrayUtility::merge($configuration, $overlayConfiguration);
+				}
+			}
+		}
+		return $configuration;
+	}
+
+	/**
+	 * @param array $row
+	 * @return array
+	 */
+	public function getFlexFormValuesSingle(array $row) {
+		$fieldName = $this->getFieldName($row);
+		$form = $this->getForm($row);
+
+		// legacy language handling, this was deprecated in TYPO3 7.6 (Deprecation: #70138 - Flex form language handling)
+		// this should stay here for a little while and be removed at some point in the future
+		$languageRef = NULL;
+		if ($GLOBALS['TSFE']->sys_language_uid > 0) {
+			$languageRef = 'l' . $GLOBALS['TSFE']->config['config']['language'];
+		}
+		$immediateConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray($row[$fieldName], $form, $languageRef, NULL);
+
+		// replacement for the deprecated language handling (Deprecation: #70138 - Flex form language handling)
+		$immediateConfiguration = $this->overlayFlexFormValues($row, $immediateConfiguration, $form);
+		return $immediateConfiguration;
+	}
 
 	/**
 	 * @param string $operation
@@ -286,9 +325,10 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 * @return Form
 	 */
 	protected function setDefaultValuesInFieldsWithInheritedValues(Form $form, array $row) {
+		$inheritedConfiguration = $this->getInheritedConfiguration($row);
 		foreach ($form->getFields() as $field) {
 			$name = $field->getName();
-			$inheritedValue = $this->getInheritedPropertyValueByDottedPath($row, $name);
+			$inheritedValue = $this->getInheritedPropertyValueByDottedPath($inheritedConfiguration, $name);
 			if (NULL !== $inheritedValue && TRUE === $field instanceof Form\FieldInterface) {
 				$field->setDefault($inheritedValue);
 			}
@@ -304,12 +344,12 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 		$tableName = $this->getTableName($row);
 		$tableFieldName = $this->getFieldName($row);
 		$cacheKey = $tableName . $tableFieldName . $row['uid'];
-		if (TRUE === empty(self::$cache[$cacheKey])) {
+		if (FALSE === isset(self::$cache[$cacheKey])) {
 			$tree = $this->getInheritanceTree($row);
 			$data = array();
 			foreach ($tree as $branch) {
 				/** @var SubPageProvider $provider */
-				$provider = $this->configurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
+				$provider = $this->pageConfigurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
 				$form = $provider->getForm($branch);
 				if (NULL === $form) {
 					break;
@@ -327,12 +367,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	}
 
 	/**
-	 * @param array $row
+	 * @param array $inheritedConfiguration
 	 * @param string $propertyPath
 	 * @return mixed
 	 */
-	protected function getInheritedPropertyValueByDottedPath(array $row, $propertyPath) {
-		$inheritedConfiguration = $this->getInheritedConfiguration($row);
+	protected function getInheritedPropertyValueByDottedPath($inheritedConfiguration, $propertyPath) {
 		if (TRUE === empty($propertyPath)) {
 			return NULL;
 		} elseif (FALSE === strpos($propertyPath, '.')) {

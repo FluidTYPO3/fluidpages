@@ -39,7 +39,7 @@ class SubPageProviderTest extends AbstractTestCase {
 			/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
 			$configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
 			$configurationService->expects($this->once())->method('message');
-			$instance->injectConfigurationService($configurationService);
+			$instance->injectPageConfigurationService($configurationService);
 		}
 		// make sure PageProvider is now using the right field name
 		$instance->trigger($record, NULL, $fieldName);
