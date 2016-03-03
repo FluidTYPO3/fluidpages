@@ -1,5 +1,26 @@
 # Fluidpages Change log
 
+3.5.0 - 2016-03-03
+------------------
+
+- [#310](https://github.com/FluidTYPO3/fluidpages/pull/310) Bug fix for incorrect variable name used in icon resolving
+
+- [#306](https://github.com/FluidTYPO3/fluidpages/pull/306) Bug fix for showing the correct template's configuration 
+
+- [#305](https://github.com/FluidTYPO3/fluidpages/pull/305) Bug fix for rendering when no layout is selected
+
+- [#298](https://github.com/FluidTYPO3/fluidpages/pull/299) PHP7 compatibility
+  - [#301](https://github.com/FluidTYPO3/fluidpages/pull/301) PHP7 compatibility
+  - [#300](https://github.com/FluidTYPO3/fluidpages/pull/300) PHP7 compatibility
+
+- [#296](https://github.com/FluidTYPO3/fluidpages/pull/296) Page configuration fields now possible to add to language overlay.
+  - Extension configuration contains toggle to enable adding mentioned fields to translatable fields. Implemented as substitute for
+    the translation behavior of FlexForms which has been removed in TYPO3.
+- [#297](https://github.com/FluidTYPO3/fluidpages/pull/297) Performance improvement for PageProvider / SubPageProvider
+  - [#298](https://github.com/FluidTYPO3/fluidpages/pull/298) Followup performance improvement
+  
+- [#293](https://github.com/FluidTYPO3/fluidpages/pull/293) Page templates' `Preview` section now shown in "page" module.
+
 3.4.0 - 2015-09-21
 ------------------
 
