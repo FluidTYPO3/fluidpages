@@ -39,7 +39,7 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	/**
 	 * @var ConfigurationService
 	 */
-	protected $configurationService;
+	protected $pageConfigurationService;
 
 	/**
 	 * @var Response
@@ -54,11 +54,11 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	}
 
 	/**
-	 * @param ConfigurationService $configurationService
+	 * @param ConfigurationService $pageConfigurationService
 	 * @return void
 	 */
-	public function injectConfigurationService(ConfigurationService $configurationService) {
-		$this->configurationService = $configurationService;
+	public function injectPageConfigurationService(ConfigurationService $pageConfigurationService) {
+		$this->pageConfigurationService = $pageConfigurationService;
 	}
 
 	/**
@@ -79,7 +79,7 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	 * @return void
 	 */
 	protected function initializeProvider() {
-		$this->provider = $this->configurationService->resolvePageProvider($this->getRecord());
+		$this->provider = $this->pageConfigurationService->resolvePageProvider($this->getRecord());
 	}
 
 	/**
@@ -88,8 +88,8 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	public function rawAction() {
 		$record = $this->getRecord();
 		$templateFileReference = $record['tx_fluidpages_templatefile'];
-		$templatePathAndFilename = $this->configurationService->convertFileReferenceToTemplatePathAndFilename($templateFileReference);
-		$paths = $this->configurationService->getViewConfigurationByFileReference($templateFileReference);
+		$templatePathAndFilename = $this->pageConfigurationService->convertFileReferenceToTemplatePathAndFilename($templateFileReference);
+		$paths = $this->pageConfigurationService->getViewConfigurationByFileReference($templateFileReference);
 		$this->provider->setTemplatePathAndFilename($templatePathAndFilename);
 		$this->view->setTemplatePathAndFilename($templatePathAndFilename);
 		$this->view->setTemplateRootPath($paths['templateRootPath']);

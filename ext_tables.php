@@ -85,7 +85,8 @@ $GLOBALS['TCA']['pages']['types'][\FluidTYPO3\Fluidpages\Controller\PageControll
 	--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.storage;storage,
 	--div--;LLL:EXT:lang/locallang_tca.xlf:sys_category.tabs.category, categories';
 
-\TYPO3\CMS\Backend\Sprite\SpriteManager::addTcaTypeIcon('pages', \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW, $doktypeIcon);
+$GLOBALS['TBE_STYLES']['spritemanager']['singleIcons']['tcarecords-pages-' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = $doktypeIcon;
+$GLOBALS['TCA']['pages']['ctrl']['typeicon_classes'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = 'tcarecords-pages-' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW;
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig(
 	'options.pageTree.doktypesToShowInNewPageDragArea := addToList(' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW . ')'
@@ -155,3 +156,30 @@ if (FALSE === empty($additionalDoktypes)) {
 $GLOBALS['TCA']['pages']['ctrl']['requestUpdate'] .= ',tx_fluidpages_templatefile';
 
 unset($doktypes, $additionalDoktypes, $doktypeIcon);
+
+if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay'])
+	&& TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay']) {
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages_language_overlay', array(
+		'tx_fed_page_flexform' => Array (
+			'exclude' => 1,
+			'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform',
+			'config' => array (
+				'type' => 'flex',
+			)
+		),
+		'tx_fed_page_flexform_sub' => Array (
+			'exclude' => 1,
+			'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform_sub',
+			'config' => array (
+				'type' => 'flex',
+			)
+		),
+	));
+
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+		'pages_language_overlay',
+		'--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_configuration,tx_fed_page_flexform,tx_fed_page_flexform_sub'
+	);
+
+	$GLOBALS['TYPO3_CONF_VARS']['FE']['pageOverlayFields'] .= ',tx_fed_page_flexform,tx_fed_page_flexform_sub';
+}
