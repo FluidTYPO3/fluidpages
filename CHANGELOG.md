@@ -1,6 +1,6 @@
 # Fluidpages Change log
 
-Upcoming
+3.4.0 - 2015-09-21
 ------------------
 
 - :exclamation: Support of [TYPO3 6.2 dropped](https://github.com/FluidTYPO3/fluidpages/commit/b225773cd2bfe8b51e148178e26a9da36d44cdac)
