@@ -43,8 +43,6 @@ class BackendLayoutTest extends UnitTestCase {
 	 * @param array $expected
 	 */
 	public function testPostProcessBackendLayout(Provider $provider, $record, $messageFunction, $messageCount, array $expected) {
-		$GLOBALS['LANG'] = $this->getMock('TYPO3\\CMS\\Lang\\LanguageService', array('sL'));
-		$GLOBALS['LANG']->expects($this->any())->method('sL')->willReturn('translatedlabel');
 		$instance = new BackendLayout();
 		$pageUid = 1;
 		$backendLayout = array();
@@ -101,7 +99,7 @@ class BackendLayoutTest extends UnitTestCase {
 						'1.' => array(
 							'columns.' => array(
 								'1.' => array(
-									'name' => 'translatedlabel',
+									'name' => 'LLL:EXT:flux/Resources/Private/Language/locallang.xlf:flux.form.columns.column',
 									'colPos' => 2,
 									'colspan' => 3,
 									'rowspan' => 3
@@ -113,7 +111,7 @@ class BackendLayoutTest extends UnitTestCase {
 			),
 			'__colPosList' => array(2),
 			'__items' => array(
-				array('translatedlabel', 2, NULL)
+				array('LLL:EXT:flux/Resources/Private/Language/locallang.xlf:flux.form.columns.column', 2, NULL)
 			)
 		);
 		return array(

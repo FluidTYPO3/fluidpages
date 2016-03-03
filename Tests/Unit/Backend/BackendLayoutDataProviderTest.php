@@ -43,10 +43,6 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	 * @param array $expected
 	 */
 	public function testGetBackendLayoutConfiguration(Provider $provider, $record, array $expected) {
-		$GLOBALS['LANG'] = $this->getMock('TYPO3\\CMS\\Lang\\LanguageService', array('sL'));
-		$GLOBALS['LANG']->csConvObj = $this->getMock('TYPO3\CMS\Core\Charset\CharsetConverter', array('readLLfile'));
-		$GLOBALS['LANG']->expects($this->any())->method('sL')->willReturn('translatedlabel');
-		$GLOBALS['LANG']->csConvObj->expects($this->any())->method('readLLfile')->willReturn(array());
 		$instance = new BackendLayoutDataProvider();
 		$pageUid = 1;
 		/** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
@@ -99,7 +95,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 				'1.' => array(
 					'columns.' => array(
 						'1.' => array(
-							'name' => 'translatedlabel',
+							'name' => 'LLL:EXT:flux/Resources/Private/Language/locallang.xlf:flux.form.columns.column',
 							'colPos' => 2,
 							'colspan' => 3,
 							'rowspan' => 3
