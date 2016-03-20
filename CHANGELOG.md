@@ -1,5 +1,9 @@
 # Fluidpages Change log
 
+3.5.1 - 2016-03-20
+------------------
+- [#314](https://github.com/FluidTYPO3/fluidpages/pull/314) Perform label translation (required since https://github.com/FluidTYPO3/flux/commit/81bb392f99ab1e30c30303ee5d885a7a44c9ff6f / Flux 7.4.0).
+
 3.5.0 - 2016-03-03
 ------------------
 
