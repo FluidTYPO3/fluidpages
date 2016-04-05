@@ -101,7 +101,7 @@ class PageController extends AbstractFluxController implements PageControllerInt
 	 * @return array
 	 */
 	public function getRecord() {
-		return $this->workspacesAwareRecordService->getSingle($this->fluxTableName, '*', $GLOBALS['TSFE']->id);
+		return $this->workspacesAwareRecordService->getSingle($this->fluxTableName, '*', $GLOBALS['TSFE']->contentPid);
 	}
 
 }
