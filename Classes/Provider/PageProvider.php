@@ -352,7 +352,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 				$provider = $this->pageConfigurationService->resolvePrimaryConfigurationProvider($this->tableName, self::FIELD_NAME_SUB, $branch);
 				$form = $provider->getForm($branch);
 				if (NULL === $form) {
-					break;
+					continue;
 				}
 				$fields = $form->getFields();
 				$values = $provider->getFlexFormValuesSingle($branch);
