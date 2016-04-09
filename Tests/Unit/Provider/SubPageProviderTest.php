@@ -65,7 +65,7 @@ class SubPageProviderTest extends AbstractTestCase {
 		/** @var PageService|\PHPUnit_Framework_MockObject_MockObject $service */
 		$service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
 		$instance = new SubPageProvider();
-		$instance->setTemplatePaths(array('templateRootPath' => 'EXT:fluidpages/Tests/Fixtures/Templates/'));
+		$instance->setTemplatePaths(array('templateRootPaths' => array('EXT:fluidpages/Tests/Fixtures/Templates/')));
 		$instance->injectPageService($service);
 		$record = array(
 			$fieldName => 'Fluidpages->dummy',
