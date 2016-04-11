@@ -227,12 +227,19 @@ class PageProvider extends AbstractProvider implements ProviderInterface {
 	 */
 	public function overlayFlexFormValues($row, $configuration, $form) {
 		if ($GLOBALS['TSFE']->sys_language_uid > 0) {
-			$overlays = $this->recordService->get('pages_language_overlay', '*', 'sys_language_uid = ' . $GLOBALS['TSFE']->sys_language_uid . ' AND pid = ' . $row['uid']);
+			$overlays = $this->recordService->get(
+				'pages_language_overlay',
+				'*',
+				'hidden = 0 AND deleted = 0 AND sys_language_uid = ' . $GLOBALS['TSFE']->sys_language_uid . ' AND pid = ' . $row['uid']
+			);
 			$fieldName = $this->getFieldName($row);
 			if (count($overlays) > 0) {
 				foreach ($overlays as $overlay) {
-					$overlayConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray($overlay[$fieldName], $form, NULL, NULL);
-					$configuration = RecursiveArrayUtility::merge($configuration, $overlayConfiguration);
+					if (isset($overlay[$fieldName])) {
+						// Note about condition: overlays may not consistently contain a workable value; skip those that don't
+						$overlayConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray($overlay[$fieldName], $form, NULL, NULL);
+						$configuration = RecursiveArrayUtility::merge($configuration, $overlayConfiguration);
+					}
 				}
 			}
 		}
