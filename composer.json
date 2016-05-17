@@ -16,7 +16,7 @@
   ],
   "homepage": "http://fluidtypo3.org",
   "license": "GPL-2.0+",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "preferred-install": "dist",
   "support": {
     "irc": "irc://irc.freenode.org/fedext",
