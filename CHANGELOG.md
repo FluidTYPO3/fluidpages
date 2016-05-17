@@ -1,5 +1,14 @@
 # Fluidpages Change log
 
+3.6.0 - 2016-05-17
+------------------
+
+- [Prevention of fatal PHP errors on incomplete configurations](https://github.com/FluidTYPO3/fluidpages/commit/79bc7b55334f9849b5dcb676958fe6bccc066b64)
+- [Bug fix for page overlays without data, fix for enableFields in overlays](https://github.com/FluidTYPO3/fluidpages/commit/89131d14cd95bc530e3c9da52d99abe1e6f4f410)
+- [#318](https://github.com/FluidTYPO3/fluidpages/pull/318) Bug fix for inheritance loop processing
+- [#315](https://github.com/FluidTYPO3/fluidpages/pull/315) Bug fix for template icons resolved by template identifier
+- [#314](https://github.com/FluidTYPO3/fluidpages/pull/314) Perform label translation (required since https://github.com/FluidTYPO3/flux/commit/81bb392f99ab1e30c30303ee5d885a7a44c9ff6f / Flux 7.4.0).
+
 3.5.0 - 2016-03-03
 ------------------
 

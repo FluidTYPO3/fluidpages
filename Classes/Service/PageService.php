@@ -203,7 +203,7 @@ class PageService implements SingletonInterface {
 						);
 						continue;
 					}
-					$form->setOption(Form::OPTION_TEMPLATEFILE, $file);
+					$form->setOption(Form::OPTION_TEMPLATEFILE, $configuredPath . $file);
 					$output[$extensionName][$filename] = $form;
 				}
 			}

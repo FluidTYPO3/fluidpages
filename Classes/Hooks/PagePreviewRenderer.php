@@ -31,17 +31,23 @@ class PagePreviewRenderer {
 
         /** @var PageProvider $pageProvider */
         $pageProvider = $objectManager->get(PageProvider::class);
+		$previewContent = '';
 
-        $row = $recordService->getSingle('pages', '*', $pageLayoutController->id);
-        $form = $pageProvider->getForm($row);
+		if ($pageProvider) {
+			$row = $recordService->getSingle('pages', '*', $pageLayoutController->id);
+			$form = $pageProvider->getForm($row);
 
-        if ($form) {
-            $form->setOption(PreviewView::OPTION_PREVIEW, array(
-                PreviewView::OPTION_MODE => PreviewView::MODE_NONE
-            ));
-        }
+			if ($form) {
 
-        list($previewHeader, $previewContent, $continueDrawing) = $pageProvider->getPreview($row);
+				// Force the preview to *not* generate content column HTML in preview
+				$form->setOption(PreviewView::OPTION_PREVIEW, array(
+					PreviewView::OPTION_MODE => PreviewView::MODE_NONE
+				));
+
+				list($previewHeader, $previewContent, $continueDrawing) = $pageProvider->getPreview($row);
+			}
+
+		}
 
         return $previewContent;
     }

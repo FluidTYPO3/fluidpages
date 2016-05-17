@@ -10,6 +10,7 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
 
 use FluidTYPO3\Fluidpages\Backend\BackendLayout;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Form\Container\Grid;
 use FluidTYPO3\Flux\Provider\Provider;
 use FluidTYPO3\Flux\Service\ContentService;
@@ -69,12 +70,14 @@ class BackendLayoutTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getPostProcessBackendLayoutTestValues() {
+		$form = Form::create(array('id' => 'formId'));
 		/** @var Provider|\PHPUnit_Framework_MockObject_MockObject $standardProvider */
 		$standardProvider = $this->getMock(
 			'FluidTYPO3\\Flux\\Provider\\Provider',
-			array('getControllerActionFromRecord')
+			array('getControllerActionFromRecord', 'getForm')
 		);
 		$standardProvider->setTemplatePaths(array());
+		$standardProvider->expects($this->any())->method('getForm')->willReturn($form);
 		$actionLessProvider = clone $standardProvider;
 		$exceptionProvider = clone $standardProvider;
 		$emptyGridProvider = clone $standardProvider;
@@ -83,10 +86,12 @@ class BackendLayoutTest extends UnitTestCase {
 		$exceptionProvider->expects($this->any())->method('getControllerActionFromRecord')->willThrowException(new \RuntimeException());
 		/** @var Grid $grid */
 		$grid = Grid::create();
+		$grid->setParent($form);
 		$emptyGridProvider->setGrid($grid);
 		$emptyGridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
 		/** @var Grid $grid */
 		$grid = Grid::create(array());
+		$grid->setParent($form);
 		$grid->createContainer('Row', 'row')->createContainer('Column', 'column')->setColSpan(3)->setRowSpan(3)->setColumnPosition(2);
 		$gridProvider->setGrid($grid);
 		$gridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
@@ -99,7 +104,7 @@ class BackendLayoutTest extends UnitTestCase {
 						'1.' => array(
 							'columns.' => array(
 								'1.' => array(
-									'name' => 'LLL:EXT:flux/Resources/Private/Language/locallang.xlf:flux.form.columns.column',
+									'name' => 'LLL:EXT:flux/Resources/Private/Language/locallang.xlf:flux.formId.columns.column',
 									'colPos' => 2,
 									'colspan' => 3,
 									'rowspan' => 3
@@ -111,7 +116,7 @@ class BackendLayoutTest extends UnitTestCase {
 			),
 			'__colPosList' => array(2),
 			'__items' => array(
-				array('LLL:EXT:flux/Resources/Private/Language/locallang.xlf:flux.form.columns.column', 2, NULL)
+				array('LLL:EXT:flux/Resources/Private/Language/locallang.xlf:flux.formId.columns.column', 2, NULL)
 			)
 		);
 		return array(
