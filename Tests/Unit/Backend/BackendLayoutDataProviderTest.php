@@ -10,6 +10,7 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
 
 use FluidTYPO3\Fluidpages\Backend\BackendLayoutDataProvider;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Form\Container\Grid;
 use FluidTYPO3\Flux\Provider\Provider;
 use FluidTYPO3\Flux\Service\ContentService;
@@ -67,11 +68,13 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getBackendLayoutConfigurationTestValues() {
+		$form = Form::create(array('id' => 'formId'));
 		/** @var Provider|\PHPUnit_Framework_MockObject_MockObject $standardProvider */
 		$standardProvider = $this->getMock(
 			'FluidTYPO3\\Flux\\Provider\\Provider',
-			array('getControllerActionFromRecord')
+			array('getControllerActionFromRecord', 'getForm')
 		);
+		$standardProvider->expects($this->atLeastOnce())->method('getForm')->willReturn($form);
 		$standardProvider->setTemplatePaths(array());
 		$actionLessProvider = clone $standardProvider;
 		$exceptionProvider = clone $standardProvider;
@@ -85,6 +88,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 		$emptyGridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
 		/** @var Grid $grid */
 		$grid = Grid::create(array());
+		$grid->setParent($form);
 		$grid->createContainer('Row', 'row')->createContainer('Column', 'column')->setColSpan(3)->setRowSpan(3)->setColumnPosition(2);
 		$gridProvider->setGrid($grid);
 		$gridProvider->expects($this->any())->method('getControllerActionFromRecord')->willReturn('default');
@@ -95,7 +99,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 				'1.' => array(
 					'columns.' => array(
 						'1.' => array(
-							'name' => 'LLL:EXT:flux/Resources/Private/Language/locallang.xlf:flux.form.columns.column',
+							'name' => 'LLL:EXT:flux/Resources/Private/Language/locallang.xlf:flux.formId.columns.column',
 							'colPos' => 2,
 							'colspan' => 3,
 							'rowspan' => 3
