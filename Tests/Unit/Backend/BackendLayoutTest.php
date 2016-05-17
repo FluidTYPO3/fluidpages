@@ -77,7 +77,7 @@ class BackendLayoutTest extends UnitTestCase {
 			array('getControllerActionFromRecord', 'getForm')
 		);
 		$standardProvider->setTemplatePaths(array());
-		$standardProvider->expects($this->atLeastOnce())->method('getForm')->willReturn($form);
+		$standardProvider->expects($this->any())->method('getForm')->willReturn($form);
 		$actionLessProvider = clone $standardProvider;
 		$exceptionProvider = clone $standardProvider;
 		$emptyGridProvider = clone $standardProvider;

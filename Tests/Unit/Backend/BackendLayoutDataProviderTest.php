@@ -74,7 +74,7 @@ class BackendLayoutDataProviderTest extends UnitTestCase {
 			'FluidTYPO3\\Flux\\Provider\\Provider',
 			array('getControllerActionFromRecord', 'getForm')
 		);
-		$standardProvider->expects($this->atLeastOnce())->method('getForm')->willReturn($form);
+		$standardProvider->expects($this->any())->method('getForm')->willReturn($form);
 		$standardProvider->setTemplatePaths(array());
 		$actionLessProvider = clone $standardProvider;
 		$exceptionProvider = clone $standardProvider;
