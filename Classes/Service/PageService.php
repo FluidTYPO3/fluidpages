@@ -1,172 +1,128 @@
 <?php
-/***************************************************************
- *  Copyright notice
+namespace FluidTYPO3\Fluidpages\Service;
+
+/*
+ * This file is part of the FluidTYPO3/Fluidpages project under GPLv2 or later.
  *
- *  (c) 2010 Claus Due <claus@wildside.dk>, Wildside A/S
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
+ * For the full copyright and license information, please read the
+ * LICENSE.md file that was distributed with this source code.
+ */
+
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
+use FluidTYPO3\Flux\View\TemplatePaths;
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * Page Service
  *
  * Service for interacting with Pages - gets content elements and page configuration
  * options.
- *
- * @package Fluidpages
- * @subpackage Service
  */
-class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
+class PageService implements SingletonInterface {
 
 	/**
-	 * @var array
-	 */
-	private static $cache = array();
-
-	/**
-	 * @var Tx_Extbase_Object_ObjectManager
+	 * @var ObjectManager
 	 */
 	protected $objectManager;
 
 	/**
-	 * @var Tx_Extbase_Configuration_ConfigurationManagerInterface
+	 * @var ConfigurationManagerInterface
 	 */
 	protected $configurationManager;
 
 	/**
-	 * @var Tx_Fluidpages_Service_ConfigurationService
+	 * @var ConfigurationService
 	 */
 	protected $configurationService;
 
 	/**
-	 * @param Tx_Extbase_Object_ObjectManager $objectManager
+	 * @var WorkspacesAwareRecordService
+	 */
+	protected $workspacesAwareRecordService;
+
+	/**
+	 * @param ObjectManager $objectManager
 	 * @return void
 	 */
-	public function injectObjectManager(Tx_Extbase_Object_ObjectManager $objectManager) {
+	public function injectObjectManager(ObjectManager $objectManager) {
 		$this->objectManager = $objectManager;
 	}
 
 	/**
-	 * @param Tx_Extbase_Configuration_ConfigurationManagerInterface $configurationManager
+	 * @param ConfigurationManagerInterface $configurationManager
 	 * @return void
 	 */
-	public function injectConfigurationManager(Tx_Extbase_Configuration_ConfigurationManagerInterface $configurationManager) {
+	public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager) {
 		$this->configurationManager = $configurationManager;
 	}
 
 	/**
-	 * @param Tx_Fluidpages_Service_ConfigurationService $configurationService
+	 * @param ConfigurationService $configurationService
 	 * @return void
 	 */
-	public function injectConfigurationService(Tx_Fluidpages_Service_ConfigurationService $configurationService) {
+	public function injectConfigurationService(ConfigurationService $configurationService) {
 		$this->configurationService = $configurationService;
+	}
+
+	/**
+	 * @param WorkspacesAwareRecordService $workspacesAwareRecordService
+	 * @return void
+	 */
+	public function injectWorkspacesAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService) {
+		$this->workspacesAwareRecordService = $workspacesAwareRecordService;
 	}
 
 	/**
 	 * Process RootLine to find first usable, configured Fluid Page Template.
 	 * WARNING: do NOT use the output of this feature to overwrite $row - the
-	 * record returned may or may not be the same recod as defined in $id.
+	 * record returned may or may not be the same record as defined in $id.
 	 *
 	 * @param integer $pageUid
 	 * @return array|NULL
 	 * @api
 	 */
 	public function getPageTemplateConfiguration($pageUid) {
-		if ($pageUid < 1) {
+		$pageUid = (integer) $pageUid;
+		if (1 > $pageUid) {
 			return NULL;
 		}
-		$cacheKey = 'page_' . $pageUid;
-		if (TRUE === isset(self::$cache[$cacheKey])) {
-			return self::$cache[$cacheKey];
-		}
-		$pageSelect = new t3lib_pageSelect();
-		$page = $pageSelect->getPage($pageUid);
-		if (strpos($page['tx_fed_page_controller_action'], '->')) {
-			return $page;
-		}
+		$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
+
+		// Initialize with possibly-empty values and loop root line
+		// to fill values as they are detected.
+		$resolvedMainTemplateIdentity = $page['tx_fed_page_controller_action'];
+		$resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
 		do {
-			$page = $this->getWorkspaceParentPage($page);
-			$workspacePage = NULL;
-			$workspacePage = $this->getWorkspacePage($page);
-			if ($workspacePage) {
-				$page = $workspacePage;
-			}
-		} while ($page && !strpos($page['tx_fed_page_controller_action_sub'], '->'));
-		$page['tx_fed_page_controller_action'] = $page['tx_fed_page_controller_action_sub'];
-		if (TRUE === empty($page['tx_fed_page_controller_action'])) {
-			$page = NULL;
-		}
-		self::$cache[$cacheKey] = $page;
-		return $page;
-	}
-
-	/**
-	 * Gets the workspace parent for a given page
-	 *
-	 * @param array $page
-	 * @return array
-	 */
-	protected function getWorkspaceParentPage($page) {
-		$page = $this->getPositionPlaceholder($page);
-		$page = t3lib_BEfunc::getRecord('pages', $page['pid']);
-		$page = $this->getPositionPlaceholder($page);
-		return $page;
-	}
-
-	/**
-	 * Gets the workspace version of a given page
-	 *
-	 * @param array $page
-	 * @return array
-	 */
-	protected function getWorkspacePage($page) {
-		if ($page) {
-			$wsid = $GLOBALS['BE_USER']->workspace ?: 0;
-			if ($wsid != 0 && $page['t3ver_wsid'] != $wsid) {
-				$workspacePage = t3lib_BEfunc::getRecordRaw('pages', $where = sprintf('t3ver_oid=%d AND t3ver_wsid=%d', $page['uid'], $wsid), $fields = '*');
-				if ($workspacePage !== NULL) {
-					$page = $workspacePage;
+			$containsSubDefinition = (FALSE !== strpos($page['tx_fed_page_controller_action_sub'], '->'));
+			$isCandidate = ((integer) $page['uid'] !== $pageUid);
+			if (TRUE === $containsSubDefinition && TRUE === $isCandidate) {
+				$resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
+				if (TRUE === empty($resolvedMainTemplateIdentity)) {
+					// Conditions met: current page is not $pageUid, original page did not
+					// contain a "this page" layout, current rootline page has "sub" selection.
+					// Then, set our "this page" value to use the "sub" selection that was detected.
+					$resolvedMainTemplateIdentity = $resolvedSubTemplateIdentity;
 				}
+				break;
 			}
+			// Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
+			// configuration as an emulated first parent page.
+			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
+			$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
+		} while (NULL !== $page);
+		if (TRUE === empty($resolvedMainTemplateIdentity) && TRUE === empty($resolvedSubTemplateIdentity)) {
+			// Neither directly configured "this page" nor inherited "sub" contains a valid value;
+			// no configuration was detected at all.
+			return NULL;
 		}
-		return $page;
-	}
+		return array(
+			'tx_fed_page_controller_action' => $resolvedMainTemplateIdentity,
+			'tx_fed_page_controller_action_sub' => $resolvedSubTemplateIdentity
+		);
 
-	/**
-	 * Gets a placeholder for a given page
-	 *
-	 * @param array $page
-	 * @return array
-	 */
-	protected function getPositionPlaceholder($page) {
-		if ($page['pid'] != -1) {
-			// original, dont do anything
-			return $page;
-		} elseif ($page['t3ver_state'] == 0) {
-			// page has changed, but not moved
-			$page = t3lib_BEfunc::getRecord('pages', $page['t3ver_oid']);
-		} elseif ($page['t3ver_state'] == 4) {
-			// page has moved. get placeholder for new position
-			$page = t3lib_BEfunc::getRecordRaw('pages', $where = sprintf('t3ver_move_id=%d AND t3ver_state=3', $page['t3ver_oid']), $fields = '*');
-			//$page = t3lib_BEfunc::getRecord('pages', $page['t3ver_move_id']);
-		}
-		return $page;
 	}
 
 	/**
@@ -177,59 +133,16 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	 * @api
 	 */
 	public function getPageFlexFormSource($pageUid) {
-		if ($pageUid < 1) {
+		$pageUid = (integer) $pageUid;
+		if (1 > $pageUid) {
 			return NULL;
 		}
-		$cacheKey = 'flexform_' . $pageUid;
-		if (TRUE === isset(self::$cache[$cacheKey])) {
-			return self::$cache[$cacheKey];
-		}
-		$pageSelect = new t3lib_pageSelect();
-		$page = $pageSelect->getPage($pageUid);
-		$page = $this->getWorkspacePage($page);
-		while ($page['uid'] != 0 && empty($page['tx_fed_page_flexform'])) {
-			$page = $this->getWorkspaceParentPage($page);
-			$workspacePage = NULL;
-			$workspacePage = $this->getWorkspacePage($page);
-			if ($workspacePage) {
-				$page = $workspacePage;
-			}
+		$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
+		while (NULL !== $page && 0 !== (integer) $page['uid'] && TRUE === empty($page['tx_fed_page_flexform'])) {
+			$resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
+			$page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
 		};
-		if (empty($page['tx_fed_page_flexform'])) {
-			return NULL;
-		}
-		self::$cache[$cacheKey] = $page['tx_fed_page_flexform'];
 		return $page['tx_fed_page_flexform'];
-	}
-
-	/**
-	 * Gets a human-readable label from a Fluid Page template file
-	 *
-	 * @param string $extensionName
-	 * @param string $templateFile
-	 * @return string
-	 * @api
-	 */
-	public function getPageTemplateLabel($extensionName, $templateFile) {
-		$config = $this->configurationService->getPageConfiguration($extensionName);
-		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$page = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $config, $extensionName);
-		return $page['label'] ? $page['label'] : $templateFile . '.html';
-	}
-
-	/**
-	 * Returns TRUE if the template is enabled
-	 *
-	 * @param string $extensionName
-	 * @param string $templateFile
-	 * @return string
-	 * @api
-	 */
-	public function getPageTemplateEnabled($extensionName, $templateFile) {
-		$config = $this->configurationService->getPageConfiguration($extensionName);
-		$templatePathAndFilename = $this->expandPathsAndTemplateFileToTemplatePathAndFilename($config, $templateFile);
-		$page = $this->configurationService->getStoredVariable($templatePathAndFilename, 'storage', 'Configuration', $config, $extensionName);
-		return (TRUE === (boolean) $page['enabled']);
 	}
 
 	/**
@@ -242,41 +155,34 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 	public function getAvailablePageTemplateFiles($format = 'html') {
 		$typoScript = $this->configurationService->getPageConfiguration();
 		$output = array();
-		if (is_array($typoScript) === FALSE) {
+		if (FALSE === is_array($typoScript)) {
 			return $output;
 		}
-		foreach ($typoScript as $extensionName=>$group) {
-			if (isset($group['enable']) === TRUE && $group['enable'] < 1) {
+		foreach ($typoScript as $extensionName => $group) {
+			if (TRUE === isset($group['enable']) && 1 > $group['enable']) {
 				continue;
 			}
-			if (FALSE === isset($group['templateRootPath'])) {
-				$this->configurationService->message('The template group "' . $extensionName . '" does not define a set of template containing at least a templateRootPath' .
-					'paths. This indicates a problem with your TypoScript configuration - most likely a static template is not loaded', t3lib_div::SYSLOG_SEVERITY_WARNING);
-				continue;
-			}
-			$configuredPath = rtrim($group['templateRootPath'], '/') . '/Page/';
-			$path = t3lib_div::getFileAbsFileName($configuredPath);
-			if (FALSE === is_dir($path)) {
-				$this->configurationService->message('The template group "' . $extensionName . '" has been configured to use the templateRootPath "' .
-					$configuredPath . '" but this directory does not exist.', t3lib_div::SYSLOG_SEVERITY_FATAL);
-				continue;
-			}
-			$files = scandir($path);
 			$output[$extensionName] = array();
-			foreach ($files as $k=>$file) {
-				$pathinfo = pathinfo($path . $file);
-				$extension = $pathinfo['extension'];
-				if (substr($file, 0, 1) === '.') {
-					unset($files[$k]);
-				} else if (strtolower($extension) != strtolower($format)) {
-					unset($files[$k]);
-				} else {
-					try {
-						$this->getPageTemplateLabel($extensionName, $path . $file);
-						$output[$extensionName][] = $pathinfo['filename'];
-					} catch (Exception $error) {
-						$this->configurationService->debug($error);
-						continue;
+			$templatePaths = new TemplatePaths($group);
+			$templateRootPaths = $templatePaths->getTemplateRootPaths();
+			foreach ($templateRootPaths as $templateRootPath) {
+				$configuredPath = $templateRootPath . 'Page/';
+				if (FALSE === is_dir($configuredPath)) {
+					$this->configurationService->message('The template group "' . $extensionName . '" has been configured to use the templateRootPath "' .
+						$configuredPath . '" but this directory does not exist.', GeneralUtility::SYSLOG_SEVERITY_FATAL);
+					continue;
+				}
+				$files = scandir($configuredPath);
+				foreach ($files as $key => $file) {
+					$pathinfo = pathinfo($file);
+					$extension = $pathinfo['extension'];
+					$filename = $pathinfo['filename'];
+					if ('.' === substr($file, 0, 1)) {
+						unset($files[$key]);
+					} else if (strtolower($extension) !== strtolower($format)) {
+						unset($files[$key]);
+					} else {
+						$output[$extensionName][$filename] = $filename;
 					}
 				}
 			}
@@ -284,19 +190,4 @@ class Tx_Fluidpages_Service_PageService implements t3lib_Singleton {
 		return $output;
 	}
 
-	/**
-	 * @param array $paths
-	 * @param string $template
-	 * @return string
-	 */
-	public function expandPathsAndTemplateFileToTemplatePathAndFilename($paths, $template) {
-		if (TRUE === file_exists($template)) {
-			$templatePathAndFilename = $template;
-		} else {
-			$templatePathAndFilename = $paths['templateRootPath'] . 'Page/' . $template . '.html';
-		}
-		return $templatePathAndFilename;
-	}
-
 }
-
