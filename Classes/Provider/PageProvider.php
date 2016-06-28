@@ -230,12 +230,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface
      */
     public function getFlexFormValues(array $row)
     {
-        $fieldName = $this->getFieldName($row);
-        $form = $this->getForm($row);
         $immediateConfiguration = $this->getFlexFormValuesSingle($row);
         $inheritedConfiguration = $this->getInheritedConfiguration($row);
-        $merged = RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
-        return $merged;
+        return RecursiveArrayUtility::merge($inheritedConfiguration, $immediateConfiguration);
     }
 
     /**
@@ -295,7 +292,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface
             null
         );
 
-        // replacement for the deprecated language handling (Deprecation: #70138 - Flex form language handling)
         $immediateConfiguration = $this->overlayFlexFormValues($row, $immediateConfiguration, $form);
         return $immediateConfiguration;
     }
