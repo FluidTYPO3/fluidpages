@@ -17,11 +17,10 @@ if (FALSE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
 	'FluidTYPO3.Fluidpages',
 	'Page',
-	array(
+	[
 		'Page' => 'render,error',
-	),
-	array(
-	),
+	],
+	[],
 	\TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN
 );
 
