@@ -15,14 +15,16 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\View\PreviewView;
 
-class PagePreviewRenderer {
+class PagePreviewRenderer
+{
 
     /**
      * @param array $params
      * @param PageLayoutController $pageLayoutController
      * @return string
      */
-    public function render(array $params, PageLayoutController $pageLayoutController) {
+    public function render(array $params, PageLayoutController $pageLayoutController)
+    {
         /** @var ObjectManager $objectManager */
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
 
@@ -31,25 +33,22 @@ class PagePreviewRenderer {
 
         /** @var PageProvider $pageProvider */
         $pageProvider = $objectManager->get(PageProvider::class);
-		$previewContent = '';
+        $previewContent = '';
 
-		if ($pageProvider) {
-			$row = $recordService->getSingle('pages', '*', $pageLayoutController->id);
-			$form = $pageProvider->getForm($row);
+        if ($pageProvider) {
+            $row = $recordService->getSingle('pages', '*', $pageLayoutController->id);
+            $form = $pageProvider->getForm($row);
 
-			if ($form) {
+            if ($form) {
+                // Force the preview to *not* generate content column HTML in preview
+                $form->setOption(PreviewView::OPTION_PREVIEW, [
+                    PreviewView::OPTION_MODE => PreviewView::MODE_NONE
+                ]);
 
-				// Force the preview to *not* generate content column HTML in preview
-				$form->setOption(PreviewView::OPTION_PREVIEW, array(
-					PreviewView::OPTION_MODE => PreviewView::MODE_NONE
-				));
-
-				list($previewHeader, $previewContent, $continueDrawing) = $pageProvider->getPreview($row);
-			}
-
-		}
+                list($previewHeader, $previewContent, $continueDrawing) = $pageProvider->getPreview($row);
+            }
+        }
 
         return $previewContent;
     }
-
 }

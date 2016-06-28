@@ -19,89 +19,101 @@ use TYPO3\CMS\Extbase\Mvc\Web\Response;
  *
  * @route off
  */
-class PageController extends AbstractFluxController implements PageControllerInterface {
+class PageController extends AbstractFluxController implements PageControllerInterface
+{
 
-	/**
-	 * @var string
-	 */
-	protected $fluxRecordField = 'tx_fed_page_flexform';
+    /**
+     * @var string
+     */
+    protected $fluxRecordField = 'tx_fed_page_flexform';
 
-	/**
-	 * @var string
-	 */
-	protected $fluxTableName = 'pages';
+    /**
+     * @var string
+     */
+    protected $fluxTableName = 'pages';
 
-	/**
-	 * @var PageService
-	 */
-	protected $pageService;
+    /**
+     * @var PageService
+     */
+    protected $pageService;
 
-	/**
-	 * @var ConfigurationService
-	 */
-	protected $pageConfigurationService;
+    /**
+     * @var ConfigurationService
+     */
+    protected $pageConfigurationService;
 
-	/**
-	 * @var Response
-	 */
-	protected $response;
+    /**
+     * @var Response
+     */
+    protected $response;
 
-	/**
-	 * @param PageService $pageService
-	 */
-	public function injectPageService(PageService $pageService) {
-		$this->pageService = $pageService;
-	}
+    /**
+     * @param PageService $pageService
+     */
+    public function injectPageService(PageService $pageService)
+    {
+        $this->pageService = $pageService;
+    }
 
-	/**
-	 * @param ConfigurationService $pageConfigurationService
-	 * @return void
-	 */
-	public function injectPageConfigurationService(ConfigurationService $pageConfigurationService) {
-		$this->pageConfigurationService = $pageConfigurationService;
-	}
+    /**
+     * @param ConfigurationService $pageConfigurationService
+     * @return void
+     */
+    public function injectPageConfigurationService(ConfigurationService $pageConfigurationService)
+    {
+        $this->pageConfigurationService = $pageConfigurationService;
+    }
 
-	/**
-	 * @param ViewInterface $view
-	 * @return void
-	 */
-	public function initializeView(ViewInterface $view) {
-		$record = $this->getRecord();
-		$this->configurationManager->getContentObject()->data = $record;
-		parent::initializeView($view);
-		$this->response->addAdditionalHeaderData(
-			(string) $this->view->renderStandaloneSection('HeaderCode', $this->provider->getTemplateVariables($record), TRUE)
-		);
-	}
+    /**
+     * @param ViewInterface $view
+     * @return void
+     */
+    public function initializeView(ViewInterface $view)
+    {
+        $record = $this->getRecord();
+        $this->configurationManager->getContentObject()->data = $record;
+        parent::initializeView($view);
+        $this->response->addAdditionalHeaderData(
+            (string) $this->view->renderStandaloneSection(
+                'HeaderCode',
+                $this->provider->getTemplateVariables($record),
+                true
+            )
+        );
+    }
 
-	/**
-	 * @throws \RuntimeException
-	 * @return void
-	 */
-	protected function initializeProvider() {
-		$this->provider = $this->pageConfigurationService->resolvePageProvider($this->getRecord());
-	}
+    /**
+     * @throws \RuntimeException
+     * @return void
+     */
+    protected function initializeProvider()
+    {
+        $this->provider = $this->pageConfigurationService->resolvePageProvider($this->getRecord());
+    }
 
-	/**
-	 * @return string
-	 */
-	public function rawAction() {
-		$record = $this->getRecord();
-		$templateFileReference = $record['tx_fluidpages_templatefile'];
-		$templatePathAndFilename = $this->pageConfigurationService->convertFileReferenceToTemplatePathAndFilename($templateFileReference);
-		$paths = $this->pageConfigurationService->getViewConfigurationByFileReference($templateFileReference);
-		$this->provider->setTemplatePathAndFilename($templatePathAndFilename);
-		$this->view->setTemplatePathAndFilename($templatePathAndFilename);
-		$this->view->setTemplateRootPath($paths['templateRootPath']);
-		$this->view->setPartialRootPath($paths['partialRootPath']);
-		$this->view->setLayoutRootPath($paths['layoutRootPath']);
-	}
+    /**
+     * @return string
+     */
+    public function rawAction()
+    {
+        $record = $this->getRecord();
+        $templateFileReference = $record['tx_fluidpages_templatefile'];
+        $templatePathAndFilename = $this->pageConfigurationService->convertFileReferenceToTemplatePathAndFilename(
+            $templateFileReference
+        );
+        $paths = $this->pageConfigurationService->getViewConfigurationByFileReference($templateFileReference);
+        $this->provider->setTemplatePathAndFilename($templatePathAndFilename);
+        $this->view->setTemplatePathAndFilename($templatePathAndFilename);
+        $this->view->setTemplateRootPath($paths['templateRootPath']);
+        $this->view->setPartialRootPath($paths['partialRootPath']);
+        $this->view->setLayoutRootPath($paths['layoutRootPath']);
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getRecord() {
-		return $this->workspacesAwareRecordService->getSingle($this->fluxTableName, '*', $GLOBALS['TSFE']->id);
-	}
-
+    /**
+     * @return array
+     */
+    public function getRecord()
+    {
+        return $this->workspacesAwareRecordService->getSingle($this->fluxTableName, '*', $GLOBALS['TSFE']->id);
+    }
 }

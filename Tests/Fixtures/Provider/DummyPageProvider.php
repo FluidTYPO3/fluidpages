@@ -14,46 +14,50 @@ use FluidTYPO3\Flux\Form;
 /**
  * Class DummyPageProvider
  */
-class DummyPageProvider extends SubPageProvider {
+class DummyPageProvider extends SubPageProvider
+{
 
-	/**
-	 * @var array
-	 */
-	protected $values = array();
+    /**
+     * @var array
+     */
+    protected $values = array();
 
-	/**
-	 * @param array $row
-	 * @param string $table
-	 * @param string $field
-	 * @param string $extensionKey
-	 * @return boolean
-	 */
-	public function trigger(array $row, $table, $field, $extensionKey = NULL) {
-		return TRUE;
-	}
+    /**
+     * @param array $row
+     * @param string $table
+     * @param string $field
+     * @param string $extensionKey
+     * @return boolean
+     */
+    public function trigger(array $row, $table, $field, $extensionKey = null)
+    {
+        return true;
+    }
 
-	/**
-	 * @param array $values
-	 * @return void
-	 */
-	public function setFlexFormValues(array $values) {
-		$this->values = $values;
-	}
+    /**
+     * @param array $values
+     * @return void
+     */
+    public function setFlexFormValues(array $values)
+    {
+        $this->values = $values;
+    }
 
-	/**
-	 * @param array $row
-	 * @return array()
-	 */
-	public function getFlexFormValues(array $row) {
-		return array();
-	}
+    /**
+     * @param array $row
+     * @return array()
+     */
+    public function getFlexFormValues(array $row)
+    {
+        return array();
+    }
 
-	/**
-	 * @param array $row
-	 * @return Form
-	 */
-	public function getForm(array $row) {
-		return $this->form;
-	}
-
+    /**
+     * @param array $row
+     * @return Form
+     */
+    public function getForm(array $row)
+    {
+        return $this->form;
+    }
 }
