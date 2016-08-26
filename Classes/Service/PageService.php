@@ -130,7 +130,6 @@ class PageService implements SingletonInterface
             'tx_fed_page_controller_action' => $resolvedMainTemplateIdentity,
             'tx_fed_page_controller_action_sub' => $resolvedSubTemplateIdentity
         ];
-
     }
 
     /**
