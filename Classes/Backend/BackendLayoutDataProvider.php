@@ -12,7 +12,7 @@ use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Service\ContentService;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
-use TYPO3\CMS\Backend\View\BackendLayout\BackendLayout;
+use TYPO3\CMS\Backend\View\BackendLayout\BackendLayout as CoreBackendLayout;
 use TYPO3\CMS\Backend\View\BackendLayout\BackendLayoutCollection;
 use TYPO3\CMS\Backend\View\BackendLayout\DataProviderContext;
 use TYPO3\CMS\Backend\View\BackendLayout\DataProviderInterface;
@@ -109,7 +109,7 @@ class BackendLayoutDataProvider implements DataProviderInterface
         $pageUid = $dataProviderContext->getPageId();
         $config = $this->getBackendLayoutConfiguration($pageUid);
         $configString = $this->encodeTypoScriptArray($config);
-        $backendLayout = new BackendLayout('fluidpages', 'Fluidpages', $configString);
+        $backendLayout = new CoreBackendLayout('fluidpages', 'Fluidpages', $configString);
         $backendLayoutCollection->add($backendLayout);
     }
 
@@ -125,7 +125,7 @@ class BackendLayoutDataProvider implements DataProviderInterface
         $configuration = $this->getBackendLayoutConfiguration($pageUid);
         $configuration = $this->ensureDottedKeys($configuration);
         $configString = $this->encodeTypoScriptArray($configuration);
-        $backendLayout = new BackendLayout($identifier, 'Fluidpages', $configString);
+        $backendLayout = new CoreBackendLayout($identifier, 'Fluidpages', $configString);
         return $backendLayout;
     }
 
