@@ -19,41 +19,43 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  * for other languages inside the pages_language_overlay
  * record.
  */
-class PageLanguageOverlayProvider extends PageProvider implements ProviderInterface {
+class PageLanguageOverlayProvider extends PageProvider implements ProviderInterface
+{
 
-	/**
-	 * @var string
-	 */
-	protected $tableName = 'pages_language_overlay';
+    /**
+     * @var string
+     */
+    protected $tableName = 'pages_language_overlay';
 
-	/**
-	 * @param array $record
-	 * @return array
-	 */
-	protected function loadRecordTreeFromDatabase($record) {
-		$parentFieldName = $this->getParentFieldName($record);
-		if (FALSE === isset($record[$parentFieldName])) {
-			$record[$parentFieldName] = $this->getParentFieldValue($record);
-		}
-		$pageRecord = $this->recordService->getSingle('pages', '*', $record['pid']);
-		$records = array();
-		while (0 < $pageRecord[$parentFieldName]) {
-			$record = $this->recordService->get($this->tableName, '*', 'pid = ' . $pageRecord['pid']);
-			$parentFieldName = $this->getParentFieldName($record);
-			array_push($records, $record);
-			$pageRecord = $this->recordService->getSingle('pages', '*', $pageRecord['pid']);
-		}
-		$records = array_reverse($records);
-		return $records;
-	}
+    /**
+     * @param array $record
+     * @return array
+     */
+    protected function loadRecordTreeFromDatabase($record)
+    {
+        $parentFieldName = $this->getParentFieldName($record);
+        if (false === isset($record[$parentFieldName])) {
+            $record[$parentFieldName] = $this->getParentFieldValue($record);
+        }
+        $pageRecord = $this->recordService->getSingle('pages', '*', $record['pid']);
+        $records = [];
+        while (0 < $pageRecord[$parentFieldName]) {
+            $record = $this->recordService->get($this->tableName, '*', 'pid = ' . $pageRecord['pid']);
+            $parentFieldName = $this->getParentFieldName($record);
+            array_push($records, $record);
+            $pageRecord = $this->recordService->getSingle('pages', '*', $pageRecord['pid']);
+        }
+        $records = array_reverse($records);
+        return $records;
+    }
 
-	/**
-	 * @param array $row
-	 * @return string
-	 */
-	public function getControllerActionReferenceFromRecord(array $row) {
-		$pageRow = $this->recordService->getSingle('pages', '*', $row['pid']);
-		return parent::getControllerActionReferenceFromRecord($pageRow);
-	}
-
+    /**
+     * @param array $row
+     * @return string
+     */
+    public function getControllerActionReferenceFromRecord(array $row)
+    {
+        $pageRow = $this->recordService->getSingle('pages', '*', $row['pid']);
+        return parent::getControllerActionReferenceFromRecord($pageRow);
+    }
 }

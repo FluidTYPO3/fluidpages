@@ -9,60 +9,60 @@ if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']
 	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Fluidpages PAGE rendering');
 }
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', array(
-	'tx_fed_page_controller_action' => array (
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', [
+	'tx_fed_page_controller_action' => [
 		'exclude' => 1,
 		'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_controller_action',
-		'config' => array (
+		'config' => [
 			'type' => 'user',
 			'userFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutSelector->renderField'
-		)
-	),
-	'tx_fed_page_controller_action_sub' => array (
+		]
+	],
+	'tx_fed_page_controller_action_sub' => [
 		'exclude' => 1,
 		'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_controller_action_sub',
-		'config' => array (
+		'config' => [
 			'type' => 'user',
 			'userFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutSelector->renderField'
-		)
-	),
-	'tx_fed_page_flexform' => Array (
+		]
+	],
+	'tx_fed_page_flexform' => [
 		'exclude' => 1,
 		'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform',
-		'config' => array (
+		'config' => [
 			'type' => 'flex',
-		)
-	),
-	'tx_fed_page_flexform_sub' => Array (
+		]
+	],
+	'tx_fed_page_flexform_sub' => [
 		'exclude' => 1,
 		'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform_sub',
-		'config' => array (
+		'config' => [
 			'type' => 'flex',
-		)
-	),
-));
+		]
+	],
+]);
 
 $doktypeIcon = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('fluidpages') . 'doktype_icon.png';
 
-$GLOBALS['PAGES_TYPES'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = array(
+$GLOBALS['PAGES_TYPES'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = [
 	'type' => 'web',
 	'icon' => $doktypeIcon,
 	'allowedTables' => '*'
-);
+];
 
-$GLOBALS['TCA']['pages']['columns']['doktype']['config']['items'][] = array(
+$GLOBALS['TCA']['pages']['columns']['doktype']['config']['items'][] = [
 	'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.doktype.' .
 		\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
 	\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
 	$doktypeIcon
-);
+];
 
-$GLOBALS['TCA']['pages_language_overlay']['columns']['doktype']['config']['items'][] = array(
+$GLOBALS['TCA']['pages_language_overlay']['columns']['doktype']['config']['items'][] = [
 	'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.doktype.' .
 		\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
 	\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
 	$doktypeIcon
-);
+];
 
 $GLOBALS['TCA']['pages']['types'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW]['showitem'] = '
 --palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.standard;standard,
@@ -110,46 +110,46 @@ if (FALSE === empty($additionalDoktypes)) {
 	$doktypes
 );
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', array(
-	'tx_fluidpages_templatefile' => array (
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', [
+	'tx_fluidpages_templatefile' => [
 		'exclude' => 1,
 		'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fluidpages_templatefile',
-		'config' => array (
+		'config' => [
 			'type' => 'input',
 			'eval' => 'trim',
 			'placeholder' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fluidpages_templatefile.placeholder',
-			'wizards' => array(
+			'wizards' => [
 				'_PADDING' => 2,
-				'link' => array(
+				'link' => [
 					'type' => 'popup',
 					'title' => 'LLL:EXT:cms/locallang_ttc.xml:header_link_formlabel',
 					'icon' => 'link_popup.gif',
-					'module' => array(
+					'module' => [
 						'name' => 'wizard_element_browser',
-						'urlParameters' => array(
+						'urlParameters' => [
 							'mode' => 'wizard',
 							'act' => 'file'
-						)
-					),
+						]
+					],
 					'JSopenParams' => 'height=300,width=500,status=0,menubar=0,scrollbars=1',
-				),
-			)
-		)
-	),
-	'tx_fluidpages_layout' => array (
+				],
+			]
+		]
+	],
+	'tx_fluidpages_layout' => [
 		'exclude' => 1,
 		'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fluidpages_layout',
 		'displayCond' => 'FIELD:tx_fluidpages_templatefile:!=:',
-		'config' => array (
+		'config' => [
 			'type' => 'select',
 			'renderType' => 'selectSingle',
 			'itemsProcFunc' => 'FluidTYPO3\Fluidpages\Backend\TemplateFileLayoutSelector->addLayoutOptions',
-			'arguments' => array(
+			'arguments' => [
 				'referring_field' => 'tx_fluidpages_templatefile'
-			)
-		)
-	),
-));
+			]
+		]
+	],
+]);
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
 	'pages', 'tx_fluidpages_templatefile, tx_fluidpages_layout', \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW, 'before:title'
 );
@@ -159,22 +159,22 @@ unset($doktypes, $additionalDoktypes, $doktypeIcon);
 
 if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay'])
 	&& TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay']) {
-	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages_language_overlay', array(
-		'tx_fed_page_flexform' => Array (
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages_language_overlay', [
+		'tx_fed_page_flexform' => [
 			'exclude' => 1,
 			'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform',
-			'config' => array (
+			'config' => [
 				'type' => 'flex',
-			)
-		),
-		'tx_fed_page_flexform_sub' => Array (
+			]
+		],
+		'tx_fed_page_flexform_sub' => [
 			'exclude' => 1,
 			'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform_sub',
-			'config' => array (
+			'config' => [
 				'type' => 'flex',
-			)
-		),
-	));
+			]
+		],
+	]);
 
 	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
 		'pages_language_overlay',
