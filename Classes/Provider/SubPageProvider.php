@@ -23,22 +23,23 @@ use FluidTYPO3\Flux\Provider\ProviderInterface;
  * that define a specific action to use and the
  * SubPageProvider act on all other page records.
  */
-class SubPageProvider extends PageProvider implements ProviderInterface {
+class SubPageProvider extends PageProvider implements ProviderInterface
+{
 
-	/**
-	 * @var string
-	 */
-	protected $fieldName = self::FIELD_NAME_SUB;
+    /**
+     * @var string
+     */
+    protected $fieldName = self::FIELD_NAME_SUB;
 
-	/**
-	 * @param array $row
-	 * @return string
-	 */
-	public function getControllerActionReferenceFromRecord(array $row) {
-		if (TRUE === empty($row[self::FIELD_ACTION_SUB])) {
-			$row = $this->pageService->getPageTemplateConfiguration($row['uid']);
-		}
-		return $row[self::FIELD_ACTION_SUB];
-	}
-
+    /**
+     * @param array $row
+     * @return string
+     */
+    public function getControllerActionReferenceFromRecord(array $row)
+    {
+        if (true === empty($row[self::FIELD_ACTION_SUB])) {
+            $row = $this->pageService->getPageTemplateConfiguration($row['uid']);
+        }
+        return $row[self::FIELD_ACTION_SUB];
+    }
 }

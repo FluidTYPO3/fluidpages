@@ -23,33 +23,41 @@ use FluidTYPO3\Flux\Provider\ProviderInterface;
  * that define a specific action to use and the
  * SubPageProvider act on all other page records.
  */
-class SubPageLanguageOverlayProvider extends PageLanguageOverlayProvider implements ProviderInterface {
+class SubPageLanguageOverlayProvider extends PageLanguageOverlayProvider implements ProviderInterface
+{
 
-	/**
-	 * @var string
-	 */
-	protected $fieldName = self::FIELD_NAME_SUB;
+    /**
+     * @var string
+     */
+    protected $fieldName = self::FIELD_NAME_SUB;
 
-	/**
-	 * @param array $row
-	 * @return string
-	 */
-	public function getControllerActionReferenceFromRecord(array $row) {
-		$pageRow = $this->recordService->getSingle('pages', '*', $row['pid']);
-		if (TRUE === empty($pageRow[self::FIELD_ACTION_SUB])) {
-			$pageRow = $this->pageService->getPageTemplateConfiguration($pageRow['uid']);
-		}
-		return $pageRow[self::FIELD_ACTION_SUB];
-	}
+    /**
+     * @param array $row
+     * @return string
+     */
+    public function getControllerActionReferenceFromRecord(array $row)
+    {
+        $pageRow = $this->recordService->getSingle('pages', '*', $row['pid']);
+        if (true === empty($pageRow[self::FIELD_ACTION_SUB])) {
+            $pageRow = $this->pageService->getPageTemplateConfiguration($pageRow['uid']);
+        }
+        return $pageRow[self::FIELD_ACTION_SUB];
+    }
 
-	/**
-	 * @param array $row
-	 * @return array
-	 */
-	public function getFlexFormValuesSingle(array $row) {
-		$fieldName = $this->getFieldName($row);
-		$form = $this->getForm($row);
-		$immediateConfiguration = $this->configurationService->convertFlexFormContentToArray($row[$fieldName], $form, NULL, NULL);
-		return $immediateConfiguration;
-	}
+    /**
+     * @param array $row
+     * @return array
+     */
+    public function getFlexFormValuesSingle(array $row)
+    {
+        $fieldName = $this->getFieldName($row);
+        $form = $this->getForm($row);
+        $immediateConfiguration = $this->configurationService->convertFlexFormContentToArray(
+            $row[$fieldName],
+            $form,
+            null,
+            null
+        );
+        return $immediateConfiguration;
+    }
 }

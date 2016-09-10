@@ -1,5 +1,10 @@
 # Fluidpages Change log
 
+3.6.1 - 2016-09-10
+------------------
+
+- [Prevention of class name duplication issue on PHP7](https://github.com/FluidTYPO3/fluidpages/commit/f28c68b1e5d56f7d868a9ab42c7d1add45f4450b)
+
 3.6.0 - 2016-05-17
 ------------------
 

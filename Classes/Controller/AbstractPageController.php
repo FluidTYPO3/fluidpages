@@ -17,6 +17,7 @@ namespace FluidTYPO3\Fluidpages\Controller;
  *
  * @deprecated
  */
-abstract class AbstractPageController extends PageController {
+abstract class AbstractPageController extends PageController
+{
 
 }

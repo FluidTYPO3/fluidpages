@@ -18,8 +18,8 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface;
  *
  * @route off
  */
-interface PageControllerInterface extends ControllerInterface {
+interface PageControllerInterface extends ControllerInterface
+{
 
-	const DOKTYPE_RAW = 187;
-
+    const DOKTYPE_RAW = 187;
 }

@@ -15,47 +15,52 @@ use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 /**
  * Class DummyPageController
  */
-class DummyPageController extends PageController {
+class DummyPageController extends PageController
+{
 
-	/**
-	 * @var array
-	 */
-	protected $record = array();
+    /**
+     * @var array
+     */
+    protected $record = array();
 
-	/**
-	 * @param ViewInterface $view
-	 */
-	public function setView(ViewInterface $view) {
-		$this->view = $view;
-	}
+    /**
+     * @param ViewInterface $view
+     */
+    public function setView(ViewInterface $view)
+    {
+        $this->view = $view;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getRecord() {
-		return $this->record;
-	}
+    /**
+     * @return array
+     */
+    public function getRecord()
+    {
+        return $this->record;
+    }
 
-	/**
-	 * @param array $record
-	 */
-	public function setRecord(array $record) {
-		$this->record = $record;
-	}
+    /**
+     * @param array $record
+     */
+    public function setRecord(array $record)
+    {
+        $this->record = $record;
+    }
 
-	/**
-	 * @return ProviderInterface
-	 */
-	public function getProvider() {
-		return $this->provider;
-	}
+    /**
+     * @return ProviderInterface
+     */
+    public function getProvider()
+    {
+        return $this->provider;
+    }
 
-	/**
-	 * @param ProviderInterface $provider
-	 * @return void
-	 */
-	public function setProvider(ProviderInterface $provider) {
-		$this->provider = $provider;
-	}
-
+    /**
+     * @param ProviderInterface $provider
+     * @return void
+     */
+    public function setProvider(ProviderInterface $provider)
+    {
+        $this->provider = $provider;
+    }
 }
