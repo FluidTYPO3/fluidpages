@@ -19,8 +19,10 @@ use FluidTYPO3\Flux\Utility\RecursiveArrayUtility;
 use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Page Configuration Provider
@@ -307,10 +309,12 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     {
         if ('update' === $operation) {
             $record = $this->loadRecordFromDatabase($id);
-            $record = RecursiveArrayUtility::mergeRecursiveOverrule(
-                $record,
-                $reference->datamap[$this->tableName][$id]
-            );
+            if(is_array($record) && $reference->datamap[$this->tableName][$id]) {
+                $record = RecursiveArrayUtility::mergeRecursiveOverrule(
+                        $record,
+                        $reference->datamap[$this->tableName][$id]
+                );
+            }
             $form = $this->getForm($record);
             if (null !== $form) {
                 $tableFieldName = $this->getFieldName($record);
