@@ -307,9 +307,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     {
         if ('update' === $operation) {
             $record = $this->loadRecordFromDatabase($id);
-			if (!is_array($record)) {
-				return;
-			}
+            if (!is_array($record)) {
+                return;
+            }
             if (isset($reference->datamap[$this->tableName][$id])) {
                 $record = RecursiveArrayUtility::mergeRecursiveOverrule(
                     $record,
