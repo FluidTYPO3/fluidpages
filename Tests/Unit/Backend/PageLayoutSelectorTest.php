@@ -29,7 +29,7 @@ class PageLayoutSelectorTest extends UnitTestCase
     {
         $instance = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager')
             ->get('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector');
-        $this->assertAttributeInstanceOf('TYPO3\\CMS\\Extbase\\Configuration\\BackendConfigurationManager', 'configurationManager', $instance);
+        $this->assertAttributeInstanceOf('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManagerInterface', 'configurationManager', $instance);
         $this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\PageService', 'pageService', $instance);
         $this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', 'configurationService', $instance);
     }
