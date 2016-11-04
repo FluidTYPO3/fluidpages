@@ -123,9 +123,9 @@ if (FALSE === empty($additionalDoktypes)) {
 				'link' => [
 					'type' => 'popup',
 					'title' => 'LLL:EXT:cms/locallang_ttc.xml:header_link_formlabel',
-					'icon' => 'link_popup.gif',
+					'icon' => 'EXT:backend/Resources/Public/Images/FormFieldWizard/wizard_link.gif',
 					'module' => [
-						'name' => 'wizard_element_browser',
+						'name' => 'wizard_link',
 						'urlParameters' => [
 							'mode' => 'wizard',
 							'act' => 'file'
