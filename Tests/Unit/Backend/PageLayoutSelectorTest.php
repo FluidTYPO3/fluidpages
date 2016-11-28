@@ -40,9 +40,9 @@ class PageLayoutSelectorTest extends UnitTestCase
     public function testRenderField()
     {
         /** @var PageLayoutSelector $instance */
-        $instance = $this->getMock('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector', array('renderInheritanceField', 'renderOptions'));
+        $instance = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector')->setMethods(array('renderInheritanceField', 'renderOptions'))->getMock();
         /** @var PageService|\PHPUnit_Framework_MockObject_MockObject $service */
-        $service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getAvailablePageTemplateFiles'));
+        $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\PageService')->setMethods(array('getAvailablePageTemplateFiles'))->getMock();
         $service->expects($this->once())->method('getAvailablePageTemplateFiles')->willReturn(array('foo' => array('bar')));
         $instance->injectPageService($service);
         $parameters = array();
@@ -62,7 +62,7 @@ class PageLayoutSelectorTest extends UnitTestCase
     {
         $typoScript = array('plugin.' => array('tx_fluidpages.' => $settings));
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configurationManager */
-        $configurationManager = $this->getMock('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager', array('getConfiguration'));
+        $configurationManager = $this->getMockBuilder('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager')->setMethods(array('getConfiguration'))->getMock();
         $configurationManager->expects($this->any())->method('getConfiguration')->willReturn($typoScript);
         $instance = new PageLayoutSelector();
         $instance->injectConfigurationManager($configurationManager);
@@ -110,7 +110,7 @@ class PageLayoutSelectorTest extends UnitTestCase
      */
     public function testRenderOptions($extension, $expectedTitle)
     {
-        $instance = $this->getMock('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector', array('renderOption'));
+        $instance = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Backend\\PageLayoutSelector')->setMethods(array('renderOption'))->getMock();
         $instance->expects($this->any())->method('renderOption')->willReturn('');
         $forms = array(
             Form::create(array('extensionName' => $extension))
@@ -135,7 +135,7 @@ class PageLayoutSelectorTest extends UnitTestCase
      */
     public function testRenderOption()
     {
-        $correctForm = $this->getMock('FluidTYPO3\\Flux\\Form', array('getLabel'));
+        $correctForm = $this->getMockBuilder('FluidTYPO3\\Flux\\Form')->setMethods(array('getLabel'))->getMock();
         $correctForm->expects($this->once())->method('getLabel')->willReturn('label');
         $instance = new PageLayoutSelector();
         $result = $this->callInaccessibleMethod($instance, 'renderOption', $correctForm, array());
