@@ -307,10 +307,15 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     {
         if ('update' === $operation) {
             $record = $this->loadRecordFromDatabase($id);
-            $record = RecursiveArrayUtility::mergeRecursiveOverrule(
-                $record,
-                $reference->datamap[$this->tableName][$id]
-            );
+            if (!is_array($record)) {
+                return;
+            }
+            if (isset($reference->datamap[$this->tableName][$id])) {
+                $record = RecursiveArrayUtility::mergeRecursiveOverrule(
+                    $record,
+                    $reference->datamap[$this->tableName][$id]
+                );
+            }
             $form = $this->getForm($record);
             if (null !== $form) {
                 $tableFieldName = $this->getFieldName($record);
