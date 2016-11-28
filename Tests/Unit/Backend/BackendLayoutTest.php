@@ -51,17 +51,18 @@ class BackendLayoutTest extends UnitTestCase
         $pageUid = 1;
         $backendLayout = array();
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
-        $configurationService = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+        $configurationService = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
+        )->setMethods(
             array('resolvePrimaryConfigurationProvider', 'debug', 'message')
-        );
+        )->getMock();
         $configurationService->expects($this->exactly($messageCount))->method($messageFunction);
         if (null !== $record) {
             $configurationService->expects($this->once())->method('resolvePrimaryConfigurationProvider')
                 ->with('pages', 'tx_fed_page_flexform', $record)->willReturn($provider);
         }
         /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $recordService */
-        $recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+        $recordService = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
         $recordService->expects($this->once())->method('getSingle')->willReturn($record);
         $instance->injectConfigurationService($configurationService);
         $instance->injectWorkspacesAwareRecordService($recordService);
@@ -76,10 +77,11 @@ class BackendLayoutTest extends UnitTestCase
     {
         $form = Form::create(array('id' => 'formId'));
         /** @var Provider|\PHPUnit_Framework_MockObject_MockObject $standardProvider */
-        $standardProvider = $this->getMock(
-            'FluidTYPO3\\Flux\\Provider\\Provider',
+        $standardProvider = $this->getMockBuilder(
+            'FluidTYPO3\\Flux\\Provider\\Provider'
+        )->setMethods(
             array('getControllerActionFromRecord', 'getForm')
-        );
+        )->getMock();
         $standardProvider->setTemplatePaths(array());
         $standardProvider->expects($this->any())->method('getForm')->willReturn($form);
         $actionLessProvider = clone $standardProvider;
@@ -152,7 +154,7 @@ class BackendLayoutTest extends UnitTestCase
         $id = 1;
         $tca = array('foo' => 'bar');
         /** @var FormEngine $mock */
-        $mock = $this->getMock('TYPO3\CMS\Backend\Form\FormEngine', array('fake'), array(), '', false);
+        $mock = $this->getMockBuilder('TYPO3\CMS\Backend\Form\FormEngine')->setMethods(array('fake'))->disableOriginalConstructor()->getMock();
         $instance = new BackendLayout();
         $instance->postProcessColPosListItemsParsed($id, $tca, $mock);
         $this->assertEquals(1, $id);

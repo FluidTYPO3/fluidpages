@@ -50,16 +50,17 @@ class BackendLayoutDataProviderTest extends UnitTestCase
         $instance = new BackendLayoutDataProvider();
         $pageUid = 1;
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
-        $configurationService = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+        $configurationService = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
+        )->setMethods(
             array('resolvePageProvider', 'debug', 'message')
-        );
+        )->getMock();
         if (null !== $record) {
             $configurationService->expects($this->once())->method('resolvePageProvider')
                 ->with($record)->willReturn($provider);
         }
         /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $recordService */
-        $recordService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+        $recordService = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
         $recordService->expects($this->once())->method('getSingle')->willReturn($record);
         $instance->injectConfigurationService($configurationService);
         $instance->injectWorkspacesAwareRecordService($recordService);
@@ -74,10 +75,11 @@ class BackendLayoutDataProviderTest extends UnitTestCase
     {
         $form = Form::create(array('id' => 'formId'));
         /** @var Provider|\PHPUnit_Framework_MockObject_MockObject $standardProvider */
-        $standardProvider = $this->getMock(
-            'FluidTYPO3\\Flux\\Provider\\Provider',
+        $standardProvider = $this->getMockBuilder(
+            'FluidTYPO3\\Flux\\Provider\\Provider'
+        )->setMethods(
             array('getControllerActionFromRecord', 'getForm')
-        );
+        )->getMock();
         $standardProvider->expects($this->any())->method('getForm')->willReturn($form);
         $standardProvider->setTemplatePaths(array());
         $actionLessProvider = clone $standardProvider;
@@ -194,10 +196,11 @@ class BackendLayoutDataProviderTest extends UnitTestCase
     public function testGetBackendLayout()
     {
         /** @var BackendLayoutDataProvider|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Backend\\BackendLayoutDataProvider',
+        $instance = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Backend\\BackendLayoutDataProvider'
+        )->setMethods(
             array('getBackendLayoutConfiguration', 'ensureDottedKeys', 'encodeTypoScriptArray')
-        );
+        )->getMock();
         $instance->expects($this->at(0))->method('getBackendLayoutConfiguration')->with(1)->willReturn(array('conf'));
         $instance->expects($this->at(1))->method('ensureDottedKeys')->with(array('conf'))->willReturn(array('conf-converted'));
         $instance->expects($this->at(2))->method('encodeTypoScriptArray')->with(array('conf-converted'))->willReturn('config');
@@ -213,10 +216,11 @@ class BackendLayoutDataProviderTest extends UnitTestCase
     public function testAddBackendLayouts()
     {
         /** @var BackendLayoutDataProvider|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Backend\\BackendLayoutDataProvider',
+        $instance = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Backend\\BackendLayoutDataProvider'
+        )->setMethods(
             array('getBackendLayoutConfiguration', 'encodeTypoScriptArray')
-        );
+        )->getMock();
         $instance->expects($this->once())->method('getBackendLayoutConfiguration')->with(1)->willReturn(array('conf'));
         $instance->expects($this->once())->method('encodeTypoScriptArray')->with(array('conf'))->willReturn('conf');
         $collection = new BackendLayoutCollection('collection');

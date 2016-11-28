@@ -34,12 +34,12 @@ class SubPageProviderTest extends AbstractTestCase
         $instance = new SubPageProvider();
         if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype']) {
             /** @var PageService $service */
-            $service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
+            $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\PageService')->setMethods(array('getPageTemplateConfiguration'))->getMock();
             $instance->injectPageService($service);
         }
         if (true === $expectsMessage) {
             /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
-            $configurationService = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('message'));
+            $configurationService = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService')->setMethods(array('message'))->getMock();
             $configurationService->expects($this->once())->method('message');
             $instance->injectPageConfigurationService($configurationService);
         }
@@ -67,7 +67,7 @@ class SubPageProviderTest extends AbstractTestCase
         $dataFieldName = 'tx_fed_page_flexform_sub';
         $fieldName = 'tx_fed_page_controller_action_sub';
         /** @var PageService|\PHPUnit_Framework_MockObject_MockObject $service */
-        $service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\PageService', array('getPageTemplateConfiguration'));
+        $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\PageService')->setMethods(array('getPageTemplateConfiguration'))->getMock();
         $instance = new SubPageProvider();
         $instance->setTemplatePaths(array('templateRootPaths' => array('EXT:fluidpages/Tests/Fixtures/Templates/')));
         $instance->injectPageService($service);

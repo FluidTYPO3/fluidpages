@@ -42,10 +42,11 @@ class ConfigurationServiceTest extends UnitTestCase
         $instance = new ConfigurationService();
         if (null !== $resourceFactoryOutput) {
             /** @var ResourceFactory|\PHPUnit_Framework_MockObject_MockObject $resourceFactory */
-            $resourceFactory = $this->getMock(
-                'TYPO3\\CMS\\Core\\Resource\\ResourceFactory',
+            $resourceFactory = $this->getMockBuilder(
+                'TYPO3\\CMS\\Core\\Resource\\ResourceFactory'
+            )->setMethods(
                 array('getFileObjectFromCombinedIdentifier')
-            );
+            )->getMock();
             $resourceFactory->expects($this->once())->method('getFileObjectFromCombinedIdentifier')
                 ->with($reference)->willReturn($resourceFactoryOutput);
             $instance->injectResourceFactory($resourceFactory);
@@ -75,10 +76,11 @@ class ConfigurationServiceTest extends UnitTestCase
     public function testGetViewConfigurationByFileReference($reference, $expectedParameter)
     {
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+        $instance = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
+        )->setMethods(
             array('getViewConfigurationForExtensionName')
-        );
+        )->getMock();
         $instance->expects($this->once())->method('getViewConfigurationForExtensionName')
             ->with($expectedParameter)->willReturn($expectedParameter);
         $result = $instance->getViewConfigurationByFileReference($reference);
@@ -105,10 +107,11 @@ class ConfigurationServiceTest extends UnitTestCase
     public function testGetPageConfigurationReturnsEmptyArrayAndDispatchesMessageOnInvalidInput($input)
     {
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+        $instance = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
+        )->setMethods(
             array('message')
-        );
+        )->getMock();
         $instance->expects($this->once())->method('message');
         $result = $instance->getPageConfiguration($input);
         $this->assertEquals(array(), $result);
@@ -132,10 +135,11 @@ class ConfigurationServiceTest extends UnitTestCase
     public function testGetPageConfigurationCallsGetViewConfigurationForExtensionName()
     {
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+        $instance = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
+        )->setMethods(
             array('getViewConfigurationForExtensionName')
-        );
+        )->getMock();
         $instance->expects($this->once())->method('getViewConfigurationForExtensionName')->with('foobar')->willReturn(array());
         $result = $instance->getPageConfiguration('foobar');
         $this->assertEquals(array(), $result);
@@ -147,10 +151,11 @@ class ConfigurationServiceTest extends UnitTestCase
     public function testGetPageConfigurationWithoutExtensionNameReadsRegisteredProviders()
     {
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+        $instance = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
+        )->setMethods(
             array('getViewConfigurationForExtensionName')
-        );
+        )->getMock();
         Core::registerProviderExtensionKey('foo', 'Page');
         Core::registerProviderExtensionKey('bar', 'Page');
         $instance->expects($this->exactly(2))->method('getViewConfigurationForExtensionName');
