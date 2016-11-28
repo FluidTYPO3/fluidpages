@@ -10,8 +10,8 @@ if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
 $autoloader = require __DIR__ . '/../vendor/autoload.php';
 $autoloader->addPsr4('FluidTYPO3\\Fluidpages\\Tests\\Fixtures\\', __DIR__ . '/Fixtures/');
 $autoloader->addPsr4('FluidTYPO3\\Fluidpages\\Tests\\Unit\\', __DIR__ . '/Unit/');
-$autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\Fixtures\\', __DIR__ . '/../vendor/fluidtypo3/flux/Tests/Fixtures/');
-$autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\Unit\\', __DIR__ . '/../vendor/fluidtypo3/flux/Tests/Unit/');
+$autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\Fixtures\\', __DIR__ . '/../typo3conf/ext/flux/Tests/Fixtures/');
+$autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\Unit\\', __DIR__ . '/../typo3conf/ext/flux/Tests/Unit/');
 $autoloader->addPsr4('TYPO3\\CMS\\Core\\', __DIR__ . '/../vendor/typo3/cms/typo3/sysext/core/Classes/');
 $autoloader->addPsr4('TYPO3\\CMS\\Core\\Tests\\', __DIR__ . '/../vendor/typo3/cms/typo3/sysext/core/Tests/');
 $autoloader->addPsr4('TYPO3\\CMS\\Extbase\\', __DIR__ . '/../vendor/typo3/cms/typo3/sysext/extbase/Classes/');
