@@ -53,7 +53,7 @@ class PageServiceTest extends UnitTestCase
     public function testGetPageTemplateConfiguration(array $records, $expected)
     {
         /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $service */
-        $service = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+        $service = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
         foreach ($records as $index => $record) {
             $service->expects($this->at($index))->method('getSingle')->willReturn($record);
         }
@@ -86,7 +86,7 @@ class PageServiceTest extends UnitTestCase
         $record1 = array('pid' => 2, 'uid' => 1);
         $record2 = array('pid' => 0, 'uid' => 3, 'tx_fed_page_flexform' => 'test');
         /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $service */
-        $service = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+        $service = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
         $service->expects($this->at(0))->method('getSingle')->with('pages', '*', 1)->willReturn($record1);
         $service->expects($this->at(1))->method('getSingle')->with('pages', '*', 2)->willReturn($record2);
         $instance = new PageService();
@@ -103,10 +103,11 @@ class PageServiceTest extends UnitTestCase
     public function testGetAvailablePageTemplateFiles($typoScript, $expected)
     {
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $service */
-        $service = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+        $service = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
+        )->setMethods(
             array('getPageConfiguration', 'message', 'getFormFromTemplateFile')
-        );
+        )->getMock();
         $service->expects($this->any())->method('getFormFromTemplateFile')->willReturn(Form::create());
         $service->expects($this->once())->method('getPageConfiguration')->willReturn($typoScript);
         $service->expects($this->any())->method('message');
