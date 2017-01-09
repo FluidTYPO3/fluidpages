@@ -59,7 +59,7 @@ class PageControllerTest extends UnitTestCase
             'FluidTYPO3\\Fluidpages\\Controller\\PageController',
             array(
                 'getRecord', 'initializeProvider', 'initializeSettings', 'initializeOverriddenSettings',
-                'initializeViewObject', 'initializeViewVariables'
+                'initializeViewObject', 'initializeViewVariables', 'initializeViewHelperVariableContainer'
             )
         );
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configurationManager */
