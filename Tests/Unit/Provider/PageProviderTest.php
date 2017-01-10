@@ -402,7 +402,7 @@ class PageProviderTest extends AbstractTestCase
         );
         $provider->expects($this->any())->method('getForm')->willReturn($form);
         $provider->expects($this->once())->method('getInheritedPropertyValueByDottedPath')
-            ->with($parentInstance->datamap[$tableName][$id], 'settings.input')->willReturn('test');
+            ->with([], 'settings.input')->willReturn('test');
         /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $recordService */
         $recordService = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle', 'update'))->getMock();
         $recordService->expects($this->atLeastOnce())->method('getSingle')->willReturn($parentInstance->datamap[$tableName][$id]);
