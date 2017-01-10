@@ -2,9 +2,9 @@
   "name": "fluidtypo3/fluidpages",
   "description": "The fluidpages package from FluidTYPO3",
   "require": {
-    "fluidtypo3/flux": "*",
+    "fluidtypo3/flux": "^7.3|^8.0|dev-development",
     "typo3/cms": "^7.6|^8.4",
-    "php": ">=5.5.0"
+    "php": ">=7.0.0"
   },
   "type": "typo3-cms-extension",
   "keywords": [
@@ -32,7 +32,7 @@
     }
   },
   "require-dev": {
-    "fluidtypo3/development": "^3.0",
-    "fluidtypo3/flux": "dev-development"
+    "fluidtypo3/flux": "dev-development",
+    "fluidtypo3/development": "^3.0"
   }
 }
