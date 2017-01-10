@@ -32,7 +32,7 @@
     }
   },
   "require-dev": {
-    "fluidtypo3/development": "^3.0",
-    "fluidtypo3/flux": "dev-development"
+    "fluidtypo3/flux": "dev-development",
+    "fluidtypo3/development": "^3.0"
   }
 }
