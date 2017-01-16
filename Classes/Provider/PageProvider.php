@@ -238,6 +238,8 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     /**
      * @param array $row source record row
      * @param array $configuration to be overlayed
+     * @param Form\FormInterface $form
+     * @return array
      */
     public function overlayFlexFormValues($row, $configuration, $form)
     {
