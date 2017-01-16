@@ -153,7 +153,7 @@ class PageService implements SingletonInterface
         while (null !== $page && 0 !== (integer) $page['uid'] && true === empty($page['tx_fed_page_flexform'])) {
             $resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
             $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
-        };
+        }
         return $page['tx_fed_page_flexform'];
     }
 
