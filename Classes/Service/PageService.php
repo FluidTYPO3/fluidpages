@@ -53,6 +53,15 @@ class PageService implements SingletonInterface
     protected $environmentService;
 
     /**
+     * Local storage for `pages` records. It is used only in frontend
+     * environment, as any modification could be done to the database record
+     * during a backend request.
+     *
+     * @var array
+     */
+    protected $pageRecordsStorage = [];
+
+    /**
      * @param ObjectManager $objectManager
      * @return void
      */
@@ -243,15 +252,6 @@ class PageService implements SingletonInterface
         }
         return $output;
     }
-
-    /**
-     * Local storage for `pages` records. It is used only in frontend
-     * environment, as any modification could be done to the database record
-     * during a backend request.
-     *
-     * @var array
-     */
-    protected $pageRecordsStorage = [];
 
     /**
      * Returns the page record for a given uid. A local storage is used in
