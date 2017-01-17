@@ -16,6 +16,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
 /**
  * Page Service
@@ -45,6 +46,11 @@ class PageService implements SingletonInterface
      * @var WorkspacesAwareRecordService
      */
     protected $workspacesAwareRecordService;
+
+    /**
+     * @var EnvironmentService
+     */
+    protected $environmentService;
 
     /**
      * @param ObjectManager $objectManager
@@ -83,6 +89,14 @@ class PageService implements SingletonInterface
     }
 
     /**
+     * @param EnvironmentService $environmentService
+     */
+    public function injectEnvironmentService(EnvironmentService $environmentService)
+    {
+        $this->environmentService = $environmentService;
+    }
+
+    /**
      * Process RootLine to find first usable, configured Fluid Page Template.
      * WARNING: do NOT use the output of this feature to overwrite $row - the
      * record returned may or may not be the same record as defined in $id.
@@ -101,7 +115,7 @@ class PageService implements SingletonInterface
         if (array_keys($cache, $pageUid)) {
             return $cache[$pageUid];
         }
-        $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
+        $page = $this->getPageRecord($pageUid);
 
         // Initialize with possibly-empty values and loop root line
         // to fill values as they are detected.
@@ -123,7 +137,7 @@ class PageService implements SingletonInterface
             // Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
             // configuration as an emulated first parent page.
             $resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
-            $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
+            $page = $this->getPageRecord($resolveParentPageUid);
         } while (null !== $page);
         if (true === empty($resolvedMainTemplateIdentity) && true === empty($resolvedSubTemplateIdentity)) {
             // Neither directly configured "this page" nor inherited "sub" contains a valid value;
@@ -149,10 +163,10 @@ class PageService implements SingletonInterface
         if (1 > $pageUid) {
             return null;
         }
-        $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
+        $page = $this->getPageRecord($pageUid);
         while (null !== $page && 0 !== (integer) $page['uid'] && true === empty($page['tx_fed_page_flexform'])) {
             $resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
-            $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
+            $page = $this->getPageRecord($resolveParentPageUid);
         }
         return $page['tx_fed_page_flexform'];
     }
@@ -228,5 +242,48 @@ class PageService implements SingletonInterface
             }
         }
         return $output;
+    }
+
+    /**
+     * Local storage for `pages` records. It is used only in frontend
+     * environment, as any modification could be done to the database record
+     * during a backend request.
+     *
+     * @var array
+     */
+    protected $pageRecordsStorage = [];
+
+    /**
+     * Returns the page record for a given uid. A local storage is used in
+     * frontend environment to reduce actual queries in the database and improve
+     * performance.
+     *
+     * @param int $pageUid
+     * @return array|mixed|NULL
+     */
+    public function getPageRecord($pageUid)
+    {
+        if ($this->environmentService->isEnvironmentInFrontendMode()) {
+            if (false === array_key_exists($pageUid, $this->pageRecordsStorage)) {
+                $this->pageRecordsStorage[$pageUid] = $this->fetchPageDataWithRecordService($pageUid);
+            }
+
+            $result = $this->pageRecordsStorage[$pageUid];
+        } else {
+            $result = $this->fetchPageDataWithRecordService($pageUid);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Used to simplify unit testing.
+     *
+     * @param int $pageUid
+     * @return array|NULL
+     */
+    protected function fetchPageDataWithRecordService($pageUid)
+    {
+        return $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
     }
 }
