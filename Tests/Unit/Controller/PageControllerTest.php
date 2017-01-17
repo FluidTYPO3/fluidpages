@@ -18,7 +18,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use FluidTYPO3\Fluidpages\Tests\Fixtures\Controller\DummyPageController;
 use FluidTYPO3\Flux\Provider\Provider;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Extbase\Mvc\Web\Response;
+use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -45,10 +45,29 @@ class PageControllerTest extends UnitTestCase
     {
         /** @var PageController $subject */
         $subject = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Controller\\PageController')->setMethods(array('dummy'))->getMock();
+
+        /** @var PageService $pageService */
+        $pageService = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\PageService'
+        )->setMethods(
+            array(
+                'getPageTemplateConfiguration'
+            )
+        )->getMock();
+
         /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $mockService */
         $mockService = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
         $mockService->expects($this->once())->method('getSingle');
-        $subject->injectWorkspacesAwareRecordService($mockService);
+        $pageService->injectWorkspacesAwareRecordService($mockService);
+
+        $environmentServiceMock = $this->getMockBuilder(EnvironmentService::class)
+            ->setMethods(['isEnvironmentInFrontendMode'])
+            ->getMock();
+        $environmentServiceMock->method('isEnvironmentInFrontendMode')
+            ->willReturn(true);
+        $pageService->injectEnvironmentService($environmentServiceMock);
+
+        $subject->injectPageService($pageService);
         $subject->getRecord();
     }
 

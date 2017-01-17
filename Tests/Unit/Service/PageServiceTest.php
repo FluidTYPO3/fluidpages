@@ -13,6 +13,7 @@ use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
+use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
 /**
  * Class PageServiceTest
@@ -59,6 +60,14 @@ class PageServiceTest extends UnitTestCase
         }
         $instance = new PageService();
         $instance->injectWorkspacesAwareRecordService($service);
+
+        $environmentServiceMock = $this->getMockBuilder(EnvironmentService::class)
+            ->setMethods(['isEnvironmentInFrontendMode'])
+            ->getMock();
+        $environmentServiceMock->method('isEnvironmentInFrontendMode')
+            ->willReturn(true);
+        $instance->injectEnvironmentService($environmentServiceMock);
+
         $result = $instance->getPageTemplateConfiguration(1);
         $this->assertEquals($expected, $result);
     }
@@ -91,6 +100,14 @@ class PageServiceTest extends UnitTestCase
         $service->expects($this->at(1))->method('getSingle')->with('pages', '*', 2)->willReturn($record2);
         $instance = new PageService();
         $instance->injectWorkspacesAwareRecordService($service);
+
+        $environmentServiceMock = $this->getMockBuilder(EnvironmentService::class)
+            ->setMethods(['isEnvironmentInFrontendMode'])
+            ->getMock();
+        $environmentServiceMock->method('isEnvironmentInFrontendMode')
+            ->willReturn(true);
+        $instance->injectEnvironmentService($environmentServiceMock);
+
         $output = $instance->getPageFlexFormSource(1);
         $this->assertEquals('test', $output);
     }
@@ -138,5 +155,77 @@ class PageServiceTest extends UnitTestCase
                 array('fluidpages' => null)
             )
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetPageRecordIsCalledOncePerPageInFrontendEnvironment()
+    {
+        /** @var PageService|\PHPUnit_Framework_MockObject_MockObject $instance */
+        $instance = $this->getMockBuilder(PageService::class)
+            ->setMethods(['fetchPageDataWithRecordService'])
+            ->getMock();
+
+        $instance->expects($this->exactly(2))
+            ->method('fetchPageDataWithRecordService')
+            ->with($this->logicalOr(
+                $this->equalTo(42),
+                $this->equalTo(1337)
+            ));
+
+        /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $service */
+        $service = $this->getMockBuilder(WorkspacesAwareRecordService::class)
+            ->setMethods(['getSingle'])
+            ->getMock();
+        $instance->injectWorkspacesAwareRecordService($service);
+
+        $environmentServiceMock = $this->getMockBuilder(EnvironmentService::class)
+            ->setMethods(['isEnvironmentInFrontendMode'])
+            ->getMock();
+        $environmentServiceMock->method('isEnvironmentInFrontendMode')
+            ->willReturn(true);
+        $instance->injectEnvironmentService($environmentServiceMock);
+
+        for ($i = 0; $i < 10; $i++) {
+            $instance->getPageRecord(42);
+            $instance->getPageRecord(1337);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetPageRecordIsCalledEverytimeInBackendEnvironment()
+    {
+        $timesCalled = 10;
+
+        /** @var PageService|\PHPUnit_Framework_MockObject_MockObject $instance */
+        $instance = $this->getMockBuilder(PageService::class)
+            ->setMethods(['fetchPageDataWithRecordService'])
+            ->getMock();
+
+        $instance->expects($this->exactly($timesCalled))
+            ->method('fetchPageDataWithRecordService');
+
+        /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $service */
+        $service = $this->getMockBuilder(WorkspacesAwareRecordService::class)
+            ->setMethods(['getSingle'])
+            ->getMock();
+        $instance->injectWorkspacesAwareRecordService($service);
+
+        $environmentServiceMock = $this->getMockBuilder(EnvironmentService::class)
+            ->setMethods(['isEnvironmentInFrontendMode', 'isEnvironmentInBackendMode'])
+            ->getMock();
+        $environmentServiceMock
+            ->method('isEnvironmentInFrontendMode')
+            ->willReturn(false);
+        $environmentServiceMock->method('isEnvironmentInBackendMode')
+            ->willReturn(true);
+        $instance->injectEnvironmentService($environmentServiceMock);
+
+        for ($i = 0; $i < $timesCalled; $i++) {
+            $instance->getPageRecord(42);
+        }
     }
 }
