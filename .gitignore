@@ -2,3 +2,7 @@ vendor
 .idea
 build
 composer.lock
+/index.php
+/typo3
+/typo3_src
+/typo3conf

@@ -238,6 +238,8 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     /**
      * @param array $row source record row
      * @param array $configuration to be overlayed
+     * @param Form\FormInterface $form
+     * @return array
      */
     public function overlayFlexFormValues($row, $configuration, $form)
     {
@@ -307,10 +309,15 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     {
         if ('update' === $operation) {
             $record = $this->loadRecordFromDatabase($id);
-            $record = RecursiveArrayUtility::mergeRecursiveOverrule(
-                $record,
-                $reference->datamap[$this->tableName][$id]
-            );
+            if (!is_array($record)) {
+                return;
+            }
+            if (isset($reference->datamap[$this->tableName][$id])) {
+                $record = RecursiveArrayUtility::mergeRecursiveOverrule(
+                    $record,
+                    $reference->datamap[$this->tableName][$id]
+                );
+            }
             $form = $this->getForm($record);
             if (null !== $form) {
                 $tableFieldName = $this->getFieldName($record);
@@ -321,7 +328,8 @@ class PageProvider extends AbstractProvider implements ProviderInterface
                     $inheritEmpty = (boolean) $field->getInheritEmpty();
                     if (isset($record[$tableFieldName]['data']) && is_array($record[$tableFieldName]['data'])) {
                         $value = $record[$tableFieldName]['data'][$sheetName]['lDEF'][$fieldName]['vDEF'];
-                        $inheritedValue = $this->getInheritedPropertyValueByDottedPath($record, $fieldName);
+                        $inheritedConfiguration = $this->getInheritedConfiguration($record);
+                        $inheritedValue = $this->getInheritedPropertyValueByDottedPath($inheritedConfiguration, $fieldName);
                         $empty = (true === empty($value) && $value !== '0' && $value !== 0);
                         $same = ($inheritedValue == $value);
                         if (true === $same && true === $inherit || (true === $inheritEmpty && true === $empty)) {

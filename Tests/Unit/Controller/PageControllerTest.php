@@ -44,9 +44,9 @@ class PageControllerTest extends UnitTestCase
     public function testGetRecordDelegatesToRecordService()
     {
         /** @var PageController $subject */
-        $subject = $this->getMock('FluidTYPO3\\Fluidpages\\Controller\\PageController', array('dummy'));
+        $subject = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Controller\\PageController')->setMethods(array('dummy'))->getMock();
         /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $mockService */
-        $mockService = $this->getMock('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService', array('getSingle'));
+        $mockService = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
         $mockService->expects($this->once())->method('getSingle');
         $subject->injectWorkspacesAwareRecordService($mockService);
         $subject->getRecord();
@@ -59,46 +59,49 @@ class PageControllerTest extends UnitTestCase
             'FluidTYPO3\\Fluidpages\\Controller\\PageController',
             array(
                 'getRecord', 'initializeProvider', 'initializeSettings', 'initializeOverriddenSettings',
-                'initializeViewObject', 'initializeViewVariables'
+                'initializeViewObject', 'initializeViewVariables', 'initializeViewHelperVariableContainer'
             )
         );
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configurationManager */
-        $configurationManager = $this->getMock(
-            'TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager',
+        $configurationManager = $this->getMockBuilder(
+            'TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager'
+        )->setMethods(
             array('getContentObject', 'getConfiguration')
-        );
+        )->getMock();
         $contentObject = new \stdClass();
         $configurationManager->expects($this->once())->method('getContentObject')->willReturn($contentObject);
         $configurationManager->expects($this->once())->method('getConfiguration')->willReturn(array('foo' => 'bar'));
         $instance->expects($this->once())->method('getRecord')->willReturn(array('uid' => 0));
         $GLOBALS['TSFE'] = (object) array('page' => 'page', 'fe_user' => (object) array('user' => 'user'));
         /** @var StandaloneView $view */
-        $view = $this->getMock('FluidTYPO3\\Flux\\View\\ExposedTemplateView', array('assign', 'renderStandaloneSection'));
+        $view = $this->getMockBuilder('FluidTYPO3\\Flux\\View\\ExposedTemplateView')->setMethods(array('assign', 'renderStandaloneSection'))->getMock();
         $instance->injectConfigurationManager($configurationManager);
-        $instance->_set('response', $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response'));
-        $instance->_set('provider', $this->getMock('FluidTYPO3\\Flux\\Provider\\ProviderInterface'));
+        $instance->_set('response', $this->getMockBuilder('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response')->getMock());
+        $instance->_set('provider', $this->getMockBuilder('FluidTYPO3\\Flux\\Provider\\ProviderInterface')->getMock());
         $instance->initializeView($view);
     }
 
     public function testInitializeProvider()
     {
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $pageConfigurationService */
-        $pageConfigurationService = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+        $pageConfigurationService = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
+        )->setMethods(
             array(
                 'resolvePrimaryConfigurationProvider',
             )
-        );
+        )->getMock();
         /** @var PageService $pageService */
-        $pageService = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\PageService',
+        $pageService = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\PageService'
+        )->setMethods(
             array(
                 'getPageTemplateConfiguration'
             )
-        );
+        )->getMock();
         $pageConfigurationService->expects($this->once())->method('resolvePrimaryConfigurationProvider');
         /** @var PageController|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMock('FluidTYPO3\\Fluidpages\\Controller\\PageController', array('getRecord'));
+        $instance = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Controller\\PageController')->setMethods(array('getRecord'))->getMock();
         $instance->expects($this->once())->method('getRecord')->willReturn(array());
         $instance->injectpageConfigurationService($pageConfigurationService);
         $instance->injectPageService($pageService);
@@ -109,15 +112,16 @@ class PageControllerTest extends UnitTestCase
     {
         $instance = new DummyPageController();
         /** @var ExposedTemplateView $view */
-        $view = $this->getMock('FluidTYPO3\\Flux\\View\\ExposedTemplateView', array('assign'));
+        $view = $this->getMockBuilder('FluidTYPO3\\Flux\\View\\ExposedTemplateView')->setMethods(array('assign'))->getMock();
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $pageConfigurationService */
-        $pageConfigurationService = $this->getMock(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService',
+        $pageConfigurationService = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
+        )->setMethods(
             array(
                 'convertFileReferenceToTemplatePathAndFilename',
                 'getViewConfigurationByFileReference',
             )
-        );
+        )->getMock();
         $pageConfigurationService->expects($this->once())->method('convertFileReferenceToTemplatePathAndFilename')->willReturn('test');
         $pageConfigurationService->expects($this->once())->method('getViewConfigurationByFileReference')->willReturn(array());
         $instance->injectpageConfigurationService($pageConfigurationService);
