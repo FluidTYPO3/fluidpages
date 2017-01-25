@@ -40,7 +40,7 @@ class TemplateFileLayoutSelectorTest extends UnitTestCase
         $instance = new TemplateFileLayoutSelector();
         $parent = '';
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $service */
-        $service = $this->getMock('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', array('getViewConfigurationByFileReference'));
+        $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService')->setMethods(array('getViewConfigurationByFileReference'))->getMock();
         $service->expects($this->once())->method('getViewConfigurationByFileReference')->willReturn(array(
             'layoutRootPaths' => array($layoutRootPath)
         ));

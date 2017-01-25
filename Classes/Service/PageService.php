@@ -93,9 +93,13 @@ class PageService implements SingletonInterface
      */
     public function getPageTemplateConfiguration($pageUid)
     {
+        static $cache = [];
         $pageUid = (integer) $pageUid;
         if (1 > $pageUid) {
             return null;
+        }
+        if (array_keys($cache, $pageUid)) {
+            return $cache[$pageUid];
         }
         $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
 
@@ -124,9 +128,9 @@ class PageService implements SingletonInterface
         if (true === empty($resolvedMainTemplateIdentity) && true === empty($resolvedSubTemplateIdentity)) {
             // Neither directly configured "this page" nor inherited "sub" contains a valid value;
             // no configuration was detected at all.
-            return null;
+            return $cache[$pageUid] = null;
         }
-        return [
+        return $cache[$pageUid] = [
             'tx_fed_page_controller_action' => $resolvedMainTemplateIdentity,
             'tx_fed_page_controller_action_sub' => $resolvedSubTemplateIdentity
         ];
@@ -149,7 +153,7 @@ class PageService implements SingletonInterface
         while (null !== $page && 0 !== (integer) $page['uid'] && true === empty($page['tx_fed_page_flexform'])) {
             $resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
             $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
-        };
+        }
         return $page['tx_fed_page_flexform'];
     }
 

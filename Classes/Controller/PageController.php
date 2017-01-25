@@ -104,9 +104,9 @@ class PageController extends AbstractFluxController implements PageControllerInt
         $paths = $this->pageConfigurationService->getViewConfigurationByFileReference($templateFileReference);
         $this->provider->setTemplatePathAndFilename($templatePathAndFilename);
         $this->view->setTemplatePathAndFilename($templatePathAndFilename);
-        $this->view->setTemplateRootPath($paths['templateRootPath']);
-        $this->view->setPartialRootPath($paths['partialRootPath']);
-        $this->view->setLayoutRootPath($paths['layoutRootPath']);
+        $this->view->setTemplateRootPaths((array) $paths['templateRootPaths']);
+        $this->view->setPartialRootPaths((array) $paths['partialRootPaths']);
+        $this->view->setLayoutRootPaths((array) $paths['layoutRootPaths']);
     }
 
     /**
