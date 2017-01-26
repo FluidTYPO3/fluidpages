@@ -59,6 +59,7 @@ class PageServiceTest extends UnitTestCase
         }
         $instance = new PageService();
         $instance->injectWorkspacesAwareRecordService($service);
+
         $result = $instance->getPageTemplateConfiguration(1);
         $this->assertEquals($expected, $result);
     }
@@ -91,6 +92,7 @@ class PageServiceTest extends UnitTestCase
         $service->expects($this->at(1))->method('getSingle')->with('pages', '*', 2)->willReturn($record2);
         $instance = new PageService();
         $instance->injectWorkspacesAwareRecordService($service);
+
         $output = $instance->getPageFlexFormSource(1);
         $this->assertEquals('test', $output);
     }
@@ -138,5 +140,34 @@ class PageServiceTest extends UnitTestCase
                 array('fluidpages' => null)
             )
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetPageRecordIsCalledOncePerPage()
+    {
+        /** @var PageService|\PHPUnit_Framework_MockObject_MockObject $instance */
+        $instance = $this->getMockBuilder(PageService::class)
+            ->setMethods(['fetchPageDataWithRecordService'])
+            ->getMock();
+
+        $instance->expects($this->exactly(2))
+            ->method('fetchPageDataWithRecordService')
+            ->with($this->logicalOr(
+                $this->equalTo(42),
+                $this->equalTo(1337)
+            ));
+
+        /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $service */
+        $service = $this->getMockBuilder(WorkspacesAwareRecordService::class)
+            ->setMethods(['getSingle'])
+            ->getMock();
+        $instance->injectWorkspacesAwareRecordService($service);
+
+        for ($i = 0; $i < 10; $i++) {
+            $instance->getPageRecord(42);
+            $instance->getPageRecord(1337);
+        }
     }
 }

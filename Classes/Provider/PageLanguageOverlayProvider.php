@@ -37,13 +37,13 @@ class PageLanguageOverlayProvider extends PageProvider implements ProviderInterf
         if (false === isset($record[$parentFieldName])) {
             $record[$parentFieldName] = $this->getParentFieldValue($record);
         }
-        $pageRecord = $this->recordService->getSingle('pages', '*', $record['pid']);
+        $pageRecord = $this->pageService->getPageRecord($record['pid']);
         $records = [];
         while (0 < $pageRecord[$parentFieldName]) {
             $record = $this->recordService->get($this->tableName, '*', 'pid = ' . $pageRecord['pid']);
             $parentFieldName = $this->getParentFieldName($record);
             array_push($records, $record);
-            $pageRecord = $this->recordService->getSingle('pages', '*', $pageRecord['pid']);
+            $pageRecord = $this->pageService->getPageRecord($pageRecord['pid']);
         }
         $records = array_reverse($records);
         return $records;
@@ -55,7 +55,7 @@ class PageLanguageOverlayProvider extends PageProvider implements ProviderInterf
      */
     public function getControllerActionReferenceFromRecord(array $row)
     {
-        $pageRow = $this->recordService->getSingle('pages', '*', $row['pid']);
+        $pageRow = $this->pageService->getPageRecord($row['pid']);
         return parent::getControllerActionReferenceFromRecord($pageRow);
     }
 }
