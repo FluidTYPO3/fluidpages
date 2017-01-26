@@ -1,7 +1,8 @@
-Latest release: 3.6.1 (2016/09/10)
+Latest release: 4.0.0 (2017/01/25)
 
 All previous release change logs:
 
+* [4.0.0 (2017/01/25)](Documentation/Changelog/4.0.0.md) [Full list of changes](https://github.com/FluidTYPO3/fluidpages/compare/3.6.1...4.0.0)
 * [3.6.1 (2016/09/10)](Documentation/Changelog/3.6.1.md) [Full list of changes](https://github.com/FluidTYPO3/fluidpages/compare/3.6.0...3.6.1)
 * [3.6.0 (2016/05/17)](Documentation/Changelog/3.6.0.md) [Full list of changes](https://github.com/FluidTYPO3/fluidpages/compare/3.5.0...3.6.0)
 * [3.5.0 (2016/03/03)](Documentation/Changelog/3.5.0.md) [Full list of changes](https://github.com/FluidTYPO3/fluidpages/compare/3.4.0...3.5.0)
