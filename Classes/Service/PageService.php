@@ -16,7 +16,6 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
 /**
  * Page Service
@@ -46,11 +45,6 @@ class PageService implements SingletonInterface
      * @var WorkspacesAwareRecordService
      */
     protected $workspacesAwareRecordService;
-
-    /**
-     * @var EnvironmentService
-     */
-    protected $environmentService;
 
     /**
      * Local storage for `pages` records. It is used only in frontend
@@ -95,14 +89,6 @@ class PageService implements SingletonInterface
     public function injectWorkspacesAwareRecordService(WorkspacesAwareRecordService $workspacesAwareRecordService)
     {
         $this->workspacesAwareRecordService = $workspacesAwareRecordService;
-    }
-
-    /**
-     * @param EnvironmentService $environmentService
-     */
-    public function injectEnvironmentService(EnvironmentService $environmentService)
-    {
-        $this->environmentService = $environmentService;
     }
 
     /**
@@ -254,26 +240,19 @@ class PageService implements SingletonInterface
     }
 
     /**
-     * Returns the page record for a given uid. A local storage is used in
-     * frontend environment to reduce actual queries in the database and improve
-     * performance.
+     * Returns the page record for a given uid. A local storage is used to
+     * reduce actual queries in the database and improve performance.
      *
      * @param int $pageUid
      * @return array|mixed|NULL
      */
     public function getPageRecord($pageUid)
     {
-        if ($this->environmentService->isEnvironmentInFrontendMode()) {
-            if (false === array_key_exists($pageUid, $this->pageRecordsStorage)) {
-                $this->pageRecordsStorage[$pageUid] = $this->fetchPageDataWithRecordService($pageUid);
-            }
-
-            $result = $this->pageRecordsStorage[$pageUid];
-        } else {
-            $result = $this->fetchPageDataWithRecordService($pageUid);
+        if (false === array_key_exists($pageUid, $this->pageRecordsStorage)) {
+            $this->pageRecordsStorage[$pageUid] = $this->fetchPageDataWithRecordService($pageUid);
         }
 
-        return $result;
+        return $this->pageRecordsStorage[$pageUid];
     }
 
     /**
