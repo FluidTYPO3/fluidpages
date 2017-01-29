@@ -110,7 +110,7 @@ class PageController extends AbstractFluxController implements PageControllerInt
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getRecord()
     {
