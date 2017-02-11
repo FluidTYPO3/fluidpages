@@ -7,29 +7,25 @@ namespace FluidTYPO3\Fluidpages\Backend;
  * For the full copyright and license information, please read the
  * LICENSE.md file that was distributed with this source code.
  */
-
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Form;
-use FluidTYPO3\Flux\View\ViewContext;
-use FluidTYPO3\Flux\View\TemplatePaths;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use FluidTYPO3\Flux\Utility\MiscellaneousUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
- * Class that renders a Page template selection field.
+ * Class for provisioning page layout selections for backend form fields
  */
-class PageLayoutSelector
+class PageLayoutDataProvider
 {
 
     /**
-     * @var BackendConfigurationManager
+     * @var ConfigurationManagerInterface
      */
     protected $configurationManager;
 
@@ -87,36 +83,11 @@ class PageLayoutSelector
     }
 
     /**
-     * Renders a Fluid Page Layout file selector
-     *
      * @param array $parameters
-     * @param mixed $pObj
-     * @return string
+     * @return array
      */
-    public function renderField(&$parameters, &$pObj)
+    public function addItems(array $parameters)
     {
-        $availableTemplates = $this->pageService->getAvailablePageTemplateFiles();
-        $selector = '<div>';
-        $selector .= $this->renderInheritanceField($parameters);
-        foreach ($availableTemplates as $extension => $group) {
-            $selector .= $this->renderOptions($extension, $group, $parameters);
-        }
-        $selector .= '</div>';
-        return $selector;
-    }
-
-    /**
-     * @param array $parameters
-     * @return string
-     */
-    protected function renderInheritanceField(array $parameters)
-    {
-        $selector = '';
-        $onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) 
-        && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
-        $pageIsSiteRoot = (boolean) ($parameters['row']['is_siteroot']);
-        $name = $parameters['itemFormElName'];
-        $value = $parameters['itemFormElValue'];
         $typoScript = $this->configurationManager->getConfiguration(
             ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT
         );
@@ -126,6 +97,7 @@ class PageLayoutSelector
         } else {
             $hideInheritFieldSiteRoot = false;
         }
+        $pageIsSiteRoot = (boolean) ($parameters['row']['is_siteroot']);
         $forceDisplayInheritSiteRoot = 'tx_fed_page_controller_action_sub' === $parameters['field']
             && !$hideInheritFieldSiteRoot;
         $forceHideInherit = (boolean) (0 === intval($parameters['row']['pid']));
@@ -135,25 +107,31 @@ class PageLayoutSelector
                     'pages.tx_fed_page_controller_action.default',
                     'Fluidpages'
                 );
-                $selected = empty($value) ? ' checked="checked" ' : null;
-                $selector .= '<label>';
-                $selector .= '<input type="radio" name="' . $name . '" ' . $onChange . '" value="" ' .
-                    $selected . '/> ' . $emptyLabel . LF;
-                $selector .= '</label>' . LF;
+                $parameters['items'][] = [
+                    $emptyLabel,
+                    '',
+                    'actions-move-down'
+                ];
             }
         }
-        return $selector;
+        $availableTemplates = $this->pageService->getAvailablePageTemplateFiles();
+        foreach ($availableTemplates as $extension => $group) {
+            $parameters['items'] = array_merge(
+                $parameters['items'],
+                $this->renderOptions($extension, $group, $parameters)
+            );
+        }
     }
 
     /**
      * @param string $extension
-     * @param array $group
+     * @param Form[] $group
      * @param array $parameters
      * @return string
      */
     protected function renderOptions($extension, array $group, array $parameters)
     {
-        $selector = '';
+        $options = [];
         if (false === empty($group)) {
             $extensionKey = ExtensionNamingUtility::getExtensionKey($extension);
             if (false === ExtensionManagementUtility::isLoaded($extensionKey)) {
@@ -164,14 +142,12 @@ class PageLayoutSelector
                 $groupTitle = $EM_CONF['']['title'];
             }
 
-            $packageLabel = LocalizationUtility::translate('pages.tx_fed_page_package', 'Fluidpages');
-            $selector .= '<h4 style="clear: both; margin-top: 1em;">' . $packageLabel . ': ' .
-                $groupTitle . '</h4>' . LF;
+            $options[] = [$groupTitle, '--div--'];
             foreach ($group as $form) {
-                $selector .= $this->renderOption($form, $parameters);
+                $options[] = $this->renderOption($form, $parameters);
             }
         }
-        return $selector;
+        return $options;
     }
 
     /**
@@ -181,14 +157,12 @@ class PageLayoutSelector
      */
     protected function renderOption(Form $form, array $parameters)
     {
-        $name = $parameters['itemFormElName'];
-        $value = $parameters['itemFormElValue'];
-        $onChange = 'onclick="if (confirm(TBE_EDITOR.labels.onChangeAlert) 
-        && TBE_EDITOR.checkSubmit(-1)){ TBE_EDITOR.submitForm() };"';
-        $selector = '';
+        $option = [];
         try {
             $extension = $form->getExtensionName();
             $thumbnail = MiscellaneousUtility::getIconForTemplate($form);
+            $thumbnail = ltrim($thumbnail, '/');
+            $thumbnail = MiscellaneousUtility::createIcon(GeneralUtility::getFileAbsFileName($thumbnail), 64, 64);
             $template = pathinfo($form->getOption(Form::OPTION_TEMPLATEFILE), PATHINFO_FILENAME);
             $formLabel = $form->getLabel();
             if (strpos($formLabel, 'LLL:') === 0) {
@@ -197,19 +171,12 @@ class PageLayoutSelector
                 $label = $formLabel;
             }
             $optionValue = $extension . '->' . lcfirst($template);
-            $selected = ($optionValue == $value ? ' checked="checked"' : '');
-            $option = '<label style="padding: 0.5em; border: 1px solid #CCC; display: inline-block; ' .
-                'vertical-align: bottom; margin: 0 1em 1em 0; cursor: pointer; ' .
-                ($selected ? 'background-color: #DDD;' : '')  . '">';
-            $option .= '<img src="' . $thumbnail . '" alt="' . $label . '" style="margin: 0.5em 0 0.5em 0; ' .
-                'max-width: 196px; max-height: 128px;"/><br />';
-            $option .= '<input type="radio" value="' . $optionValue . '"' . $selected . ' name="' . $name . '" ' .
-                $onChange . ' /> ' . $label;
-            $option .= '</label>';
-            $selector .= $option . LF;
+            $option = [$label, $optionValue, $thumbnail];
+            #var_dump($thumbnail);
+
         } catch (\RuntimeException $error) {
             $this->configurationService->debug($error);
         }
-        return $selector;
+        return $option;
     }
 }
