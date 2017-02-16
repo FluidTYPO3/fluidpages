@@ -17,6 +17,8 @@ use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use FluidTYPO3\Flux\Utility\RecursiveArrayUtility;
 use FluidTYPO3\Flux\View\TemplatePaths;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -169,9 +171,22 @@ class PageProvider extends AbstractProvider implements ProviderInterface
      */
     public function getForm(array $row)
     {
+        $cacheId = 'fluidpages-' . md5($row['uid'] . '/' . $row['pid'] . '/' . $row[$this->getFieldName($row)]);
+        $persistentCache = $this->getFluxCache();
+        $runtimeCache = $this->getRuntimeCache();
+        $cachedPersistent = $persistentCache->get($cacheId) ?? $runtimeCache->get($cacheId);
+        if ($cachedPersistent) {
+            return $cachedPersistent;
+        }
+
         $form = parent::getForm($row);
         if (null !== $form) {
             $form = $this->setDefaultValuesInFieldsWithInheritedValues($form, $row);
+        }
+        if ($form->getOption(Form::OPTION_STATIC)) {
+            $persistentCache->set($cacheId, $form);
+        } else {
+            $runtimeCache->set($cacheId, $form);
         }
         return $form;
     }
@@ -487,5 +502,21 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         }
         $records = array_reverse($records);
         return $records;
+    }
+
+    /**
+     * @return VariableFrontend
+     */
+    protected function getRuntimeCache()
+    {
+        return GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_runtime');
+    }
+
+    /**
+     * @return VariableFrontend
+     */
+    protected function getFluxCache()
+    {
+        return GeneralUtility::makeInstance(CacheManager::class)->getCache('flux');
     }
 }
