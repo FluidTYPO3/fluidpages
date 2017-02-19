@@ -11,14 +11,13 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Controller;
 use FluidTYPO3\Fluidpages\Controller\PageController;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Fluidpages\Tests\Fixtures\Controller\DummyPageController;
+use FluidTYPO3\Flux\Provider\Provider;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\View\ExposedTemplateView;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use FluidTYPO3\Fluidpages\Tests\Fixtures\Controller\DummyPageController;
-use FluidTYPO3\Flux\Provider\Provider;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Extbase\Mvc\Web\Response;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**

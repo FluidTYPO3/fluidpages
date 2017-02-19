@@ -10,7 +10,6 @@ namespace FluidTYPO3\Fluidpages\Backend;
 
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
-use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\View\TemplatePaths;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 

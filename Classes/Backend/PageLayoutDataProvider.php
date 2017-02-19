@@ -172,7 +172,6 @@ class PageLayoutDataProvider
             }
             $optionValue = $extension . '->' . lcfirst($template);
             $option = [$label, $optionValue, $thumbnail];
-            #var_dump($thumbnail);
 
         } catch (\RuntimeException $error) {
             $this->configurationService->debug($error);
