@@ -8,9 +8,9 @@ namespace FluidTYPO3\Fluidpages\Controller;
  * LICENSE.md file that was distributed with this source code.
  */
 
-use FluidTYPO3\Flux\Controller\AbstractFluxController;
-use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Flux\Controller\AbstractFluxController;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Response;
 

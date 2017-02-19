@@ -9,11 +9,11 @@ namespace FluidTYPO3\Fluidpages\Hooks;
  */
 
 use FluidTYPO3\Fluidpages\Provider\PageProvider;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
+use FluidTYPO3\Flux\View\PreviewView;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
-use FluidTYPO3\Flux\View\PreviewView;
 
 class PagePreviewRenderer
 {
