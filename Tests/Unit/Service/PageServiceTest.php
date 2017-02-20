@@ -10,15 +10,16 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Service;
 
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Fluidpages\Tests\Unit\AbstractTestCase;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * Class PageServiceTest
  * @package FluidTYPO3\Fluidpages\Tests\Unit\Service
  */
-class PageServiceTest extends UnitTestCase
+class PageServiceTest extends AbstractTestCase
 {
 
     /**
@@ -87,8 +88,8 @@ class PageServiceTest extends UnitTestCase
         $record2 = array('pid' => 0, 'uid' => 3, 'tx_fed_page_flexform' => 'test');
         /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $service */
         $service = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
-        $service->expects($this->at(0))->method('getSingle')->with('pages', '*', 1)->willReturn($record1);
-        $service->expects($this->at(1))->method('getSingle')->with('pages', '*', 2)->willReturn($record2);
+        $service->expects($this->at(0))->method('getSingle')->with('pages', 'uid,pid,t3ver_oid,tx_fed_page_flexform', 1)->willReturn($record1);
+        $service->expects($this->at(1))->method('getSingle')->with('pages', 'uid,pid,t3ver_oid,tx_fed_page_flexform', 2)->willReturn($record2);
         $instance = new PageService();
         $instance->injectWorkspacesAwareRecordService($service);
         $output = $instance->getPageFlexFormSource(1);
@@ -134,9 +135,13 @@ class PageServiceTest extends UnitTestCase
                 array('fluidpages' => array('Dummy'))
             ),
             array(
-                array('fluidpages' => array('templateRootPaths' => array('EXT:fluidpages/Invalid'))),
+                array('fluidpages' => array('templateRootPaths' => array(ExtensionManagementUtility::extPath('fluidpages', 'Invalid')))),
                 array('fluidpages' => null)
-            )
+            ),
+            array(
+                array('fluidpages' => array('templateRootPaths' => array(ExtensionManagementUtility::extPath('fluidpages', 'Resources/Private/Templates/')))),
+                array('fluidpages' => null)
+            ),
         );
     }
 }

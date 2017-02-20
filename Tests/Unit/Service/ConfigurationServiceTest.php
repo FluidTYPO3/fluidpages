@@ -9,15 +9,15 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Service;
  */
 
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
+use FluidTYPO3\Fluidpages\Tests\Unit\AbstractTestCase;
 use FluidTYPO3\Flux\Core;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class ConfigurationServiceTest
  */
-class ConfigurationServiceTest extends UnitTestCase
+class ConfigurationServiceTest extends AbstractTestCase
 {
 
     /**

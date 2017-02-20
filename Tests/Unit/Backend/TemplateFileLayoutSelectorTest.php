@@ -10,13 +10,13 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
 
 use FluidTYPO3\Fluidpages\Backend\TemplateFileLayoutSelector;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
+use FluidTYPO3\Fluidpages\Tests\Unit\AbstractTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class TemplateFileLayoutSelectorTest
  */
-class TemplateFileLayoutSelectorTest extends UnitTestCase
+class TemplateFileLayoutSelectorTest extends AbstractTestCase
 {
 
     /**
