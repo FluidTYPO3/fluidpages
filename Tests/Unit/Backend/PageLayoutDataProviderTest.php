@@ -8,18 +8,11 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Backend;
  * LICENSE.md file that was distributed with this source code.
  */
 
-use FluidTYPO3\Fluidpages\Backend\BackendLayoutDataProvider;
 use FluidTYPO3\Fluidpages\Backend\PageLayoutDataProvider;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Fluidpages\Tests\Unit\AbstractTestCase;
 use FluidTYPO3\Flux\Form;
-use FluidTYPO3\Flux\Form\Container\Grid;
-use FluidTYPO3\Flux\Provider\Provider;
-use FluidTYPO3\Flux\Service\ContentService;
-use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
-use TYPO3\CMS\Backend\View\BackendLayout\BackendLayoutCollection;
-use TYPO3\CMS\Backend\View\BackendLayout\DataProviderContext;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -27,7 +20,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
 /**
  * Class PageLayoutDataProviderTest
  */
-class PageLayoutDataProviderTest extends UnitTestCase
+class PageLayoutDataProviderTest extends AbstractTestCase
 {
 
     /**
@@ -70,27 +63,27 @@ class PageLayoutDataProviderTest extends UnitTestCase
             [
                 [],
                 [],
-                [['Fluid Pages Engine', '--div--'], [null, '->', '']]
+                [['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
             ],
             [
                 [],
                 [['foo', 'bar', 'baz']],
-                [['foo', 'bar', 'baz'], ['Fluid Pages Engine', '--div--'], [null, '->', '']]
+                [['foo', 'bar', 'baz'], ['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
             ],
             [
                 ['field' => 'tx_fed_page_controller_action_sub', 'row' => ['pid' => 1]],
                 [['foo', 'bar', 'baz']],
-                [['foo', 'bar', 'baz'], ['Parent decides', '', 'actions-move-down'], ['Fluid Pages Engine', '--div--'], [null, '->', '']]
+                [['foo', 'bar', 'baz'], ['Parent decides', '', 'actions-move-down'], ['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
             ],
             [
                 ['field' => 'tx_fed_page_controller_action_sub', 'row' => ['pid' => 1, 'is_siteroot' => false]],
                 [['foo', 'bar', 'baz']],
-                [['foo', 'bar', 'baz'], ['Parent decides', '', 'actions-move-down'], ['Fluid Pages Engine', '--div--'], [null, '->', '']]
+                [['foo', 'bar', 'baz'], ['Parent decides', '', 'actions-move-down'], ['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
             ],
             [
                 ['field' => 'tx_fed_page_controller_action', 'row' => ['pid' => 0, 'is_siteroot' => true]],
                 [['foo', 'bar', 'baz']],
-                [['foo', 'bar', 'baz'], ['Fluid Pages Engine', '--div--'], [null, '->', '']]
+                [['foo', 'bar', 'baz'], ['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
             ],
 
         ];

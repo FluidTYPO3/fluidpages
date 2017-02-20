@@ -101,7 +101,12 @@ class PageService implements SingletonInterface
         if (array_keys($cache, $pageUid)) {
             return $cache[$pageUid];
         }
-        $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
+        $fieldList = 'tx_fed_page_controller_action_sub,t3ver_oid,pid,uid';
+        $page = $this->workspacesAwareRecordService->getSingle(
+            'pages',
+            'tx_fed_page_controller_action,' . $fieldList,
+            $pageUid
+        );
 
         // Initialize with possibly-empty values and loop root line
         // to fill values as they are detected.
@@ -123,7 +128,11 @@ class PageService implements SingletonInterface
             // Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
             // configuration as an emulated first parent page.
             $resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
-            $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
+            $page = $this->workspacesAwareRecordService->getSingle(
+                'pages',
+                $fieldList,
+                $resolveParentPageUid
+            );
         } while (null !== $page);
         if (true === empty($resolvedMainTemplateIdentity) && true === empty($resolvedSubTemplateIdentity)) {
             // Neither directly configured "this page" nor inherited "sub" contains a valid value;
@@ -149,10 +158,11 @@ class PageService implements SingletonInterface
         if (1 > $pageUid) {
             return null;
         }
-        $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $pageUid);
+        $fieldList = 'uid,pid,t3ver_oid,tx_fed_page_flexform';
+        $page = $this->workspacesAwareRecordService->getSingle('pages', $fieldList, $pageUid);
         while (null !== $page && 0 !== (integer) $page['uid'] && true === empty($page['tx_fed_page_flexform'])) {
             $resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
-            $page = $this->workspacesAwareRecordService->getSingle('pages', '*', $resolveParentPageUid);
+            $page = $this->workspacesAwareRecordService->getSingle('pages', $fieldList, $resolveParentPageUid);
         }
         return $page['tx_fed_page_flexform'];
     }

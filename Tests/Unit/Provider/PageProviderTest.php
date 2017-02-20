@@ -14,6 +14,7 @@ use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Tests\Fixtures\Provider\DummyPageProvider;
 use FluidTYPO3\Flux\Form;
+use FluidTYPO3\Flux\Service\FluxService;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Records;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Xml;
@@ -197,6 +198,7 @@ class PageProviderTest extends AbstractTestCase
         $provider->expects($this->any())->method('getForm')->willReturn(Form::create());
         $provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
         $provider->injectPageConfigurationService($mockConfigurationService);
+        $provider->injectConfigurationService($this->getMockBuilder(FluxService::class)->getMock());
         $values = $provider->getFlexformValues($record);
         $this->assertEquals($values, array());
     }
@@ -236,6 +238,7 @@ class PageProviderTest extends AbstractTestCase
         $provider->expects($this->any())->method('getForm')->willReturn(Form::create());
         $provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
         $provider->injectPageConfigurationService($mockConfigurationService);
+        $provider->injectConfigurationService($this->getMockBuilder(FluxService::class)->getMock());
         $values = $provider->getFlexformValues($record);
         $this->assertEquals($values, array());
     }
