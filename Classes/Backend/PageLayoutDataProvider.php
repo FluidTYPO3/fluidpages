@@ -161,8 +161,10 @@ class PageLayoutDataProvider
         try {
             $extension = $form->getExtensionName();
             $thumbnail = MiscellaneousUtility::getIconForTemplate($form);
-            $thumbnail = ltrim($thumbnail, '/');
-            $thumbnail = MiscellaneousUtility::createIcon(GeneralUtility::getFileAbsFileName($thumbnail), 64, 64);
+            if (NULL !== $thumbnail) {
+                $thumbnail = ltrim($thumbnail, '/');
+                $thumbnail = MiscellaneousUtility::createIcon(GeneralUtility::getFileAbsFileName($thumbnail), 64, 64);
+            }
             $template = pathinfo($form->getOption(Form::OPTION_TEMPLATEFILE), PATHINFO_FILENAME);
             $formLabel = $form->getLabel();
             if (strpos($formLabel, 'LLL:') === 0) {
