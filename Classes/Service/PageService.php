@@ -12,6 +12,8 @@ use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\View\TemplatePaths;
 use FluidTYPO3\Flux\View\ViewContext;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -93,13 +95,15 @@ class PageService implements SingletonInterface
      */
     public function getPageTemplateConfiguration($pageUid)
     {
-        static $cache = [];
         $pageUid = (integer) $pageUid;
         if (1 > $pageUid) {
             return null;
         }
-        if (array_key_exists($pageUid, $cache)) {
-            return $cache[$pageUid];
+        $cacheId = 'fluidpages-template-configuration-' . $pageUid;
+        $runtimeCache = $this->getRuntimeCache();
+        $fromCache = $runtimeCache->get($cacheId);
+        if ($fromCache) {
+            return $fromCache;
         }
         $fieldList = 'tx_fed_page_controller_action_sub,t3ver_oid,pid,uid';
         $page = $this->workspacesAwareRecordService->getSingle(
@@ -137,12 +141,14 @@ class PageService implements SingletonInterface
         if (true === empty($resolvedMainTemplateIdentity) && true === empty($resolvedSubTemplateIdentity)) {
             // Neither directly configured "this page" nor inherited "sub" contains a valid value;
             // no configuration was detected at all.
-            return $cache[$pageUid] = null;
+            return null;
         }
-        return $cache[$pageUid] = [
+        $configurarion = [
             'tx_fed_page_controller_action' => $resolvedMainTemplateIdentity,
             'tx_fed_page_controller_action_sub' => $resolvedSubTemplateIdentity
         ];
+        $runtimeCache->set($cacheId, $configurarion);
+        return $configurarion;
     }
 
     /**
@@ -238,5 +244,13 @@ class PageService implements SingletonInterface
             }
         }
         return $output;
+    }
+
+    /**
+     * @return VariableFrontend
+     */
+    protected function getRuntimeCache()
+    {
+        return GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_runtime');
     }
 }
