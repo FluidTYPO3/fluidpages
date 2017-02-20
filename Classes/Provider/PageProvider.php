@@ -251,43 +251,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @param array $row source record row
-     * @param array $configuration to be overlayed
-     * @param Form\FormInterface $form
-     * @return array
-     */
-    public function overlayFlexFormValues($row, $configuration, $form)
-    {
-        if ($GLOBALS['TSFE']->sys_language_uid > 0) {
-            $overlays = $this->recordService->get(
-                'pages_language_overlay',
-                '*',
-                sprintf(
-                    'hidden = 0 AND deleted = 0 AND sys_language_uid = %d AND pid = %d',
-                    $GLOBALS['TSFE']->sys_language_uid,
-                    $row['uid']
-                )
-            );
-            $fieldName = $this->getFieldName($row);
-            if (count($overlays) > 0) {
-                foreach ($overlays as $overlay) {
-                    if (isset($overlay[$fieldName])) {
-                        // Overlays may not consistently contain a workable value; skip those that don't
-                        $overlayConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray(
-                            $overlay[$fieldName],
-                            $form,
-                            null,
-                            null
-                        );
-                        $configuration = RecursiveArrayUtility::merge($configuration, $overlayConfiguration);
-                    }
-                }
-            }
-        }
-        return $configuration;
-    }
-
-    /**
      * @param array $row
      * @return array
      */
@@ -295,21 +258,12 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     {
         $fieldName = $this->getFieldName($row);
         $form = $this->getForm($row);
-
-        // legacy language handling, this was deprecated in TYPO3 7.6 (Deprecation: #70138 Flex form language handling)
-        // this should stay here for a little while and be removed at some point in the future
-        $languageRef = null;
-        if ($GLOBALS['TSFE']->sys_language_uid > 0) {
-            $languageRef = 'l' . $GLOBALS['TSFE']->config['config']['language'];
-        }
-        $immediateConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray(
+        $immediateConfiguration = $this->configurationService->convertFlexFormContentToArray(
             $row[$fieldName],
             $form,
-            $languageRef,
+            null,
             null
         );
-
-        $immediateConfiguration = $this->overlayFlexFormValues($row, $immediateConfiguration, $form);
         return $immediateConfiguration;
     }
 
