@@ -98,7 +98,7 @@ class PageService implements SingletonInterface
         if (1 > $pageUid) {
             return null;
         }
-        if (array_keys($cache, $pageUid)) {
+        if (array_key_exists($pageUid, $cache)) {
             return $cache[$pageUid];
         }
         $fieldList = 'tx_fed_page_controller_action_sub,t3ver_oid,pid,uid';
