@@ -155,7 +155,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         if (false === empty($action)) {
             $paths = $this->getTemplatePaths($row);
             $templatePaths = new TemplatePaths($paths);
-            list (, $action) = explode('->', $action);
+            $action = $this->getControllerActionFromRecord($row);
             $action = ucfirst($action);
             $templatePathAndFilename = $templatePaths->resolveTemplateFileForControllerAndActionAndFormat(
                 'Page',
@@ -198,9 +198,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     public function getControllerExtensionKeyFromRecord(array $row)
     {
         $action = $this->getControllerActionReferenceFromRecord($row);
-        if (false !== strpos($action, '->')) {
-            $extensionName = array_shift(explode('->', $action));
-            return $extensionName;
+        $offset = strpos($action, '->');
+        if (false !== $offset) {
+            return substr($action, 0, $offset);
         }
         return $this->extensionKey;
     }
