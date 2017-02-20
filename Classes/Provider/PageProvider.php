@@ -299,7 +299,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         // legacy language handling, this was deprecated in TYPO3 7.6 (Deprecation: #70138 Flex form language handling)
         // this should stay here for a little while and be removed at some point in the future
         $languageRef = null;
-        if ($GLOBALS['TSFE']->sys_language_uid > 0) {
+        if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay'])
+            && TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay']
+            && $GLOBALS['TSFE']->sys_language_uid > 0) {
             $languageRef = 'l' . $GLOBALS['TSFE']->config['config']['language'];
         }
         $immediateConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray(
