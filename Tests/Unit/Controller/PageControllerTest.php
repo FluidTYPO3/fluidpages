@@ -12,18 +12,19 @@ use FluidTYPO3\Fluidpages\Controller\PageController;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Tests\Fixtures\Controller\DummyPageController;
+use FluidTYPO3\Fluidpages\Tests\Unit\AbstractTestCase;
 use FluidTYPO3\Flux\Provider\Provider;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\View\ExposedTemplateView;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
+use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Class PageControllerTest
  */
-class PageControllerTest extends UnitTestCase
+class PageControllerTest extends AbstractTestCase
 {
 
     /**
@@ -54,13 +55,14 @@ class PageControllerTest extends UnitTestCase
     public function testInitializeView()
     {
         /** @var PageController|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getAccessibleMock(
-            'FluidTYPO3\\Fluidpages\\Controller\\PageController',
+        $instance = $this->getMockBuilder(
+            'FluidTYPO3\\Fluidpages\\Controller\\PageController'
+        )->setMethods(
             array(
                 'getRecord', 'initializeProvider', 'initializeSettings', 'initializeOverriddenSettings',
                 'initializeViewObject', 'initializeViewVariables', 'initializeViewHelperVariableContainer'
             )
-        );
+        )->getMock();
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configurationManager */
         $configurationManager = $this->getMockBuilder(
             'TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager'
@@ -75,8 +77,8 @@ class PageControllerTest extends UnitTestCase
         /** @var StandaloneView $view */
         $view = $this->getMockBuilder('FluidTYPO3\\Flux\\View\\ExposedTemplateView')->setMethods(array('assign', 'renderStandaloneSection'))->getMock();
         $instance->injectConfigurationManager($configurationManager);
-        $instance->_set('response', $this->getMockBuilder('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response')->getMock());
-        $instance->_set('provider', $this->getMockBuilder('FluidTYPO3\\Flux\\Provider\\ProviderInterface')->getMock());
+        ObjectAccess::setProperty($instance, 'response', $this->getMockBuilder('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response')->getMock(), true);
+        ObjectAccess::setProperty($instance, 'provider', $this->getMockBuilder('FluidTYPO3\\Flux\\Provider\\ProviderInterface')->getMock(), true);
         $instance->initializeView($view);
     }
 
