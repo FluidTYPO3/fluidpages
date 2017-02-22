@@ -42,21 +42,4 @@ class SubPageLanguageOverlayProvider extends PageLanguageOverlayProvider impleme
         }
         return $pageRow[self::FIELD_ACTION_SUB];
     }
-
-    /**
-     * @param array $row
-     * @return array
-     */
-    public function getFlexFormValuesSingle(array $row)
-    {
-        $fieldName = $this->getFieldName($row);
-        $form = $this->getForm($row);
-        $immediateConfiguration = $this->configurationService->convertFlexFormContentToArray(
-            $row[$fieldName],
-            $form,
-            null,
-            null
-        );
-        return $immediateConfiguration;
-    }
 }
