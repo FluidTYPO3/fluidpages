@@ -63,27 +63,27 @@ class PageLayoutDataProviderTest extends AbstractTestCase
             [
                 [],
                 [],
-                [['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
+                [['Fluid Pages Engine', '--div--'], [null, '->', null]]
             ],
             [
                 [],
                 [['foo', 'bar', 'baz']],
-                [['foo', 'bar', 'baz'], ['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
+                [['foo', 'bar', 'baz'], ['Fluid Pages Engine', '--div--'], [null, '->', null]]
             ],
             [
                 ['field' => 'tx_fed_page_controller_action_sub', 'row' => ['pid' => 1]],
                 [['foo', 'bar', 'baz']],
-                [['foo', 'bar', 'baz'], ['Parent decides', '', 'actions-move-down'], ['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
+                [['foo', 'bar', 'baz'], ['Parent decides', '', 'actions-move-down'], ['Fluid Pages Engine', '--div--'], [null, '->', null]]
             ],
             [
                 ['field' => 'tx_fed_page_controller_action_sub', 'row' => ['pid' => 1, 'is_siteroot' => false]],
                 [['foo', 'bar', 'baz']],
-                [['foo', 'bar', 'baz'], ['Parent decides', '', 'actions-move-down'], ['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
+                [['foo', 'bar', 'baz'], ['Parent decides', '', 'actions-move-down'], ['Fluid Pages Engine', '--div--'], [null, '->', null]]
             ],
             [
                 ['field' => 'tx_fed_page_controller_action', 'row' => ['pid' => 0, 'is_siteroot' => true]],
                 [['foo', 'bar', 'baz']],
-                [['foo', 'bar', 'baz'], ['Fluid Pages Engine', '--div--'], [null, '->', 'icon-d41d8cd98f00b204e9800998ecf8427e']]
+                [['foo', 'bar', 'baz'], ['Fluid Pages Engine', '--div--'], [null, '->', null]]
             ],
 
         ];
