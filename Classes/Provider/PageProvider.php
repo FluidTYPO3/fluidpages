@@ -184,10 +184,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface
             $form = $this->setDefaultValuesInFieldsWithInheritedValues($form, $row);
             if ($form->getOption(Form::OPTION_STATIC)) {
                 $persistentCache->set($cacheId, $form);
-            } else {
-                $runtimeCache->set($cacheId, $form);
             }
         }
+        $runtimeCache->set($cacheId, $form);
         return $form;
     }
 
