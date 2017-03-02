@@ -48,4 +48,11 @@ $EM_CONF[$_EXTKEY] = array (
           'FluidTYPO3\\Fluidpages\\' => 'Classes/',
       ),
   ),
+  'autoload-dev' =>
+  array(
+      'psr-4' =>
+      array(
+          'FluidTYPO3\\Fluidpages\\Tests\\' => 'Tests/',
+      ),
+  ),
 );
