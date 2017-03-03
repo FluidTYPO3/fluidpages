@@ -8,6 +8,9 @@ if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
 
 /** @var Composer\Autoload\ClassLoader $autoloader */
 $autoloader = require __DIR__ . '/../vendor/autoload.php';
+$autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\Fixtures\\', __DIR__ . '/../typo3conf/ext/flux/Tests/Fixtures/');
+$autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\Unit\\', __DIR__ . '/../typo3conf/ext/flux/Tests/Unit/');
+$autoloader->addPsr4('TYPO3\\CMS\\Core\\Tests\\', __DIR__ . '/../vendor/typo3/cms/typo3/sysext/core/Tests/');
 
 \FluidTYPO3\Development\Bootstrap::initialize(
     $autoloader,
