@@ -8,7 +8,6 @@ namespace FluidTYPO3\Fluidpages\Provider;
  * LICENSE.md file that was distributed with this source code.
  */
 
-use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
 
 /**

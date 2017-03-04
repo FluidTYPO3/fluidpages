@@ -1,23 +1,27 @@
 <?php
 defined ('TYPO3_MODE') or die ('Access denied.');
 
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EXTCONF);
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fluidpages']);
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', [
     'tx_fed_page_controller_action' => [
         'exclude' => 1,
         'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_controller_action',
         'config' => [
-            'type' => 'user',
-            'userFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutSelector->renderField'
+            'type' => 'select',
+            'itemsProcFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutDataProvider->addItems',
+            'showIconTable' => true,
+            'selicon_cols' => 16,
         ]
     ],
     'tx_fed_page_controller_action_sub' => [
         'exclude' => 1,
         'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_controller_action_sub',
         'config' => [
-            'type' => 'user',
-            'userFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutSelector->renderField'
+            'type' => 'select',
+            'itemsProcFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutDataProvider->addItems',
+            'showIconTable' => true,
+            'selicon_cols' => 16,
         ]
     ],
     'tx_fed_page_flexform' => [
@@ -142,7 +146,7 @@ if (FALSE === empty($additionalDoktypes)) {
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
     'pages', 'tx_fluidpages_templatefile, tx_fluidpages_layout', \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW, 'before:title'
 );
-$GLOBALS['TCA']['pages']['ctrl']['requestUpdate'] .= ',tx_fluidpages_templatefile';
+$GLOBALS['TCA']['pages']['ctrl']['requestUpdate'] .= ',tx_fluidpages_templatefile,tx_fed_page_controller_action,tx_fed_page_controller_action_sub';
 
 if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay'])
     && TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay']) {

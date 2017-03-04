@@ -8,9 +8,7 @@ namespace FluidTYPO3\Fluidpages\Provider;
  * LICENSE.md file that was distributed with this source code.
  */
 
-use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
-use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Page LanguageOverlayConfiguration Provider
@@ -55,7 +53,7 @@ class PageLanguageOverlayProvider extends PageProvider implements ProviderInterf
      */
     public function getControllerActionReferenceFromRecord(array $row)
     {
-        $pageRow = $this->recordService->getSingle('pages', '*', $row['pid']);
+        $pageRow = (array) $this->recordService->getSingle('pages', '*', $row['pid']);
         return parent::getControllerActionReferenceFromRecord($pageRow);
     }
 }

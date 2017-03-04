@@ -8,7 +8,6 @@ namespace FluidTYPO3\Fluidpages\Provider;
  * LICENSE.md file that was distributed with this source code.
  */
 
-use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
 
 /**
@@ -42,22 +41,5 @@ class SubPageLanguageOverlayProvider extends PageLanguageOverlayProvider impleme
             $pageRow = $this->pageService->getPageTemplateConfiguration($pageRow['uid']);
         }
         return $pageRow[self::FIELD_ACTION_SUB];
-    }
-
-    /**
-     * @param array $row
-     * @return array
-     */
-    public function getFlexFormValuesSingle(array $row)
-    {
-        $fieldName = $this->getFieldName($row);
-        $form = $this->getForm($row);
-        $immediateConfiguration = $this->configurationService->convertFlexFormContentToArray(
-            $row[$fieldName],
-            $form,
-            null,
-            null
-        );
-        return $immediateConfiguration;
     }
 }

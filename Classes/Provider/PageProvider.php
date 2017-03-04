@@ -17,6 +17,8 @@ use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use FluidTYPO3\Flux\Utility\RecursiveArrayUtility;
 use FluidTYPO3\Flux\View\TemplatePaths;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -153,7 +155,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         if (false === empty($action)) {
             $paths = $this->getTemplatePaths($row);
             $templatePaths = new TemplatePaths($paths);
-            list (, $action) = explode('->', $action);
+            $action = $this->getControllerActionFromRecord($row);
             $action = ucfirst($action);
             $templatePathAndFilename = $templatePaths->resolveTemplateFileForControllerAndActionAndFormat(
                 'Page',
@@ -169,10 +171,22 @@ class PageProvider extends AbstractProvider implements ProviderInterface
      */
     public function getForm(array $row)
     {
+        $cacheId = 'fluidpages-' . md5($row['uid'] . '/' . $row['pid'] . '/' . $row[$this->getFieldName($row)]);
+        $persistentCache = $this->getFluxCache();
+        $runtimeCache = $this->getRuntimeCache();
+        $cachedPersistent = $persistentCache->get($cacheId) ?? $runtimeCache->get($cacheId);
+        if ($cachedPersistent) {
+            return $cachedPersistent;
+        }
+
         $form = parent::getForm($row);
         if (null !== $form) {
             $form = $this->setDefaultValuesInFieldsWithInheritedValues($form, $row);
+            if ($form->getOption(Form::OPTION_STATIC)) {
+                $persistentCache->set($cacheId, $form);
+            }
         }
+        $runtimeCache->set($cacheId, $form);
         return $form;
     }
 
@@ -183,9 +197,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     public function getControllerExtensionKeyFromRecord(array $row)
     {
         $action = $this->getControllerActionReferenceFromRecord($row);
-        if (false !== strpos($action, '->')) {
-            $extensionName = array_shift(explode('->', $action));
-            return $extensionName;
+        $offset = strpos($action, '->');
+        if (false !== $offset) {
+            return substr($action, 0, $offset);
         }
         return $this->extensionKey;
     }
@@ -236,43 +250,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @param array $row source record row
-     * @param array $configuration to be overlayed
-     * @param Form\FormInterface $form
-     * @return array
-     */
-    public function overlayFlexFormValues($row, $configuration, $form)
-    {
-        if ($GLOBALS['TSFE']->sys_language_uid > 0) {
-            $overlays = $this->recordService->get(
-                'pages_language_overlay',
-                '*',
-                sprintf(
-                    'hidden = 0 AND deleted = 0 AND sys_language_uid = %d AND pid = %d',
-                    $GLOBALS['TSFE']->sys_language_uid,
-                    $row['uid']
-                )
-            );
-            $fieldName = $this->getFieldName($row);
-            if (count($overlays) > 0) {
-                foreach ($overlays as $overlay) {
-                    if (isset($overlay[$fieldName])) {
-                        // Overlays may not consistently contain a workable value; skip those that don't
-                        $overlayConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray(
-                            $overlay[$fieldName],
-                            $form,
-                            null,
-                            null
-                        );
-                        $configuration = RecursiveArrayUtility::merge($configuration, $overlayConfiguration);
-                    }
-                }
-            }
-        }
-        return $configuration;
-    }
-
-    /**
      * @param array $row
      * @return array
      */
@@ -280,21 +257,12 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     {
         $fieldName = $this->getFieldName($row);
         $form = $this->getForm($row);
-
-        // legacy language handling, this was deprecated in TYPO3 7.6 (Deprecation: #70138 Flex form language handling)
-        // this should stay here for a little while and be removed at some point in the future
-        $languageRef = null;
-        if ($GLOBALS['TSFE']->sys_language_uid > 0) {
-            $languageRef = 'l' . $GLOBALS['TSFE']->config['config']['language'];
-        }
-        $immediateConfiguration = $this->pageConfigurationService->convertFlexFormContentToArray(
+        $immediateConfiguration = $this->configurationService->convertFlexFormContentToArray(
             $row[$fieldName],
             $form,
-            $languageRef,
+            null,
             null
         );
-
-        $immediateConfiguration = $this->overlayFlexFormValues($row, $immediateConfiguration, $form);
         return $immediateConfiguration;
     }
 
@@ -487,5 +455,21 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         }
         $records = array_reverse($records);
         return $records;
+    }
+
+    /**
+     * @return VariableFrontend
+     */
+    protected function getRuntimeCache()
+    {
+        return GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_runtime');
+    }
+
+    /**
+     * @return VariableFrontend
+     */
+    protected function getFluxCache()
+    {
+        return GeneralUtility::makeInstance(CacheManager::class)->getCache('flux');
     }
 }
