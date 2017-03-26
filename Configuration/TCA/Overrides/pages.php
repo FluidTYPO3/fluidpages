@@ -82,6 +82,8 @@ $GLOBALS['TCA']['pages']['types'][\FluidTYPO3\Fluidpages\Controller\PageControll
 	--palette--;LLL:EXT:cms/locallang_tca.xlf:pages.palettes.storage;storage,
 	--div--;LLL:EXT:lang/locallang_tca.xlf:sys_category.tabs.category, categories';
 
+$GLOBALS['TCA']['pages']['ctrl']['useColumnsForDefaultValues'] .= ',tx_fed_page_controller_action,tx_fed_page_controller_action_sub,tx_fluidpages_templatefile,tx_fluidpages_layout';
+
 $GLOBALS['TCA']['pages']['ctrl']['typeicon_classes'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = 'tcarecords-pages-' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW;
 
 $doktypes = '0,1,4';
