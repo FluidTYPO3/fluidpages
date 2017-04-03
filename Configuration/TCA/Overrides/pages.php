@@ -7,21 +7,31 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($GLO
     'tx_fed_page_controller_action' => [
         'exclude' => 1,
         'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_controller_action',
+        'onChange' => 'reload',
         'config' => [
             'type' => 'select',
+            'renderType' => 'selectSingle',
             'itemsProcFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutDataProvider->addItems',
-            'showIconTable' => true,
-            'selicon_cols' => 16,
+            'fieldWizard' => [
+                'selectIcons' => [
+                    'disabled' => false
+                ]
+            ]
         ]
     ],
     'tx_fed_page_controller_action_sub' => [
         'exclude' => 1,
         'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_controller_action_sub',
+        'onChange' => 'reload',
         'config' => [
             'type' => 'select',
+            'renderType' => 'selectSingle',
             'itemsProcFunc' => 'FluidTYPO3\Fluidpages\Backend\PageLayoutDataProvider->addItems',
-            'showIconTable' => true,
-            'selicon_cols' => 16,
+            'fieldWizard' => [
+                'selectIcons' => [
+                    'disabled' => false
+                ]
+            ]
         ]
     ],
     'tx_fed_page_flexform' => [
@@ -109,8 +119,10 @@ if (FALSE === empty($additionalDoktypes)) {
     'tx_fluidpages_templatefile' => [
         'exclude' => 1,
         'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fluidpages_templatefile',
+        'onChange' => 'reload',
         'config' => [
             'type' => 'input',
+            'renderType' => 'inputLink',
             'eval' => 'trim',
             'placeholder' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fluidpages_templatefile.placeholder',
             'wizards' => [
@@ -118,7 +130,7 @@ if (FALSE === empty($additionalDoktypes)) {
                 'link' => [
                     'type' => 'popup',
                     'title' => 'LLL:EXT:cms/locallang_ttc.xml:header_link_formlabel',
-                    'icon' => 'EXT:backend/Resources/Public/Images/FormFieldWizard/wizard_link.gif',
+                    'icon' => 'actions-wizard-link',
                     'module' => [
                         'name' => 'wizard_link',
                         'urlParameters' => [
@@ -135,6 +147,7 @@ if (FALSE === empty($additionalDoktypes)) {
         'exclude' => 1,
         'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fluidpages_layout',
         'displayCond' => 'FIELD:tx_fluidpages_templatefile:!=:',
+        'onChange' => 'reload',
         'config' => [
             'type' => 'select',
             'renderType' => 'selectSingle',
@@ -148,7 +161,6 @@ if (FALSE === empty($additionalDoktypes)) {
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
     'pages', 'tx_fluidpages_templatefile, tx_fluidpages_layout', \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW, 'before:title'
 );
-$GLOBALS['TCA']['pages']['ctrl']['requestUpdate'] .= ',tx_fluidpages_templatefile,tx_fed_page_controller_action,tx_fed_page_controller_action_sub';
 
 if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay'])
     && TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay']) {
