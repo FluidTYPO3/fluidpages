@@ -1,15 +1,36 @@
 <?php
 // Register composer autoloader
-if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
+$autoloaderFolders = [
+    trim(shell_exec('pwd')) . '/vendor/',
+    __DIR__ . '/../vendor/'
+];
+foreach ($autoloaderFolders as $autoloaderFolder) {
+    if (file_exists($autoloaderFolder . 'autoload.php')) {
+        /** @var Composer\Autoload\ClassLoader $autoloader */
+        $autoloader = require $autoloaderFolder . 'autoload.php';
+        if (!getenv('TYPO3_PATH_ROOT')) {
+            $path = realpath($autoloaderFolder . '../') . '/';
+            $pwd = trim(shell_exec('pwd'));
+            if (file_exists($pwd . '/composer.json')) {
+                $json = json_decode(file_get_contents($pwd . '/composer.json'), true);
+                if ($json['extra']['typo3/cms']['web-dir'] ?? false) {
+                    $path .= $json['extra']['typo3/cms']['web-dir'] . '/';
+                }
+            }
+            putenv('TYPO3_PATH_ROOT=' . $path);
+        }
+        break;
+    }
+}
+
+if (!isset($autoloader)) {
     throw new \RuntimeException(
-        'Could not find vendor/autoload.php, make sure you ran composer.'
+        'Could not find autoload.php, make sure you ran composer.'
     );
 }
 
-/** @var Composer\Autoload\ClassLoader $autoloader */
-$autoloader = require __DIR__ . '/../vendor/autoload.php';
-$autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\Fixtures\\', __DIR__ . '/../typo3conf/ext/flux/Tests/Fixtures/');
-$autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\Unit\\', __DIR__ . '/../typo3conf/ext/flux/Tests/Unit/');
+$autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\', __DIR__ . '/../typo3conf/ext/flux/Tests/');
+$autoloader->addPsr4('FluidTYPO3\\Fluidpages\\Tests\\', __DIR__ . '/../typo3conf/ext/flux/Tests/');
 $autoloader->addPsr4('TYPO3\\CMS\\Core\\Tests\\', __DIR__ . '/../vendor/typo3/cms/typo3/sysext/core/Tests/');
 
 \FluidTYPO3\Development\Bootstrap::initialize(
