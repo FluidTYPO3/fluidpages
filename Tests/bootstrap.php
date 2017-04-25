@@ -30,7 +30,7 @@ if (!isset($autoloader)) {
 }
 
 $autoloader->addPsr4('FluidTYPO3\\Flux\\Tests\\', __DIR__ . '/../typo3conf/ext/flux/Tests/');
-$autoloader->addPsr4('FluidTYPO3\\Fluidpages\\Tests\\', __DIR__ . '/../typo3conf/ext/flux/Tests/');
+$autoloader->addPsr4('FluidTYPO3\\Fluidpages\\Tests\\', __DIR__ . '/Tests/');
 $autoloader->addPsr4('TYPO3\\CMS\\Core\\Tests\\', __DIR__ . '/../vendor/typo3/cms/typo3/sysext/core/Tests/');
 
 \FluidTYPO3\Development\Bootstrap::initialize(
