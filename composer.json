@@ -31,11 +31,6 @@
       "FluidTYPO3\\Fluidpages\\": "Classes/"
     }
   },
-  "autoload-dev": {
-    "psr-4": {
-      "FluidTYPO3\\Fluidpages\\Tests\\": "Tests/"
-    }
-  },
   "require-dev": {
     "fluidtypo3/flux": "dev-development",
     "fluidtypo3/development": "^3.0"
