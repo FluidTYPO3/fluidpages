@@ -179,8 +179,9 @@ class BackendLayoutDataProvider implements DataProviderInterface
             $provider = $this->configurationService->resolvePageProvider($record);
             $action = $provider->getControllerActionFromRecord($record);
             if (true === empty($action)) {
-                $this->configurationService->message(
+                GeneralUtility::sysLog(
                     'No template selected - backend layout will not be rendered',
+                    'fluidpages',
                     GeneralUtility::SYSLOG_SEVERITY_INFO
                 );
                 return [];
@@ -188,13 +189,15 @@ class BackendLayoutDataProvider implements DataProviderInterface
             $grid = $provider->getGrid($record)->build();
             if (false === is_array($grid) || 0 === count($grid['rows'])) {
                 // no grid is defined; we use the "raw" BE layout as a default behavior
-                $this->configurationService->message(
-                    'The selected page template does not contain a grid but the template is itself valid.'
+                GeneralUtility::sysLog(
+                    'The selected page template does not contain a grid but the template is itself valid.',
+                    'fluidpages',
+                    GeneralUtility::SYSLOG_SEVERITY_INFO
                 );
                 return [];
             }
         } catch (\Exception $error) {
-            $this->configurationService->debug($error);
+            GeneralUtility::sysLog($error->getMessage(), 'fluidpages', GeneralUtility::SYSLOG_SEVERITY_WARNING);
             return [];
         }
 

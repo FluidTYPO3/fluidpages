@@ -25,22 +25,15 @@ class SubPageProviderTest extends AbstractTestCase
      * @dataProvider getControllerActionFromRecordTestValues
      * @param array $record
      * @param string $fieldName
-     * @param boolean $expectsMessage
      * @param string $expected
      */
-    public function testGetControllerActionFromRecord(array $record, $fieldName, $expectsMessage, $expected)
+    public function testGetControllerActionFromRecord(array $record, $fieldName, $expected)
     {
         $instance = new SubPageProvider();
         if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype']) {
             /** @var PageService $service */
             $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\PageService')->setMethods(array('getPageTemplateConfiguration'))->getMock();
             $instance->injectPageService($service);
-        }
-        if (true === $expectsMessage) {
-            /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
-            $configurationService = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService')->setMethods(array('message'))->getMock();
-            $configurationService->expects($this->once())->method('message');
-            $instance->injectPageConfigurationService($configurationService);
         }
         // make sure PageProvider is now using the right field name
         $instance->trigger($record, null, $fieldName);
@@ -54,9 +47,9 @@ class SubPageProviderTest extends AbstractTestCase
     public function getControllerActionFromRecordTestValues()
     {
         return array(
-            array(array('doktype' => PageControllerInterface::DOKTYPE_RAW), '', false, 'raw'),
-            array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => ''), 'tx_fed_page_flexform_sub', true, 'default'),
-            array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => 'fluidpages->action'), 'tx_fed_page_flexform_sub', false, 'action'),
+            array(array('doktype' => PageControllerInterface::DOKTYPE_RAW), '', 'raw'),
+            array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => ''), 'tx_fed_page_flexform_sub', 'default'),
+            array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => 'fluidpages->action'), 'tx_fed_page_flexform_sub', 'action'),
         );
     }
 

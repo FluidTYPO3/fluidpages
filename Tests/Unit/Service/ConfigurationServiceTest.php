@@ -12,6 +12,7 @@ use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Tests\Unit\AbstractTestCase;
 use FluidTYPO3\Flux\Core;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -75,14 +76,7 @@ class ConfigurationServiceTest extends AbstractTestCase
      */
     public function testGetViewConfigurationByFileReference($reference, $expectedParameter)
     {
-        /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMockBuilder(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
-        )->setMethods(
-            array('getViewConfigurationForExtensionName')
-        )->getMock();
-        $instance->expects($this->once())->method('getViewConfigurationForExtensionName')
-            ->with($expectedParameter)->willReturn($expectedParameter);
+        $instance = new ConfigurationService();
         $result = $instance->getViewConfigurationByFileReference($reference);
         $this->assertEquals($expectedParameter, $result);
     }
@@ -92,10 +86,20 @@ class ConfigurationServiceTest extends AbstractTestCase
      */
     public function getViewConfigurationByFileReferenceTestValues()
     {
+        $fluidpagesPaths = [
+            'templateRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Resources/Private/Templates/')],
+            'partialRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Resources/Private/Partials/')],
+            'layoutRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Resources/Private/Layouts/')],
+        ];
+        $fallbackPaths = [
+            'templateRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Templates/')],
+            'partialRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Partials/')],
+            'layoutRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Layouts/')],
+        ];
         return array(
-            array('some/file', 'fluidpages'),
-            array('EXT:fluidpages/some/file', 'fluidpages'),
-            array('EXT:other/some/file', 'other')
+            array('some/file', $fluidpagesPaths),
+            array('EXT:fluidpages/some/file', $fluidpagesPaths),
+            array('EXT:other/some/file', $fallbackPaths)
         );
     }
 
@@ -104,15 +108,9 @@ class ConfigurationServiceTest extends AbstractTestCase
      * @param mixed $input
      * @return void
      */
-    public function testGetPageConfigurationReturnsEmptyArrayAndDispatchesMessageOnInvalidInput($input)
+    public function testGetPageConfigurationReturnsEmptyArrayOnInvalidInput($input)
     {
-        /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMockBuilder(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
-        )->setMethods(
-            array('message')
-        )->getMock();
-        $instance->expects($this->once())->method('message');
+        $instance = new ConfigurationService();
         $result = $instance->getPageConfiguration($input);
         $this->assertEquals(array(), $result);
     }
@@ -134,15 +132,20 @@ class ConfigurationServiceTest extends AbstractTestCase
      */
     public function testGetPageConfigurationCallsGetViewConfigurationForExtensionName()
     {
-        /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMockBuilder(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
-        )->setMethods(
-            array('getViewConfigurationForExtensionName')
-        )->getMock();
-        $instance->expects($this->once())->method('getViewConfigurationForExtensionName')->with('foobar')->willReturn(array());
+        $instance = new ConfigurationService();
         $result = $instance->getPageConfiguration('foobar');
-        $this->assertEquals(array(), $result);
+        $expected = [
+            'templateRootPaths' => [
+                ExtensionManagementUtility::extPath('fluidpages', 'Templates/')
+            ],
+            'partialRootPaths' => [
+                ExtensionManagementUtility::extPath('fluidpages', 'Partials/')
+            ],
+            'layoutRootPaths' => [
+                ExtensionManagementUtility::extPath('fluidpages', 'Layouts/')
+            ],
+        ];
+        $this->assertEquals($expected, $result);
     }
 
     /**
@@ -150,15 +153,9 @@ class ConfigurationServiceTest extends AbstractTestCase
      */
     public function testGetPageConfigurationWithoutExtensionNameReadsRegisteredProviders()
     {
-        /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMockBuilder(
-            'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'
-        )->setMethods(
-            array('getViewConfigurationForExtensionName')
-        )->getMock();
+        $instance = new ConfigurationService();
         Core::registerProviderExtensionKey('foo', 'Page');
         Core::registerProviderExtensionKey('bar', 'Page');
-        $instance->expects($this->exactly(2))->method('getViewConfigurationForExtensionName');
         $result = $instance->getPageConfiguration();
         $this->assertCount(2, $result);
     }

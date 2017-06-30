@@ -12,9 +12,12 @@ use FluidTYPO3\Fluidpages\Provider\PageProvider;
 use FluidTYPO3\Flux\Core;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Service\FluxService;
+use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
+use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Fluid\View\TemplatePaths;
 
 /**
  * Configuration Service
@@ -26,9 +29,23 @@ class ConfigurationService extends FluxService implements SingletonInterface
 {
 
     /**
+     * @var WorkspacesAwareRecordService
+     */
+    protected $recordService;
+
+    /**
      * @var ResourceFactory
      */
     protected $resourceFactory;
+
+    /**
+     * @param WorkspacesAwareRecordService $recordService
+     * @return void
+     */
+    public function injectRecordService(WorkspacesAwareRecordService $recordService)
+    {
+        $this->recordService = $recordService;
+    }
 
     /**
      * @param ResourceFactory $resourceFactory
@@ -63,8 +80,7 @@ class ConfigurationService extends FluxService implements SingletonInterface
         if (0 === strpos($reference, 'EXT:')) {
             $extensionKey = substr($reference, 4, strpos($reference, '/') - 4);
         }
-        $configuration = $this->getViewConfigurationForExtensionName($extensionKey);
-        return $configuration;
+        return (new TemplatePaths(ExtensionNamingUtility::getExtensionKey($extensionKey)))->toArray();
     }
 
     /**
@@ -81,24 +97,23 @@ class ConfigurationService extends FluxService implements SingletonInterface
             // an empty value that is not null indicates an incorrect caller. Instead
             // of returning ALL paths here, an empty array is the proper return value.
             // However, dispatch a debug message to inform integrators of the problem.
-            $this->message(
+            GeneralUtility::sysLog(
                 'Template paths have been attempted fetched using an empty value that is NOT NULL in ' .
                 get_class($this) . '. This indicates a potential problem with your TypoScript configuration - a ' .
                 'value which is expected to be an array may be defined as a string. This error is not fatal but may ' .
                 'prevent the affected collection (which cannot be identified here) from showing up',
+                'fluidpages',
                 GeneralUtility::SYSLOG_SEVERITY_NOTICE
             );
             return [];
         }
         if (null !== $extensionName) {
-            return $this->getViewConfigurationForExtensionName($extensionName);
+            return (new TemplatePaths(ExtensionNamingUtility::getExtensionKey($extensionName)))->toArray();
         }
         $configurations = [];
         $registeredExtensionKeys = Core::getRegisteredProviderExtensionKeys('Page');
         foreach ($registeredExtensionKeys as $registeredExtensionKey) {
-            $configurations[$registeredExtensionKey] = $this->getViewConfigurationForExtensionName(
-                $registeredExtensionKey
-            );
+            $configurations[$registeredExtensionKey] = (new TemplatePaths(ExtensionNamingUtility::getExtensionKey($registeredExtensionKey)))->toArray();
         }
         return $configurations;
     }

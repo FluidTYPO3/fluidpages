@@ -157,27 +157,21 @@ class PageLayoutDataProvider
      */
     protected function renderOption(Form $form, array $parameters)
     {
-        $option = [];
-        try {
-            $extension = $form->getExtensionName();
-            $thumbnail = MiscellaneousUtility::getIconForTemplate($form);
-            if (NULL !== $thumbnail) {
-                $thumbnail = ltrim($thumbnail, '/');
-                $thumbnail = MiscellaneousUtility::createIcon(GeneralUtility::getFileAbsFileName($thumbnail), 64, 64);
-            }
-            $template = pathinfo($form->getOption(Form::OPTION_TEMPLATEFILE), PATHINFO_FILENAME);
-            $formLabel = $form->getLabel();
-            if (strpos($formLabel, 'LLL:') === 0) {
-                $label = LocalizationUtility::translate($formLabel, $extension);
-            } else {
-                $label = $formLabel;
-            }
-            $optionValue = $extension . '->' . lcfirst($template);
-            $option = [$label, $optionValue, $thumbnail];
-
-        } catch (\RuntimeException $error) {
-            $this->configurationService->debug($error);
+        $extension = $form->getExtensionName();
+        $thumbnail = MiscellaneousUtility::getIconForTemplate($form);
+        if (NULL !== $thumbnail) {
+            $thumbnail = ltrim($thumbnail, '/');
+            $thumbnail = MiscellaneousUtility::createIcon(GeneralUtility::getFileAbsFileName($thumbnail), 64, 64);
         }
+        $template = pathinfo($form->getOption(Form::OPTION_TEMPLATEFILE), PATHINFO_FILENAME);
+        $formLabel = $form->getLabel();
+        if (strpos($formLabel, 'LLL:') === 0) {
+            $label = LocalizationUtility::translate($formLabel, $extension);
+        } else {
+            $label = $formLabel;
+        }
+        $optionValue = $extension . '->' . lcfirst($template);
+        $option = [$label, $optionValue, $thumbnail];
         return $option;
     }
 }

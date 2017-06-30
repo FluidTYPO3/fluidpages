@@ -16,13 +16,10 @@ use FluidTYPO3\Flux\Provider\AbstractProvider;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use FluidTYPO3\Flux\Utility\RecursiveArrayUtility;
-use FluidTYPO3\Flux\View\TemplatePaths;
-use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
-use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
+use FluidTYPO3\Flux\View\PreviewView;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
+use TYPO3\CMS\Fluid\View\TemplatePaths;
 
 /**
  * Page Configuration Provider
@@ -66,11 +63,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     protected $configurationSectionName = 'Configuration';
 
     /**
-     * @var FlexFormTools
-     */
-    protected $flexformTool;
-
-    /**
      * @var PageService
      */
     protected $pageService;
@@ -84,14 +76,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface
      * @var array
      */
     private static $cache = [];
-
-    /**
-     * CONSTRUCTOR
-     */
-    public function __construct()
-    {
-        $this->flexformTool = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Configuration\\FlexForm\\FlexFormTools');
-    }
 
     /**
      * Returns TRUE that this Provider should trigger if:
@@ -133,6 +117,20 @@ class PageProvider extends AbstractProvider implements ProviderInterface
 
     /**
      * @param array $row
+     * @return Form|null
+     */
+    public function getForm(array $row)
+    {
+        $form = parent::getForm($row);
+        if ($form) {
+            $form->setOption(PreviewView::OPTION_PREVIEW, [PreviewView::OPTION_MODE => 'none']);
+            $form = $this->setDefaultValuesInFieldsWithInheritedValues($form, $row);
+        }
+        return $form;
+    }
+
+    /**
+     * @param array $row
      * @return string
      */
     public function getExtensionKey(array $row)
@@ -153,8 +151,8 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         $templatePathAndFilename = $this->templatePathAndFilename;
         $action = $this->getControllerActionReferenceFromRecord($row);
         if (false === empty($action)) {
-            $paths = $this->getTemplatePaths($row);
-            $templatePaths = new TemplatePaths($paths);
+            $pathsOrExtensionKey = $this->templatePaths ?? ExtensionNamingUtility::getExtensionKey($this->getControllerExtensionKeyFromRecord($row));
+            $templatePaths = new TemplatePaths($pathsOrExtensionKey);
             $action = $this->getControllerActionFromRecord($row);
             $action = ucfirst($action);
             $templatePathAndFilename = $templatePaths->resolveTemplateFileForControllerAndActionAndFormat(
@@ -163,31 +161,6 @@ class PageProvider extends AbstractProvider implements ProviderInterface
             );
         }
         return $templatePathAndFilename;
-    }
-
-    /**
-     * @param array $row
-     * @return Form|NULL
-     */
-    public function getForm(array $row)
-    {
-        $cacheId = 'fluidpages-' . md5($row['uid'] . '/' . $row['pid'] . '/' . $row[$this->getFieldName($row)]);
-        $persistentCache = $this->getFluxCache();
-        $runtimeCache = $this->getRuntimeCache();
-        $cachedPersistent = $persistentCache->get($cacheId) ?? $runtimeCache->get($cacheId);
-        if ($cachedPersistent) {
-            return $cachedPersistent;
-        }
-
-        $form = parent::getForm($row);
-        if (null !== $form) {
-            $form = $this->setDefaultValuesInFieldsWithInheritedValues($form, $row);
-            if ($form->getOption(Form::OPTION_STATIC)) {
-                $persistentCache->set($cacheId, $form);
-            }
-        }
-        $runtimeCache->set($cacheId, $form);
-        return $form;
     }
 
     /**
@@ -214,13 +187,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         if (PageControllerInterface::DOKTYPE_RAW === (integer) $row['doktype']) {
             return 'raw';
         }
-        $action = $this->getControllerActionReferenceFromRecord($row);
-        if (true === empty($action)) {
-            $this->pageConfigurationService->message(
-                'No page template selected and no template was inherited from parent page(s)'
-            );
-            return 'default';
-        }
+        $action = $this->getControllerActionReferenceFromRecord($row) ?? 'default';
         $controllerActionName = array_pop(explode('->', $action));
         $controllerActionName{0} = strtolower($controllerActionName{0});
         return $controllerActionName;
@@ -276,7 +243,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     public function postProcessRecord($operation, $id, array &$row, DataHandler $reference, array $removals = [])
     {
         if ('update' === $operation) {
-            $record = $this->loadRecordFromDatabase($id);
+            $record = $this->recordService->getSingle($this->getTableName($row), '*', $id);
             if (!is_array($record)) {
                 return;
             }
@@ -432,7 +399,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     {
         $parentFieldName = $this->getParentFieldName($row);
         if (null !== $parentFieldName && false === isset($row[$parentFieldName])) {
-            $row = $this->loadRecordFromDatabase($row['uid']);
+            $row = $this->recordService->getSingle($this->getTableName($row), '*', $row[$parentFieldName]);
         }
         return $row[$parentFieldName];
     }
@@ -449,27 +416,11 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         }
         $records = [];
         while (0 < $record[$parentFieldName]) {
-            $record = $this->loadRecordFromDatabase($record[$parentFieldName]);
+            $record = $this->recordService->getSingle($this->getTableName($record), '*', $record[$parentFieldName]);
             $parentFieldName = $this->getParentFieldName($record);
             array_push($records, $record);
         }
         $records = array_reverse($records);
         return $records;
-    }
-
-    /**
-     * @return VariableFrontend
-     */
-    protected function getRuntimeCache()
-    {
-        return GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_runtime');
-    }
-
-    /**
-     * @return VariableFrontend
-     */
-    protected function getFluxCache()
-    {
-        return GeneralUtility::makeInstance(CacheManager::class)->getCache('flux');
     }
 }

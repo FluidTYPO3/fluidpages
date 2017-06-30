@@ -15,6 +15,7 @@ use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Tests\Fixtures\Provider\DummyPageProvider;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\FluxService;
+use FluidTYPO3\Flux\Service\RecordService;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Records;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Xml;
@@ -36,7 +37,6 @@ class PageProviderTest extends AbstractTestCase
     {
         $instance = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager')
             ->get('FluidTYPO3\\Fluidpages\\Provider\\PageProvider');
-        $this->assertAttributeInstanceOf('TYPO3\\CMS\\Core\\Configuration\\FlexForm\\FlexFormTools', 'flexformTool', $instance);
         $this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\PageService', 'pageService', $instance);
         $this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', 'pageConfigurationService', $instance);
     }
@@ -149,8 +149,7 @@ class PageProviderTest extends AbstractTestCase
         }
         if (true === $expectsMessage) {
             /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
-            $configurationService = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService')->setMethods(array('message'))->getMock();
-            $configurationService->expects($this->once())->method('message');
+            $configurationService = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService')->getMock();
             $instance->injectPageConfigurationService($configurationService);
         }
         // make sure PageProvider is now using the right field name
@@ -256,7 +255,9 @@ class PageProviderTest extends AbstractTestCase
         )->getMock();
         $provider->expects($this->exactly(2))->method('getParentFieldName')->will($this->returnValue('somefield'));
         $provider->expects($this->exactly(1))->method('getParentFieldValue')->will($this->returnValue(1));
-        $provider->expects($this->exactly(1))->method('loadRecordFromDatabase')->will($this->returnValue($record));
+        $recordService = $this->getMockBuilder(WorkspacesAwareRecordService::class)->setMethods(['getSingle'])->getMock();
+        $recordService->expects($this->exactly(1))->method('getSingle')->will($this->returnValue($record));
+        $provider->injectRecordService($recordService);
         $output = $this->callInaccessibleMethod($provider, 'loadRecordTreeFromDatabase', $record);
         $expected = array($record);
         $this->assertEquals($expected, $output);
@@ -327,8 +328,10 @@ class PageProviderTest extends AbstractTestCase
         $rowWithPid = $row;
         $rowWithPid['pid'] = 1;
         $className = str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4));
-        $instance = $this->getMockBuilder($className)->setMethods(array('getParentFieldName', 'getTableName', 'loadRecordFromDatabase'))->getMock();
-        $instance->expects($this->once())->method('loadRecordFromDatabase')->with($row['uid'])->will($this->returnValue($rowWithPid));
+        $instance = $this->getMockBuilder($className)->setMethods(array('getParentFieldName', 'getTableName'))->getMock();
+        $recordService = $this->getMockBuilder(WorkspacesAwareRecordService::class)->setMethods(['getSingle'])->getMock();
+        $recordService->expects($this->exactly(1))->method('getSingle')->will($this->returnValue($rowWithPid));
+        $instance->injectRecordService($recordService);
         $instance->expects($this->once())->method('getParentFieldName')->with($row)->will($this->returnValue('pid'));
         $result = $this->callInaccessibleMethod($instance, 'getParentFieldValue', $row);
         $this->assertEquals($rowWithPid['pid'], $result);
