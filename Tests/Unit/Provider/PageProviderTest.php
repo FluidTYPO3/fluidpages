@@ -391,6 +391,7 @@ class PageProviderTest extends AbstractTestCase
         /** @var DataHandler $parentInstance */
         $parentInstance = GeneralUtility::makeInstance('TYPO3\CMS\Core\DataHandling\DataHandler');
         $parentInstance->datamap[$tableName][$id] = array(
+            'uid' => $record['uid'],
             $fieldName => array(
                 'data' => array(
                     'options' => array(
