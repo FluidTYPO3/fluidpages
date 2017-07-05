@@ -14,7 +14,6 @@ use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Tests\Fixtures\Controller\DummyPageController;
 use FluidTYPO3\Fluidpages\Tests\Unit\AbstractTestCase;
 use FluidTYPO3\Flux\Provider\Provider;
-use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\TemplateView;
 
@@ -38,15 +37,13 @@ class PageControllerTest extends AbstractTestCase
     /**
      * @return void
      */
-    public function testGetRecordDelegatesToRecordService()
+    public function testGetRecordReadsFromTypoScriptFrontendController()
     {
+        $GLOBALS['TSFE'] = (object) ['page' => ['foo' => 'bar']];
         /** @var PageController $subject */
         $subject = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Controller\\PageController')->setMethods(array('dummy'))->getMock();
-        /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $mockService */
-        $mockService = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
-        $mockService->expects($this->once())->method('getSingle');
-        $subject->injectWorkspacesAwareRecordService($mockService);
-        $subject->getRecord();
+        $record = $subject->getRecord();
+        $this->assertSame(['foo' => 'bar'], $record);
     }
 
     public function testInitializeProvider()
