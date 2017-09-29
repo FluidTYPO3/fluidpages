@@ -17,7 +17,8 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($GLO
                     'disabled' => false
                 ]
             ]
-        ]
+        ],
+        'displayCond' => 'USER:FluidTYPO3\\Fluidpages\\UserFunction\\LayoutSelect->doShowPageConfiguration:0',
     ],
     'tx_fed_page_controller_action_sub' => [
         'exclude' => 1,
@@ -32,7 +33,8 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($GLO
                     'disabled' => false
                 ]
             ]
-        ]
+        ],
+        'displayCond' => 'USER:FluidTYPO3\\Fluidpages\\UserFunction\\LayoutSelect->doShowPageConfiguration:1',
     ],
     'tx_fed_page_flexform' => [
         'exclude' => 1,
@@ -42,7 +44,8 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($GLO
             'ds' => [
                 'default' => '<T3DataStructure><ROOT><el></el></ROOT></T3DataStructure>'
             ]
-        ]
+        ],
+        'displayCond' => 'USER:FluidTYPO3\\Fluidpages\\UserFunction\\LayoutSelect->doShowPageConfiguration:0',
     ],
     'tx_fed_page_flexform_sub' => [
         'exclude' => 1,
@@ -52,7 +55,8 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($GLO
             'ds' => [
                 'default' => '<T3DataStructure><ROOT><el></el></ROOT></T3DataStructure>'
             ]
-        ]
+        ],
+        'displayCond' => 'USER:FluidTYPO3\\Fluidpages\\UserFunction\\LayoutSelect->doShowPageConfiguration:1',
     ],
 ]);
 

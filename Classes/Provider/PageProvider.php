@@ -11,6 +11,7 @@ namespace FluidTYPO3\Fluidpages\Provider;
 use FluidTYPO3\Fluidpages\Controller\PageControllerInterface;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
+use FluidTYPO3\Fluidpages\UserFunction\LayoutSelect;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Provider\AbstractProvider;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
@@ -107,6 +108,15 @@ class PageProvider extends AbstractProvider implements ProviderInterface
     }
 
     /**
+     * @param LayoutSelect $layoutSelect
+     * @return void
+     */
+    public function injectLayoutSelect(LayoutSelect $layoutSelect)
+    {
+        $this->layoutSelect = $layoutSelect;
+    }
+
+    /**
      * @param ConfigurationService $pageConfigurationService
      * @return void
      */
@@ -199,8 +209,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface
      */
     public function getControllerActionReferenceFromRecord(array $row)
     {
-        if (true === empty($row[self::FIELD_ACTION_MAIN])) {
-            $row = $this->pageService->getPageTemplateConfiguration($row['uid']);
+        $useFluidpages = $this->layoutSelect->isFluidpagesBackendLayout($row['backend_layout']);
+        if (true === empty($row[self::FIELD_ACTION_MAIN]) || false === $useFluidpages) {
+            $row = $this->layoutSelect->getPageTemplateConfiguration($row['uid']);
         }
         return $row[self::FIELD_ACTION_MAIN];
     }

@@ -8,6 +8,7 @@ namespace FluidTYPO3\Fluidpages\Service;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Fluidpages\UserFunction\LayoutSelect;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
@@ -96,63 +97,12 @@ class PageService implements SingletonInterface
      * @param integer $pageUid
      * @return array|NULL
      * @api
+     * @deprecated
      */
     public function getPageTemplateConfiguration($pageUid)
     {
-        $pageUid = (integer) $pageUid;
-        if (1 > $pageUid) {
-            return null;
-        }
-        $cacheId = 'fluidpages-template-configuration-' . $pageUid;
-        $runtimeCache = $this->getRuntimeCache();
-        $fromCache = $runtimeCache->get($cacheId);
-        if ($fromCache) {
-            return $fromCache;
-        }
-        $fieldList = 'tx_fed_page_controller_action_sub,t3ver_oid,pid,uid';
-        $page = $this->workspacesAwareRecordService->getSingle(
-            'pages',
-            'tx_fed_page_controller_action,' . $fieldList,
-            $pageUid
-        );
-
-        // Initialize with possibly-empty values and loop root line
-        // to fill values as they are detected.
-        $resolvedMainTemplateIdentity = $page['tx_fed_page_controller_action'];
-        $resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
-        do {
-            $containsSubDefinition = (false !== strpos($page['tx_fed_page_controller_action_sub'], '->'));
-            $isCandidate = ((integer) $page['uid'] !== $pageUid);
-            if (true === $containsSubDefinition && true === $isCandidate) {
-                $resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
-                if (true === empty($resolvedMainTemplateIdentity)) {
-                    // Conditions met: current page is not $pageUid, original page did not
-                    // contain a "this page" layout, current rootline page has "sub" selection.
-                    // Then, set our "this page" value to use the "sub" selection that was detected.
-                    $resolvedMainTemplateIdentity = $resolvedSubTemplateIdentity;
-                }
-                break;
-            }
-            // Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
-            // configuration as an emulated first parent page.
-            $resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
-            $page = $this->workspacesAwareRecordService->getSingle(
-                'pages',
-                $fieldList,
-                $resolveParentPageUid
-            );
-        } while (null !== $page);
-        if (true === empty($resolvedMainTemplateIdentity) && true === empty($resolvedSubTemplateIdentity)) {
-            // Neither directly configured "this page" nor inherited "sub" contains a valid value;
-            // no configuration was detected at all.
-            return null;
-        }
-        $configurarion = [
-            'tx_fed_page_controller_action' => $resolvedMainTemplateIdentity,
-            'tx_fed_page_controller_action_sub' => $resolvedSubTemplateIdentity
-        ];
-        $runtimeCache->set($cacheId, $configurarion);
-        return $configurarion;
+        $layoutSelect = GeneralUtility::makeInstance(LayoutSelect::class);
+        return $layoutSelect->getPageTemplateConfiguration($pageUid);
     }
 
     /**
