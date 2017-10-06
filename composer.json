@@ -34,5 +34,6 @@
   "require-dev": {
     "fluidtypo3/flux": "dev-development",
     "fluidtypo3/development": "^3.0"
-  }
+  },
+  "non-feature-branches": ["development", "staging"]
 }
