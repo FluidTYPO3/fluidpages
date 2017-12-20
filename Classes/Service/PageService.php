@@ -189,6 +189,7 @@ class PageService implements SingletonInterface
     {
         $typoScript = $this->configurationService->getPageConfiguration();
         $output = [];
+        /** @var TemplateView $view */
         $view = $this->objectManager->get(TemplateView::class);
         foreach ((array) $typoScript as $extensionName => $group) {
             if (true === isset($group['enable']) && 1 > $group['enable']) {
@@ -210,6 +211,9 @@ class PageService implements SingletonInterface
                     continue;
                 }
 
+                $view->setLayoutRootPaths($templatePaths->getLayoutRootPaths());
+                $view->setPartialRootPaths($templatePaths->getPartialRootPaths());
+                $view->setTemplateRootPaths($templatePaths->getTemplateRootPaths());
                 $view->setTemplatePathAndFilename($file);
                 try {
                     $view->renderSection('Configuration');
