@@ -211,6 +211,9 @@ class PageService implements SingletonInterface
                 }
 
                 $view->setTemplatePathAndFilename($file);
+                $view->setPartialRootPaths($templatePaths->getPartialRootPaths());
+                $view->setLayoutRootPaths($templatePaths->getLayoutRootPaths());
+
                 try {
                     $view->renderSection('Configuration');
                     $form = $view->getRenderingContext()->getViewHelperVariableContainer()->get(FormViewHelper::class, 'form');
