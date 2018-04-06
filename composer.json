@@ -2,12 +2,12 @@
   "name": "fluidtypo3/fluidpages",
   "description": "The fluidpages package from FluidTYPO3",
   "require": {
-    "typo3/cms-core": "^8.7 || dev-master",
-    "typo3/cms-fluid": "^8.7 || dev-master",
-    "typo3/cms-backend": "^8.7 || dev-master",
-    "typo3/cms-frontend": "^8.7 || dev-master",
-    "typo3/cms-recordlist": "^8.7 || dev-master",
-    "fluidtypo3/flux": "^7.3|^8.0|dev-development",
+    "typo3/cms-core": "^8.7 || ^9 || dev-master",
+    "typo3/cms-fluid": "^8.7 || ^9 || dev-master",
+    "typo3/cms-backend": "^8.7 || ^9 || dev-master",
+    "typo3/cms-frontend": "^8.7 || ^9 || dev-master",
+    "typo3/cms-recordlist": "^8.7 || ^9 || dev-master",
+    "fluidtypo3/flux": "^7.3 || ^8.0 || dev-development",
     "php": ">=7.0.0"
   },
   "type": "typo3-cms-extension",

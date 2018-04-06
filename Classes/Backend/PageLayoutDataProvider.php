@@ -103,12 +103,8 @@ class PageLayoutDataProvider
         $forceHideInherit = (boolean) (0 === intval($parameters['row']['pid']));
         if (!$forceHideInherit) {
             if (!$pageIsSiteRoot || $forceDisplayInheritSiteRoot || !$hideInheritFieldSiteRoot) {
-                $emptyLabel = LocalizationUtility::translate(
-                    'pages.tx_fed_page_controller_action.default',
-                    'Fluidpages'
-                );
                 $parameters['items'][] = [
-                    $emptyLabel,
+                    'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_controller_action.default',
                     '',
                     'actions-move-down'
                 ];
@@ -164,12 +160,7 @@ class PageLayoutDataProvider
             $thumbnail = MiscellaneousUtility::createIcon(GeneralUtility::getFileAbsFileName($thumbnail), 64, 64);
         }
         $template = pathinfo($form->getOption(Form::OPTION_TEMPLATEFILE), PATHINFO_FILENAME);
-        $formLabel = $form->getLabel();
-        if (strpos($formLabel, 'LLL:') === 0) {
-            $label = LocalizationUtility::translate($formLabel, $extension);
-        } else {
-            $label = $formLabel;
-        }
+        $label = $form->getLabel();
         $optionValue = $extension . '->' . lcfirst($template);
         $option = [$label, $optionValue, $thumbnail];
         return $option;

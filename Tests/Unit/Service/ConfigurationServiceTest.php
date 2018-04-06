@@ -91,15 +91,9 @@ class ConfigurationServiceTest extends AbstractTestCase
             'partialRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Resources/Private/Partials/')],
             'layoutRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Resources/Private/Layouts/')],
         ];
-        $fallbackPaths = [
-            'templateRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Templates/')],
-            'partialRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Partials/')],
-            'layoutRootPaths' => [ExtensionManagementUtility::extPath('fluidpages', 'Layouts/')],
-        ];
         return array(
             array('some/file', $fluidpagesPaths),
             array('EXT:fluidpages/some/file', $fluidpagesPaths),
-            array('EXT:other/some/file', $fallbackPaths)
         );
     }
 
@@ -136,13 +130,13 @@ class ConfigurationServiceTest extends AbstractTestCase
         $result = $instance->getPageConfiguration('foobar');
         $expected = [
             'templateRootPaths' => [
-                ExtensionManagementUtility::extPath('fluidpages', 'Templates/')
+                GeneralUtility::getFileAbsFileName('Templates/'),
             ],
             'partialRootPaths' => [
-                ExtensionManagementUtility::extPath('fluidpages', 'Partials/')
+                GeneralUtility::getFileAbsFileName('Partials/'),
             ],
             'layoutRootPaths' => [
-                ExtensionManagementUtility::extPath('fluidpages', 'Layouts/')
+                GeneralUtility::getFileAbsFileName('Layouts/'),
             ],
         ];
         $this->assertEquals($expected, $result);

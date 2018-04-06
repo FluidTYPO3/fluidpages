@@ -16,6 +16,7 @@ use TYPO3\CMS\Backend\View\BackendLayout\BackendLayout as CoreBackendLayout;
 use TYPO3\CMS\Backend\View\BackendLayout\BackendLayoutCollection;
 use TYPO3\CMS\Backend\View\BackendLayout\DataProviderContext;
 use TYPO3\CMS\Backend\View\BackendLayout\DataProviderInterface;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\TypoScript\ExtendedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -168,6 +169,7 @@ class BackendLayoutDataProvider implements DataProviderInterface
      */
     protected function getBackendLayoutConfiguration($pageUid)
     {
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
         try {
             $record = $this->recordService->getSingle('pages', '*', $pageUid);
 
@@ -179,25 +181,23 @@ class BackendLayoutDataProvider implements DataProviderInterface
             $provider = $this->configurationService->resolvePageProvider($record);
             $action = $provider->getControllerActionFromRecord($record);
             if (true === empty($action)) {
-                GeneralUtility::sysLog(
-                    'No template selected - backend layout will not be rendered',
-                    'fluidpages',
-                    GeneralUtility::SYSLOG_SEVERITY_INFO
+                $logger->log(
+                    GeneralUtility::SYSLOG_SEVERITY_INFO,
+                    'No template selected - backend layout will not be rendered'
                 );
                 return [];
             }
             $grid = $provider->getGrid($record)->build();
             if (false === is_array($grid) || 0 === count($grid['rows'])) {
                 // no grid is defined; we use the "raw" BE layout as a default behavior
-                GeneralUtility::sysLog(
-                    'The selected page template does not contain a grid but the template is itself valid.',
-                    'fluidpages',
-                    GeneralUtility::SYSLOG_SEVERITY_INFO
+                $logger->log(
+                    GeneralUtility::SYSLOG_SEVERITY_INFO,
+                    'The selected page template does not contain a grid but the template is itself valid.'
                 );
                 return [];
             }
         } catch (\Exception $error) {
-            GeneralUtility::sysLog($error->getMessage(), 'fluidpages', GeneralUtility::SYSLOG_SEVERITY_WARNING);
+            $logger->log(GeneralUtility::SYSLOG_SEVERITY_WARNING, $error->getMessage());
             return [];
         }
 
@@ -238,7 +238,7 @@ class BackendLayoutDataProvider implements DataProviderInterface
             $config['rows.'][($rowIndex + 1) . '.'] = [
                 'columns.' => [
                     '1.' => [
-                        'name' => LocalizationUtility::translate('fluidContentArea', 'fluidpages'),
+                        'name' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:fluidContentArea',
                         'colPos' => ContentService::COLPOS_FLUXCONTENT
                     ]
                 ]

@@ -32,6 +32,17 @@ class PageProviderTest extends AbstractTestCase
     const FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL = 'EXT:flux/Tests/Fixtures/Templates/Content/AbsolutelyMinimal.html';
 
     /**
+     * @var array
+     */
+    public static $contentRecordWithoutParentAndWithoutChildren = array(
+        'uid' => 123,
+        'header' => 'Has no parent',
+        'colPos' => 0,
+        'tx_flux_parent' => 0,
+        'tx_flux_column' => '',
+    );
+
+    /**
      * @return void
      */
     public function testPerformsInjections()
@@ -324,7 +335,7 @@ class PageProviderTest extends AbstractTestCase
      */
     public function getParentFieldValueLoadsRecordFromDatabaseIfRecordLacksParentFieldValue()
     {
-        $row = Records::$contentRecordWithoutParentAndWithoutChildren;
+        $row = static::$contentRecordWithoutParentAndWithoutChildren;
         $row['uid'] = 2;
         $rowWithPid = $row;
         $rowWithPid['pid'] = 1;
@@ -370,8 +381,18 @@ class PageProviderTest extends AbstractTestCase
      */
     protected function getBasicRecord()
     {
-        $record = Records::$contentRecordWithoutParentAndWithoutChildren;
-        $record['pi_flexform'] = Xml::SIMPLE_FLEXFORM_SOURCE_DEFAULT_SHEET_ONE_FIELD;
+        $record = static::$contentRecordWithoutParentAndWithoutChildren;
+        $record['pi_flexform'] = '<T3FlexForms>
+            <data>
+                <sheet index="options">
+                    <language index="lDEF">
+                        <field index="settings.input">
+                            <value index="vDEF">0</value>
+                        </field>
+                    </language>
+                </sheet>
+            </data>
+        </T3FlexForms>';
         return $record;
     }
 
@@ -387,7 +408,17 @@ class PageProviderTest extends AbstractTestCase
         $record = $this->getBasicRecord();
         $fieldName = $provider->getFieldName($record);
         $tableName = $provider->getTableName($record);
-        $record[$fieldName] = Xml::EXPECTING_FLUX_REMOVALS;
+        $record[$fieldName] = '<T3FlexForms>
+            <data>
+                <sheet index="options">
+                    <language index="lDEF">
+                        <field index="settings.input">
+                            <value index="vDEF">0</value>
+                        </field>
+                    </language>
+                </sheet>
+            </data>
+        </T3FlexForms>';
         $id = $record['uid'];
         /** @var DataHandler $parentInstance */
         $parentInstance = GeneralUtility::makeInstance('TYPO3\CMS\Core\DataHandling\DataHandler');
