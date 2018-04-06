@@ -8,11 +8,11 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Provider;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Development\AbstractTestCase;
 use FluidTYPO3\Fluidpages\Controller\PageControllerInterface;
 use FluidTYPO3\Fluidpages\Provider\SubPageProvider;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
-use FluidTYPO3\Flux\Tests\Unit\AbstractTestCase;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**

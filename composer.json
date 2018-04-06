@@ -2,8 +2,12 @@
   "name": "fluidtypo3/fluidpages",
   "description": "The fluidpages package from FluidTYPO3",
   "require": {
+    "typo3/cms-core": "^8.7 || dev-master",
+    "typo3/cms-fluid": "^8.7 || dev-master",
+    "typo3/cms-backend": "^8.7 || dev-master",
+    "typo3/cms-frontend": "^8.7 || dev-master",
+    "typo3/cms-recordlist": "^8.7 || dev-master",
     "fluidtypo3/flux": "^7.3|^8.0|dev-development",
-    "typo3/cms": "^7.6|^8.4",
     "php": ">=7.0.0"
   },
   "type": "typo3-cms-extension",
@@ -18,6 +22,8 @@
   "homepage": "http://fluidtypo3.org",
   "license": "GPL-2.0+",
   "preferred-install": "dist",
+  "prefer-stable": true,
+  "minimum-stability": "dev",
   "support": {
     "irc": "irc://irc.freenode.org/fedext",
     "issues": "https://github.com/FluidTYPO3/fluidcontent/issues"
@@ -33,7 +39,7 @@
   },
   "require-dev": {
     "fluidtypo3/flux": "dev-development",
-    "fluidtypo3/development": "^3.0"
+    "fluidtypo3/development": "^4.0"
   },
   "non-feature-branches": ["development", "staging"]
 }
