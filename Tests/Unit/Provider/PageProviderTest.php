@@ -8,6 +8,7 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Provider;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Development\AbstractTestCase;
 use FluidTYPO3\Fluidpages\Controller\PageControllerInterface;
 use FluidTYPO3\Fluidpages\Provider\PageProvider;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
@@ -19,7 +20,6 @@ use FluidTYPO3\Flux\Service\RecordService;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Records;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Xml;
-use FluidTYPO3\Flux\Tests\Unit\AbstractTestCase;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -29,6 +29,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class PageProviderTest extends AbstractTestCase
 {
+    const FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL = 'EXT:flux/Tests/Fixtures/Templates/Content/AbsolutelyMinimal.html';
 
     /**
      * @return void
@@ -195,7 +196,7 @@ class PageProviderTest extends AbstractTestCase
         $provider->expects($this->once())->method('getInheritanceTree')->will($this->returnValue($tree));
         $provider->expects($this->any())->method('unsetInheritedValues');
         $provider->expects($this->any())->method('getForm')->willReturn(Form::create());
-        $provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
+        $provider->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
         $provider->injectPageConfigurationService($mockConfigurationService);
         $provider->injectConfigurationService($this->getMockBuilder(FluxService::class)->getMock());
         $values = $provider->getFlexformValues($record);
@@ -235,7 +236,7 @@ class PageProviderTest extends AbstractTestCase
         $provider->expects($this->once())->method('getInheritanceTree')->will($this->returnValue($tree));
         $provider->expects($this->any())->method('unsetInheritedValues');
         $provider->expects($this->any())->method('getForm')->willReturn(Form::create());
-        $provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
+        $provider->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
         $provider->injectPageConfigurationService($mockConfigurationService);
         $provider->injectConfigurationService($this->getMockBuilder(FluxService::class)->getMock());
         $values = $provider->getFlexformValues($record);
@@ -422,5 +423,15 @@ class PageProviderTest extends AbstractTestCase
         $provider->postProcessRecord('update', $id, $record, $parentInstance);
         $this->assertIsString($record[$fieldName]);
         $this->assertNotContains('settings.input', $record[$fieldName]);
+    }
+
+    /**
+     * @param mixed $value
+     * @return void
+     */
+    protected function assertIsString($value)
+    {
+        $isStringConstraint = new \PHPUnit_Framework_Constraint_IsType(\PHPUnit_Framework_Constraint_IsType::TYPE_STRING);
+        $this->assertThat($value, $isStringConstraint);
     }
 }
