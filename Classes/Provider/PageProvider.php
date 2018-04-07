@@ -254,7 +254,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface
                 );
             }
             $form = $this->getForm($record);
-            if (null !== $form) {
+            if ($form) {
                 $tableFieldName = $this->getFieldName($record);
                 foreach ($form->getFields() as $field) {
                     $fieldName = $field->getName();
