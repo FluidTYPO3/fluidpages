@@ -14,6 +14,7 @@ use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Service\FluxService;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -97,13 +98,12 @@ class ConfigurationService extends FluxService implements SingletonInterface
             // an empty value that is not null indicates an incorrect caller. Instead
             // of returning ALL paths here, an empty array is the proper return value.
             // However, dispatch a debug message to inform integrators of the problem.
-            GeneralUtility::sysLog(
+            GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__)->log(
+                GeneralUtility::SYSLOG_SEVERITY_NOTICE,
                 'Template paths have been attempted fetched using an empty value that is NOT NULL in ' .
                 get_class($this) . '. This indicates a potential problem with your TypoScript configuration - a ' .
                 'value which is expected to be an array may be defined as a string. This error is not fatal but may ' .
-                'prevent the affected collection (which cannot be identified here) from showing up',
-                'fluidpages',
-                GeneralUtility::SYSLOG_SEVERITY_NOTICE
+                'prevent the affected collection (which cannot be identified here) from showing up'
             );
             return [];
         }

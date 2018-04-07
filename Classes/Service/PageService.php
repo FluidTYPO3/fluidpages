@@ -13,6 +13,7 @@ use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
 use FluidTYPO3\Flux\ViewHelpers\FormViewHelper;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -137,6 +138,7 @@ class PageService implements SingletonInterface
      */
     public function getAvailablePageTemplateFiles($format = 'html')
     {
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
         $typoScript = $this->configurationService->getPageConfiguration();
         $output = [];
         $view = $this->objectManager->get(TemplateView::class);
@@ -166,15 +168,15 @@ class PageService implements SingletonInterface
                     $form = $view->getRenderingContext()->getViewHelperVariableContainer()->get(FormViewHelper::class, 'form');
 
                     if (false === $form instanceof Form) {
-                        $this->configurationService->message(
-                            'Template file ' . $file . ' contains an unparsable Form definition',
-                            GeneralUtility::SYSLOG_SEVERITY_FATAL
+                        $logger->log(
+                            GeneralUtility::SYSLOG_SEVERITY_FATAL,
+                            'Template file ' . $file . ' contains an unparsable Form definition'
                         );
                         continue;
                     } elseif (false === $form->getEnabled()) {
-                        $this->configurationService->message(
-                            'Template file ' . $file . ' is disabled by configuration',
-                            GeneralUtility::SYSLOG_SEVERITY_NOTICE
+                        $logger->log(
+                            GeneralUtility::SYSLOG_SEVERITY_NOTICE,
+                            'Template file ' . $file . ' is disabled by configuration'
                         );
                         continue;
                     }
@@ -182,7 +184,7 @@ class PageService implements SingletonInterface
                     $form->setExtensionName($extensionName);
                     $output[$extensionName][$filename] = $form;
                 } catch (InvalidSectionException $error) {
-                    GeneralUtility::sysLog($error->getMessage() . ' (file: ' . $file . ')', 'fluidpages', GeneralUtility::SYSLOG_SEVERITY_ERROR);
+                    $logger->log(GeneralUtility::SYSLOG_SEVERITY_ERROR, $error->getMessage());
                 }
             }
         }

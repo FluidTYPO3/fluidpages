@@ -115,7 +115,7 @@ class BackendLayoutDataProviderTest extends AbstractTestCase
                 '2.' => array(
                     'columns.' => array(
                         '1.' => array(
-                            'name' => 'Fluid Content Area',
+                            'name' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:fluidContentArea',
                             'colPos' => ContentService::COLPOS_FLUXCONTENT
                         )
                     )
