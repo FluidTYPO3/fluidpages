@@ -19,7 +19,7 @@ use FluidTYPO3\Flux\Utility\RecursiveArrayUtility;
 use FluidTYPO3\Flux\View\PreviewView;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
-use TYPO3\CMS\Fluid\View\TemplatePaths;
+use FluidTYPO3\Flux\View\TemplatePaths;
 
 /**
  * Page Configuration Provider
