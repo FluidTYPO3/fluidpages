@@ -199,6 +199,7 @@ class PageService implements SingletonInterface
             $output[$extensionName] = [];
             $extensionKey = ExtensionNamingUtility::getExtensionKey($extensionName);
             $templatePaths = new TemplatePaths($extensionKey);
+            $view->getRenderingContext()->setTemplatePaths($templatePaths);
             foreach ($templatePaths->resolveAvailableTemplateFiles('Page') as $file) {
                 $pathinfo = pathinfo($file);
                 $extension = $pathinfo['extension'];
