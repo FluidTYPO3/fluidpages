@@ -6,3 +6,4 @@ composer.lock
 /typo3
 /typo3_src
 /typo3conf
+/public

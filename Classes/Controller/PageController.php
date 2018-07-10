@@ -11,7 +11,6 @@ namespace FluidTYPO3\Fluidpages\Controller;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Flux\Controller\AbstractFluxController;
-use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Response;
 
 /**
@@ -65,24 +64,6 @@ class PageController extends AbstractFluxController implements PageControllerInt
     }
 
     /**
-     * @param ViewInterface $view
-     * @return void
-     */
-    public function initializeView(ViewInterface $view)
-    {
-        $record = $this->getRecord();
-        $this->configurationManager->getContentObject()->data = $record;
-        parent::initializeView($view);
-        $this->response->addAdditionalHeaderData(
-            (string) $this->view->renderStandaloneSection(
-                'HeaderCode',
-                $this->provider->getTemplateVariables($record),
-                true
-            )
-        );
-    }
-
-    /**
      * @throws \RuntimeException
      * @return void
      */
@@ -114,6 +95,6 @@ class PageController extends AbstractFluxController implements PageControllerInt
      */
     public function getRecord()
     {
-        return $this->workspacesAwareRecordService->getSingle($this->fluxTableName, '*', $GLOBALS['TSFE']->id);
+        return $GLOBALS['TSFE']->page ?? null;
     }
 }

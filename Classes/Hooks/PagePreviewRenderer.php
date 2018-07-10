@@ -9,9 +9,9 @@ namespace FluidTYPO3\Fluidpages\Hooks;
  */
 
 use FluidTYPO3\Fluidpages\Provider\PageProvider;
-use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
-use FluidTYPO3\Flux\View\PreviewView;
+use FluidTYPO3\Flux\Integration\PreviewView;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
@@ -30,7 +30,11 @@ class PagePreviewRenderer
         $pageProvider = $this->getPageProvider();
         $previewContent = '';
 
-        $row = $this->getRecordService()->getSingle('pages', '*', $pageLayoutController->id);
+        $row = $this->getRecord($pageLayoutController->id);
+        if (!$row) {
+            return '';
+        }
+
         $form = $pageProvider->getForm($row);
 
         if ($form) {
@@ -46,12 +50,12 @@ class PagePreviewRenderer
     }
 
     /**
-     * @return WorkspacesAwareRecordService
-     * @codeCoverageIgnore
+     * @param $uid
+     * @return array|null
      */
-    protected function getRecordService()
+    protected function getRecord($uid)
     {
-        return GeneralUtility::makeInstance(ObjectManager::class)->get(WorkspacesAwareRecordService::class);
+        return BackendUtility::getRecord('pages', $uid);
     }
 
     /**
