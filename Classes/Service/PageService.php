@@ -10,14 +10,19 @@ namespace FluidTYPO3\Fluidpages\Service;
 
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
-use FluidTYPO3\Flux\View\TemplatePaths;
-use FluidTYPO3\Flux\View\ViewContext;
+use FluidTYPO3\Flux\Utility\ExtensionNamingUtility;
+use FluidTYPO3\Flux\ViewHelpers\FormViewHelper;
+use TYPO3\CMS\Core\Log\LogManager;
+use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Fluid\View\TemplatePaths;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Fluid\View\TemplateView;
+use TYPO3Fluid\Fluid\View\Exception\InvalidSectionException;
 
 /**
  * Page Service
@@ -183,63 +188,54 @@ class PageService implements SingletonInterface
      */
     public function getAvailablePageTemplateFiles($format = 'html')
     {
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
         $typoScript = $this->configurationService->getPageConfiguration();
         $output = [];
+        $view = $this->objectManager->get(TemplateView::class);
         foreach ((array) $typoScript as $extensionName => $group) {
             if (true === isset($group['enable']) && 1 > $group['enable']) {
                 continue;
             }
             $output[$extensionName] = [];
-            $templatePaths = new TemplatePaths($group);
-            $templateRootPaths = $templatePaths->getTemplateRootPaths();
-            foreach ($templateRootPaths as $templateRootPath) {
-                $configuredPath = $templateRootPath . 'Page/';
-                if (false === is_dir($configuredPath)) {
-                    $this->configurationService->message(
-                        sprintf(
-                            'The template group "%s" has been configured to use the templateRootPath "' .
-                            '%s" but this directory does not exist.',
-                            $extensionName,
-                            $configuredPath
-                        ),
-                        GeneralUtility::SYSLOG_SEVERITY_FATAL
-                    );
+            $extensionKey = ExtensionNamingUtility::getExtensionKey($extensionName);
+            $templatePaths = new TemplatePaths($extensionKey);
+            $view->getRenderingContext()->setTemplatePaths($templatePaths);
+            foreach ($templatePaths->resolveAvailableTemplateFiles('Page') as $file) {
+                $pathinfo = pathinfo($file);
+                $extension = $pathinfo['extension'];
+                if ('.' === substr($file, 0, 1)) {
+                    continue;
+                } elseif (strtolower($extension) !== strtolower($format)) {
                     continue;
                 }
-                $files = scandir($configuredPath);
-                foreach ($files as $key => $file) {
-                    $pathinfo = pathinfo($file);
-                    $extension = $pathinfo['extension'];
-                    if ('.' === substr($file, 0, 1)) {
-                        continue;
-                    } elseif (strtolower($extension) !== strtolower($format)) {
-                        continue;
-                    }
-                    $filename = $pathinfo['filename'];
-                    if (isset($output[$extensionName][$filename])) {
-                        continue;
-                    }
-                    $viewContext = new ViewContext($configuredPath . $file, $extensionName, 'Page');
-                    $viewContext->setSectionName('Configuration');
-                    $viewContext->setTemplatePaths($templatePaths);
-                    $form = $this->configurationService->getFormFromTemplateFile($viewContext);
-                    $templatePathAndFilename = $form->getOption(Form::OPTION_TEMPLATEFILE);
+                $filename = $pathinfo['filename'];
+                if (isset($output[$extensionName][$filename])) {
+                    continue;
+                }
+
+                $view->setTemplatePathAndFilename($file);
+                try {
+                    $view->renderSection('Configuration');
+                    $form = $view->getRenderingContext()->getViewHelperVariableContainer()->get(FormViewHelper::class, 'form');
+
                     if (false === $form instanceof Form) {
-                        $this->configurationService->message(
-                            'Template file ' . $viewContext . ' contains an unparsable Form definition',
-                            GeneralUtility::SYSLOG_SEVERITY_FATAL
+                        $logger->log(
+                            GeneralUtility::SYSLOG_SEVERITY_FATAL,
+                            'Template file ' . $file . ' contains an unparsable Form definition'
+                        );
+                        continue;
+                    } elseif (false === $form->getEnabled()) {
+                        $logger->log(
+                            GeneralUtility::SYSLOG_SEVERITY_NOTICE,
+                            'Template file ' . $file . ' is disabled by configuration'
                         );
                         continue;
                     }
-                    if (false === $form->getEnabled()) {
-                        $this->configurationService->message(
-                            'Template file ' . $templatePathAndFilename . ' is disabled by configuration',
-                            GeneralUtility::SYSLOG_SEVERITY_NOTICE
-                        );
-                        continue;
-                    }
-                    $form->setOption(Form::OPTION_TEMPLATEFILE, $configuredPath . $file);
+                    $form->setOption(Form::OPTION_TEMPLATEFILE, $file);
+                    $form->setExtensionName($extensionName);
                     $output[$extensionName][$filename] = $form;
+                } catch (InvalidSectionException $error) {
+                    $logger->log(GeneralUtility::SYSLOG_SEVERITY_ERROR, $error->getMessage());
                 }
             }
         }

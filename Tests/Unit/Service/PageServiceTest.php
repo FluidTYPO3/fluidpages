@@ -14,6 +14,8 @@ use FluidTYPO3\Fluidpages\Tests\Unit\AbstractTestCase;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * Class PageServiceTest
@@ -111,9 +113,15 @@ class PageServiceTest extends AbstractTestCase
         )->getMock();
         $service->expects($this->any())->method('getFormFromTemplateFile')->willReturn(Form::create());
         $service->expects($this->once())->method('getPageConfiguration')->willReturn($typoScript);
-        $service->expects($this->any())->method('message');
         $instance = new PageService();
         $instance->injectConfigurationService($service);
+        $instance->injectObjectManager(GeneralUtility::makeInstance(ObjectManager::class));
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['fluid']['namespaces'] = [
+            'f' => [
+                'TYPO3\\CMS\\Fluid\\ViewHelpers',
+                'TYPO3Fluid\\Fluid\\ViewHelpers'
+            ]
+        ];
         $result = $instance->getAvailablePageTemplateFiles();
         if (null === $expected) {
             $this->assertEmpty($result);

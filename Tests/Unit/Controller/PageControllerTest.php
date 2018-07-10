@@ -14,12 +14,8 @@ use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Tests\Fixtures\Controller\DummyPageController;
 use FluidTYPO3\Fluidpages\Tests\Unit\AbstractTestCase;
 use FluidTYPO3\Flux\Provider\Provider;
-use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
-use FluidTYPO3\Flux\View\ExposedTemplateView;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
-use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Fluid\View\TemplateView;
 
 /**
  * Class PageControllerTest
@@ -41,45 +37,13 @@ class PageControllerTest extends AbstractTestCase
     /**
      * @return void
      */
-    public function testGetRecordDelegatesToRecordService()
+    public function testGetRecordReadsFromTypoScriptFrontendController()
     {
+        $GLOBALS['TSFE'] = (object) ['page' => ['foo' => 'bar']];
         /** @var PageController $subject */
         $subject = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Controller\\PageController')->setMethods(array('dummy'))->getMock();
-        /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $mockService */
-        $mockService = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
-        $mockService->expects($this->once())->method('getSingle');
-        $subject->injectWorkspacesAwareRecordService($mockService);
-        $subject->getRecord();
-    }
-
-    public function testInitializeView()
-    {
-        /** @var PageController|\PHPUnit_Framework_MockObject_MockObject $instance */
-        $instance = $this->getMockBuilder(
-            'FluidTYPO3\\Fluidpages\\Controller\\PageController'
-        )->setMethods(
-            array(
-                'getRecord', 'initializeProvider', 'initializeSettings', 'initializeOverriddenSettings',
-                'initializeViewObject', 'initializeViewVariables', 'initializeViewHelperVariableContainer'
-            )
-        )->getMock();
-        /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configurationManager */
-        $configurationManager = $this->getMockBuilder(
-            'TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager'
-        )->setMethods(
-            array('getContentObject', 'getConfiguration')
-        )->getMock();
-        $contentObject = new \stdClass();
-        $configurationManager->expects($this->once())->method('getContentObject')->willReturn($contentObject);
-        $configurationManager->expects($this->once())->method('getConfiguration')->willReturn(array('foo' => 'bar'));
-        $instance->expects($this->once())->method('getRecord')->willReturn(array('uid' => 0));
-        $GLOBALS['TSFE'] = (object) array('page' => 'page', 'fe_user' => (object) array('user' => 'user'));
-        /** @var StandaloneView $view */
-        $view = $this->getMockBuilder('FluidTYPO3\\Flux\\View\\ExposedTemplateView')->setMethods(array('assign', 'renderStandaloneSection'))->getMock();
-        $instance->injectConfigurationManager($configurationManager);
-        ObjectAccess::setProperty($instance, 'response', $this->getMockBuilder('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response')->getMock(), true);
-        ObjectAccess::setProperty($instance, 'provider', $this->getMockBuilder('FluidTYPO3\\Flux\\Provider\\ProviderInterface')->getMock(), true);
-        $instance->initializeView($view);
+        $record = $subject->getRecord();
+        $this->assertSame(['foo' => 'bar'], $record);
     }
 
     public function testInitializeProvider()
@@ -113,7 +77,7 @@ class PageControllerTest extends AbstractTestCase
     {
         $instance = new DummyPageController();
         /** @var ExposedTemplateView $view */
-        $view = $this->getMockBuilder('FluidTYPO3\\Flux\\View\\ExposedTemplateView')->setMethods(array('assign'))->getMock();
+        $view = $this->getMockBuilder(TemplateView::class)->setMethods(array('assign'))->getMock();
         /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $pageConfigurationService */
         $pageConfigurationService = $this->getMockBuilder(
             'FluidTYPO3\\Fluidpages\\Service\\ConfigurationService'

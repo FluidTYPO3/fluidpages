@@ -8,6 +8,7 @@ namespace FluidTYPO3\Fluidpages\Tests\Unit\Provider;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Development\AbstractTestCase;
 use FluidTYPO3\Fluidpages\Controller\PageControllerInterface;
 use FluidTYPO3\Fluidpages\Provider\PageProvider;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
@@ -15,10 +16,10 @@ use FluidTYPO3\Fluidpages\Service\PageService;
 use FluidTYPO3\Fluidpages\Tests\Fixtures\Provider\DummyPageProvider;
 use FluidTYPO3\Flux\Form;
 use FluidTYPO3\Flux\Service\FluxService;
+use FluidTYPO3\Flux\Service\RecordService;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Records;
 use FluidTYPO3\Flux\Tests\Fixtures\Data\Xml;
-use FluidTYPO3\Flux\Tests\Unit\AbstractTestCase;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -28,6 +29,18 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class PageProviderTest extends AbstractTestCase
 {
+    const FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL = 'EXT:flux/Tests/Fixtures/Templates/Content/AbsolutelyMinimal.html';
+
+    /**
+     * @var array
+     */
+    public static $contentRecordWithoutParentAndWithoutChildren = array(
+        'uid' => 123,
+        'header' => 'Has no parent',
+        'colPos' => 0,
+        'tx_flux_parent' => 0,
+        'tx_flux_column' => '',
+    );
 
     /**
      * @return void
@@ -36,7 +49,6 @@ class PageProviderTest extends AbstractTestCase
     {
         $instance = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager')
             ->get('FluidTYPO3\\Fluidpages\\Provider\\PageProvider');
-        $this->assertAttributeInstanceOf('TYPO3\\CMS\\Core\\Configuration\\FlexForm\\FlexFormTools', 'flexformTool', $instance);
         $this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\PageService', 'pageService', $instance);
         $this->assertAttributeInstanceOf('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService', 'pageConfigurationService', $instance);
     }
@@ -149,8 +161,7 @@ class PageProviderTest extends AbstractTestCase
         }
         if (true === $expectsMessage) {
             /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
-            $configurationService = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService')->setMethods(array('message'))->getMock();
-            $configurationService->expects($this->once())->method('message');
+            $configurationService = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService')->getMock();
             $instance->injectPageConfigurationService($configurationService);
         }
         // make sure PageProvider is now using the right field name
@@ -196,7 +207,7 @@ class PageProviderTest extends AbstractTestCase
         $provider->expects($this->once())->method('getInheritanceTree')->will($this->returnValue($tree));
         $provider->expects($this->any())->method('unsetInheritedValues');
         $provider->expects($this->any())->method('getForm')->willReturn(Form::create());
-        $provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
+        $provider->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
         $provider->injectPageConfigurationService($mockConfigurationService);
         $provider->injectConfigurationService($this->getMockBuilder(FluxService::class)->getMock());
         $values = $provider->getFlexformValues($record);
@@ -236,7 +247,7 @@ class PageProviderTest extends AbstractTestCase
         $provider->expects($this->once())->method('getInheritanceTree')->will($this->returnValue($tree));
         $provider->expects($this->any())->method('unsetInheritedValues');
         $provider->expects($this->any())->method('getForm')->willReturn(Form::create());
-        $provider->setTemplatePathAndFilename($this->getAbsoluteFixtureTemplatePathAndFilename(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
+        $provider->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName(self::FIXTURE_TEMPLATE_ABSOLUTELYMINIMAL));
         $provider->injectPageConfigurationService($mockConfigurationService);
         $provider->injectConfigurationService($this->getMockBuilder(FluxService::class)->getMock());
         $values = $provider->getFlexformValues($record);
@@ -256,7 +267,9 @@ class PageProviderTest extends AbstractTestCase
         )->getMock();
         $provider->expects($this->exactly(2))->method('getParentFieldName')->will($this->returnValue('somefield'));
         $provider->expects($this->exactly(1))->method('getParentFieldValue')->will($this->returnValue(1));
-        $provider->expects($this->exactly(1))->method('loadRecordFromDatabase')->will($this->returnValue($record));
+        $recordService = $this->getMockBuilder(WorkspacesAwareRecordService::class)->setMethods(['getSingle'])->getMock();
+        $recordService->expects($this->exactly(1))->method('getSingle')->will($this->returnValue($record));
+        $provider->injectRecordService($recordService);
         $output = $this->callInaccessibleMethod($provider, 'loadRecordTreeFromDatabase', $record);
         $expected = array($record);
         $this->assertEquals($expected, $output);
@@ -322,13 +335,15 @@ class PageProviderTest extends AbstractTestCase
      */
     public function getParentFieldValueLoadsRecordFromDatabaseIfRecordLacksParentFieldValue()
     {
-        $row = Records::$contentRecordWithoutParentAndWithoutChildren;
+        $row = static::$contentRecordWithoutParentAndWithoutChildren;
         $row['uid'] = 2;
         $rowWithPid = $row;
         $rowWithPid['pid'] = 1;
         $className = str_replace('Tests\\Unit\\', '', substr(get_class($this), 0, -4));
-        $instance = $this->getMockBuilder($className)->setMethods(array('getParentFieldName', 'getTableName', 'loadRecordFromDatabase'))->getMock();
-        $instance->expects($this->once())->method('loadRecordFromDatabase')->with($row['uid'])->will($this->returnValue($rowWithPid));
+        $instance = $this->getMockBuilder($className)->setMethods(array('getParentFieldName', 'getTableName'))->getMock();
+        $recordService = $this->getMockBuilder(WorkspacesAwareRecordService::class)->setMethods(['getSingle'])->getMock();
+        $recordService->expects($this->exactly(1))->method('getSingle')->will($this->returnValue($rowWithPid));
+        $instance->injectRecordService($recordService);
         $instance->expects($this->once())->method('getParentFieldName')->with($row)->will($this->returnValue('pid'));
         $result = $this->callInaccessibleMethod($instance, 'getParentFieldValue', $row);
         $this->assertEquals($rowWithPid['pid'], $result);
@@ -366,8 +381,18 @@ class PageProviderTest extends AbstractTestCase
      */
     protected function getBasicRecord()
     {
-        $record = Records::$contentRecordWithoutParentAndWithoutChildren;
-        $record['pi_flexform'] = Xml::SIMPLE_FLEXFORM_SOURCE_DEFAULT_SHEET_ONE_FIELD;
+        $record = static::$contentRecordWithoutParentAndWithoutChildren;
+        $record['pi_flexform'] = '<T3FlexForms>
+            <data>
+                <sheet index="options">
+                    <language index="lDEF">
+                        <field index="settings.input">
+                            <value index="vDEF">0</value>
+                        </field>
+                    </language>
+                </sheet>
+            </data>
+        </T3FlexForms>';
         return $record;
     }
 
@@ -383,11 +408,22 @@ class PageProviderTest extends AbstractTestCase
         $record = $this->getBasicRecord();
         $fieldName = $provider->getFieldName($record);
         $tableName = $provider->getTableName($record);
-        $record[$fieldName] = Xml::EXPECTING_FLUX_REMOVALS;
+        $record[$fieldName] = '<T3FlexForms>
+            <data>
+                <sheet index="options">
+                    <language index="lDEF">
+                        <field index="settings.input">
+                            <value index="vDEF">0</value>
+                        </field>
+                    </language>
+                </sheet>
+            </data>
+        </T3FlexForms>';
         $id = $record['uid'];
         /** @var DataHandler $parentInstance */
         $parentInstance = GeneralUtility::makeInstance('TYPO3\CMS\Core\DataHandling\DataHandler');
         $parentInstance->datamap[$tableName][$id] = array(
+            'uid' => $record['uid'],
             $fieldName => array(
                 'data' => array(
                     'options' => array(
@@ -418,5 +454,15 @@ class PageProviderTest extends AbstractTestCase
         $provider->postProcessRecord('update', $id, $record, $parentInstance);
         $this->assertIsString($record[$fieldName]);
         $this->assertNotContains('settings.input', $record[$fieldName]);
+    }
+
+    /**
+     * @param mixed $value
+     * @return void
+     */
+    protected function assertIsString($value)
+    {
+        $isStringConstraint = new \PHPUnit_Framework_Constraint_IsType(\PHPUnit_Framework_Constraint_IsType::TYPE_STRING);
+        $this->assertThat($value, $isStringConstraint);
     }
 }

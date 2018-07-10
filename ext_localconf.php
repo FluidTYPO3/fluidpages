@@ -1,49 +1,57 @@
 <?php
+
 if (!defined ('TYPO3_MODE')) {
-	die ('Access denied.');
-}
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EXTCONF);
-
-if (FALSE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['autoload'])
-	|| TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['autoload']) {
-	\FluidTYPO3\Flux\Core::addStaticTypoScript('EXT:fluidpages/Configuration/TypoScript/');
+    die ('Access denied.');
 }
 
-\FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\PageProvider');
-\FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\SubPageProvider');
-\FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\PageLanguageOverlayProvider');
-\FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\SubPageLanguageOverlayProvider');
+(function() use ($_EXTKEY, $_EXTCONF) {
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($_EXTCONF);
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-	'FluidTYPO3.Fluidpages',
-	'Page',
-	[
-		'Page' => 'render,error',
-	],
-	[],
-	\TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN
-);
+    \FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\PageProvider');
+    \FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\SubPageProvider');
+    \FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\PageLanguageOverlayProvider');
+    \FluidTYPO3\Flux\Core::registerConfigurationProvider('FluidTYPO3\Fluidpages\Provider\SubPageLanguageOverlayProvider');
 
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['BackendLayoutDataProvider']['fluidpages'] = 'FluidTYPO3\Fluidpages\Backend\BackendLayoutDataProvider';
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['cms/layout/db_layout.php']['drawHeaderHook'][] = \FluidTYPO3\Fluidpages\Hooks\PagePreviewRenderer::class . '->render';
+    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+        'FluidTYPO3.Fluidpages',
+        'Page',
+        [
+            'Page' => 'render,error',
+        ],
+        [],
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN
+    );
 
-if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['autoload'])
-    && FALSE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['autoload']) {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Fluidpages PAGE rendering');
-}
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['BackendLayoutDataProvider']['fluidpages'] = \FluidTYPO3\Fluidpages\Backend\BackendLayoutDataProvider::class;
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['cms/layout/db_layout.php']['drawHeaderHook'][] = \FluidTYPO3\Fluidpages\Hooks\PagePreviewRenderer::class . '->render';
 
-$doktypeIcon = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('fluidpages') . 'doktype_icon.png';
-$GLOBALS['PAGES_TYPES'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = [
-    'type' => 'web',
-    'icon' => $doktypeIcon,
-    'allowedTables' => '*'
-];
+    if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['autoload'] ?? true) {
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScriptConstants(file_get_contents(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('fluidpages', 'Configuration/TypoScript/constants.txt')));
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScriptSetup(file_get_contents(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('fluidpages', 'Configuration/TypoScript/setup.txt')));
+    }
+
+    $doktypeIcon = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('EXT:fluidpages/doktype_icon.png');
+    $GLOBALS['PAGES_TYPES'][\FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = [
+        'type' => 'web',
+        'icon' => $doktypeIcon,
+        'allowedTables' => '*'
+    ];
 
 
-$GLOBALS['TBE_STYLES']['spritemanager']['singleIcons']['tcarecords-pages-' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = $doktypeIcon;
+    $GLOBALS['TBE_STYLES']['spritemanager']['singleIcons']['tcarecords-pages-' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW] = $doktypeIcon;
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig(
-    'options.pageTree.doktypesToShowInNewPageDragArea := addToList(' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW . ')'
-);
+    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig(
+        'options.pageTree.doktypesToShowInNewPageDragArea := addToList(' . \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW . ')'
+    );
 
-unset($doktypeIcon);
+
+    if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay'])
+        && TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay']) {
+        $GLOBALS['TYPO3_CONF_VARS']['FE']['pageOverlayFields'] .= ',tx_fed_page_flexform,tx_fed_page_flexform_sub';
+    }
+
+    $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] .= ($GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] == '' ? '' : ',') .
+        'tx_fed_page_controller_action,tx_fed_page_controller_action_sub,tx_fed_page_flexform,tx_fed_page_flexform_sub,';
+
+    unset($doktypeIcon);
+})();
