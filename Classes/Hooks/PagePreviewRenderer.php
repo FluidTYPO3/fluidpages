@@ -9,8 +9,7 @@ namespace FluidTYPO3\Fluidpages\Hooks;
  */
 
 use FluidTYPO3\Fluidpages\Provider\PageProvider;
-use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
-use FluidTYPO3\Flux\View\PreviewView;
+use FluidTYPO3\Flux\Integration\PreviewView;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
