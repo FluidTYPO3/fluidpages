@@ -31,3 +31,13 @@ When editing the page a Flux ConfigurationProvider takes care of processing the 
 it as fields available to the content editor much like TemplaVoila.
 
 View the [online templating manual](https://fluidtypo3.org/documentation/templating-manual/introduction.html) for more information.
+
+## Installation
+
+### Installation using Composer
+
+The recommended way to install the extension is by using [Composer](https://getcomposer.org/). In your Composer based TYPO3 project root, just do `composer require fluidtypo3/fluidpages`.
+
+### Installation as extension from TYPO3 Extension Repository (TER)
+
+Download and install as TYPO3 extension. Search for the term `fluidpages`.
