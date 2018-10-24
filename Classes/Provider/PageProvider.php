@@ -418,8 +418,10 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         $records = [];
         while (0 < $record[$parentFieldName]) {
             $record = $this->recordService->getSingle($this->getTableName($record), '*', $record[$parentFieldName]);
-            $parentFieldName = $this->getParentFieldName($record);
-            array_push($records, $record);
+            if (!empty($record)) {
+                $parentFieldName = $this->getParentFieldName($record);
+                $records[] = $record;
+            }
         }
         $records = array_reverse($records);
         return $records;
