@@ -41,47 +41,6 @@ class PageServiceTest extends AbstractTestCase
     }
 
     /**
-     * @test
-     */
-    public function getPageTemplateConfigurationWithZeroUidReturnsNull()
-    {
-        $this->assertNull($this->getPageService()->getPageTemplateConfiguration(0));
-    }
-
-    /**
-     * @dataProvider getPageTemplateConfigurationTestValues
-     * @param array $records
-     * @param array|NULL $expected
-     */
-    public function testGetPageTemplateConfiguration(array $records, $expected)
-    {
-        /** @var WorkspacesAwareRecordService|\PHPUnit_Framework_MockObject_MockObject $service */
-        $service = $this->getMockBuilder('FluidTYPO3\\Flux\\Service\\WorkspacesAwareRecordService')->setMethods(array('getSingle'))->getMock();
-        foreach ($records as $index => $record) {
-            $service->expects($this->at($index))->method('getSingle')->willReturn($record);
-        }
-        $instance = new PageService();
-        $instance->injectWorkspacesAwareRecordService($service);
-        $result = $instance->getPageTemplateConfiguration(1);
-        $this->assertEquals($expected, $result);
-    }
-
-    /**
-     * @return array
-     */
-    public function getPageTemplateConfigurationTestValues()
-    {
-        $m = 'tx_fed_page_controller_action';
-        $s = 'tx_fed_page_controller_action_sub';
-        return array(
-            array(array(array()), null),
-            array(array(array($m => '', $s => '')), null),
-            array(array(array($m => 'test1->test1', $s => 'test2->test2')), array($m => 'test1->test1', $s => 'test2->test2')),
-            array(array(array($m => ''), array($s => 'test2->test2')), array($m => 'test2->test2', $s => 'test2->test2'))
-        );
-    }
-
-    /**
      * @return void
      */
     public function testGetPageFlexFormSource()

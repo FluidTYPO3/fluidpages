@@ -81,7 +81,13 @@ class PageProviderTest extends AbstractTestCase
         $instance = new PageProvider();
         $instance->setTemplatePaths(array('templateRootPaths' => array('EXT:fluidpages/Tests/Fixtures/Templates/')));
         $instance->injectPageService($service);
+
+        /** @var LayoutSelect $layoutSelectMock */
+        $layoutSelectMock = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\UserFunction\\LayoutSelect')->setMethods(array('getPageTemplateConfiguration'))->getMock();
+        $instance->injectLayoutSelect($layoutSelectMock);
+
         $record = array(
+            'backend_layout' => 'fluidpages__fluidpages',
             $fieldName => 'Fluidpages->dummy',
         );
         $service->expects($this->any())->method('getPageTemplateConfiguration')->willReturn($record);
@@ -158,6 +164,10 @@ class PageProviderTest extends AbstractTestCase
             /** @var PageService $service */
             $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\PageService')->setMethods(array('getPageTemplateConfiguration'))->getMock();
             $instance->injectPageService($service);
+
+            /** @var LayoutSelect $layoutSelectMock */
+            $layoutSelectMock = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\UserFunction\\LayoutSelect')->setMethods(array('getPageTemplateConfiguration'))->getMock();
+            $instance->injectLayoutSelect($layoutSelectMock);
         }
         if (true === $expectsMessage) {
             /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
@@ -177,9 +187,84 @@ class PageProviderTest extends AbstractTestCase
     {
         return array(
             array(array('doktype' => PageControllerInterface::DOKTYPE_RAW), '', false, 'raw'),
-            array(array('doktype' => 0, 'tx_fed_page_controller_action' => ''), 'tx_fed_page_flexform', true, 'default'),
-            array(array('doktype' => 0, 'tx_fed_page_controller_action' => 'fluidpages->action'), 'tx_fed_page_flexform', false, 'action'),
+            array(array('doktype' => 0, 'backend_layout' => 'fluidpages__fluidpages', 'tx_fed_page_controller_action' => ''), 'tx_fed_page_flexform', true, 'default'),
+            array(array('doktype' => 0, 'backend_layout' => 'fluidpages__fluidpages', 'tx_fed_page_controller_action' => 'fluidpages->action'), 'tx_fed_page_flexform', false, 'action'),
         );
+    }
+
+    /**
+     * @dataProvider getControllerActionReferenceFromRecordTestValues
+     *
+     * @param array $record   Page row
+     * @param mixed $calcRow  Row data calculated by pageService->getPageTemplateConfiguration
+     * @param mixed $expected Expected return value
+     */
+    public function testGetControllerActionReferenceFromRecord(array $record, $calcRow, $expected)
+    {
+        $instance = new PageProvider();
+        /** @var LayoutSelect $layoutSelectMock */
+        $layoutSelectMock = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\UserFunction\\LayoutSelect')->setMethods(array('getPageTemplateConfiguration'))->getMock();
+        $layoutSelectMock->expects($this->any())
+                        ->method('getPageTemplateConfiguration')
+                        ->will($this->returnValue($calcRow));
+        $instance->injectLayoutSelect($layoutSelectMock);
+
+        $result = $instance->getControllerActionReferenceFromRecord($record);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Data provider for testGetControllerActionReferenceFromRecord()
+     *
+     * @return array
+     */
+    public function getControllerActionReferenceFromRecordTestValues()
+    {
+        return [
+            'no action' => [
+                [
+                    'tx_fed_page_controller_action' => '',
+                ],
+                null,
+                null
+            ],
+            'normal action' => [
+                [
+                    'tx_fed_page_controller_action' => 'test1->test1',
+                    'backend_layout'                => 'fluidpages__foo',
+                ],
+                [],
+                'test1->test1'
+            ],
+            'no action, result from pageService' => [
+                [
+                    'tx_fed_page_controller_action' => '',
+                    'backend_layout'                => 'fluidpages__bar',
+                ],
+                [
+                    'tx_fed_page_controller_action' => 'test1->test1',
+                ],
+                'test1->test1'
+            ],
+            'no backend layout' => [
+                [
+                    'tx_fed_page_controller_action' => 'test1->test1',
+                    'backend_layout'                => '',
+                ],
+                null,
+                null
+            ],
+            'no backend layout, result from pageService' => [
+                [
+                    'tx_fed_page_controller_action' => 'test1->test1',
+                    'backend_layout'                => '',
+                ],
+                [
+                    'tx_fed_page_controller_action' => 'test2->test2'
+                ],
+                'test2->test2'
+            ],
+        ];
     }
 
     public function testGetFlexFormValuesReturnsCollectedDataWhenEncounteringNullForm()
