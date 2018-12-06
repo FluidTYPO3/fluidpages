@@ -13,6 +13,9 @@ if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']
             'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform',
             'config' => [
                 'type' => 'flex',
+                'ds' => [
+                    'default' => '<T3DataStructure><ROOT><el></el></ROOT></T3DataStructure>'
+                ]
             ]
         ],
         'tx_fed_page_flexform_sub' => [
@@ -20,6 +23,9 @@ if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']
             'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform_sub',
             'config' => [
                 'type' => 'flex',
+                'ds' => [
+                    'default' => '<T3DataStructure><ROOT><el></el></ROOT></T3DataStructure>'
+                ]                
             ]
         ],
     ]);
