@@ -62,7 +62,7 @@ class PageServiceTest extends AbstractTestCase
         }
         $instance = new PageService();
         $instance->injectWorkspacesAwareRecordService($service);
-        $result = $instance->getPageTemplateConfiguration(1);
+        $result = $instance->getPageTemplateConfiguration(2);
         $this->assertEquals($expected, $result);
     }
 
@@ -71,13 +71,17 @@ class PageServiceTest extends AbstractTestCase
      */
     public function getPageTemplateConfigurationTestValues()
     {
+        $u = 'uid';
+        $p = 'pid';
+        $o = 't3ver_oid';
         $m = 'tx_fed_page_controller_action';
         $s = 'tx_fed_page_controller_action_sub';
         return array(
-            array(array(array()), null),
-            array(array(array($m => '', $s => '')), null),
-            array(array(array($m => 'test1->test1', $s => 'test2->test2')), array($m => 'test1->test1', $s => 'test2->test2')),
-            array(array(array($m => ''), array($s => 'test2->test2')), array($m => 'test2->test2', $s => 'test2->test2'))
+            array(array(null), null),
+            array(array(array($u => 2, $p => 0, $o => 0, $m => '', $s => '')), null),
+            array(array(array($u => 2, $p => 0, $o => 0, $m => 'test1->test1', $s => 'test2->test2')), array($m => 'test1->test1', $s => 'test2->test2')),
+            array(array(array($u => 2, $p => 1, $o => 0, $m => ''), array($u => 1, $p => 0, $o => 0, $s => 'test2->test2')), array($m => 'test2->test2', $s => 'test2->test2')),
+            array(array(array($u => 2, $p => -1, $o => 1, $m => ''), array($u => 1, $p => 0, $o => 0, $s => 'test2->test2')), array($m => 'test2->test2', $s => 'test2->test2'))
         );
     }
 
