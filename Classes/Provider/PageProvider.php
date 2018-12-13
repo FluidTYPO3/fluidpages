@@ -187,7 +187,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         if (PageControllerInterface::DOKTYPE_RAW === (integer) $row['doktype']) {
             return 'raw';
         }
-        $action = $this->getControllerActionReferenceFromRecord($row) ?? 'default';
+        $action = $this->getControllerActionReferenceFromRecord($row) ?: 'default';
         $parts = explode('->', $action);
         $controllerActionName = end($parts);
         $controllerActionName{0} = strtolower($controllerActionName{0});
