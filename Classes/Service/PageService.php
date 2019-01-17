@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 use TYPO3\CMS\Fluid\View\TemplateView;
 use TYPO3Fluid\Fluid\View\Exception\InvalidSectionException;
 
@@ -47,6 +48,11 @@ class PageService implements SingletonInterface
      * @var ConfigurationService
      */
     protected $configurationService;
+
+    /**
+     * @var Dispatcher
+     */
+    protected $signalSlotDispatcher = null;
 
     /**
      * @var WorkspacesAwareRecordService
@@ -224,6 +230,7 @@ class PageService implements SingletonInterface
                 try {
                     $view->renderSection('Configuration');
                     $form = $view->getRenderingContext()->getViewHelperVariableContainer()->get(FormViewHelper::class, 'form');
+                    $this->emitAfterFormCreate($form, $extensionName);
 
                     if (false === $form instanceof Form) {
                         $logger->log(
@@ -256,4 +263,19 @@ class PageService implements SingletonInterface
     {
         return GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_runtime');
     }
+
+    /**
+     * Emits a signal after a form has been created.
+     *
+     * @param Form $form
+     * @param String $extensionName
+     */
+    protected function emitAfterFormCreate(Form $form, String $extensionName)
+    {
+        if ($this->signalSlotDispatcher === null) {
+            $this->signalSlotDispatcher  = GeneralUtility::makeInstance(Dispatcher::class);
+        }
+        $this->signalSlotDispatcher->dispatch(__CLASS__, 'afterFormCreate', [$form, $extensionName]);
+    }
+
 }
