@@ -64,7 +64,7 @@ $GLOBALS['TCA']['pages']['columns']['doktype']['config']['items'][] = [
     $doktypeIcon
 ];
 
-$GLOBALS['TCA']['pages_language_overlay']['columns']['doktype']['config']['items'][] = [
+$GLOBALS['TCA']['pages']['columns']['doktype']['config']['items'][] = [
     'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.doktype.' .
     \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
     \FluidTYPO3\Fluidpages\Controller\PageControllerInterface::DOKTYPE_RAW,
