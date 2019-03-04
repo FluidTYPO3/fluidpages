@@ -74,49 +74,4 @@ if (FALSE === empty($additionalDoktypes)) {
     $doktypes
 );
 
-
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', [
-    'tx_fluidpages_templatefile' => [
-        'exclude' => 1,
-        'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fluidpages_templatefile',
-        'onChange' => 'reload',
-        'config' => [
-            'type' => 'input',
-            'renderType' => 'inputLink',
-            'eval' => 'trim',
-            'placeholder' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fluidpages_templatefile.placeholder',
-            'wizards' => [
-                '_PADDING' => 2,
-                'link' => [
-                    'type' => 'popup',
-                    'title' => 'LLL:EXT:cms/locallang_ttc.xml:header_link_formlabel',
-                    'icon' => 'actions-wizard-link',
-                    'module' => [
-                        'name' => 'wizard_link',
-                        'urlParameters' => [
-                            'mode' => 'wizard',
-                            'act' => 'file'
-                        ]
-                    ],
-                    'JSopenParams' => 'height=300,width=500,status=0,menubar=0,scrollbars=1',
-                ],
-            ]
-        ]
-    ],
-    'tx_fluidpages_layout' => [
-        'exclude' => 1,
-        'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fluidpages_layout',
-        'displayCond' => 'FIELD:tx_fluidpages_templatefile:!=:',
-        'onChange' => 'reload',
-        'config' => [
-            'type' => 'select',
-            'renderType' => 'selectSingle',
-            'itemsProcFunc' => 'FluidTYPO3\Fluidpages\Backend\TemplateFileLayoutSelector->addLayoutOptions',
-            'arguments' => [
-                'referring_field' => 'tx_fluidpages_templatefile'
-            ]
-        ]
-    ],
-]);
-
 unset($doktypes, $additionalDoktypes, $doktypeIcon);
