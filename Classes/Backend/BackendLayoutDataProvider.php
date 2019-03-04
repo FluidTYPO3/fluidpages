@@ -15,6 +15,7 @@ use TYPO3\CMS\Backend\View\BackendLayout\BackendLayout;
 use TYPO3\CMS\Backend\View\BackendLayout\BackendLayoutCollection;
 use TYPO3\CMS\Backend\View\BackendLayout\DataProviderContext;
 use TYPO3\CMS\Backend\View\BackendLayout\DataProviderInterface;
+use TYPO3\CMS\Backend\View\BackendLayout\DefaultDataProvider;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
@@ -22,7 +23,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 /**
  * Class for backend layouts
  */
-class BackendLayoutDataProvider implements DataProviderInterface
+class BackendLayoutDataProvider extends DefaultDataProvider implements DataProviderInterface
 {
 
     /**
@@ -104,7 +105,11 @@ class BackendLayoutDataProvider implements DataProviderInterface
         if (null === $record) {
             return new BackendLayout('empty', 'Empty', '');
         }
-        return $this->resolveProvider($record)->getGrid($record)->buildBackendLayout(0);
+        $grid = $this->resolveProvider($record)->getGrid($record);
+        if (!$grid->hasChildren()) {
+            return parent::getBackendLayout($identifier, $pageUid);
+        }
+        return $grid->buildBackendLayout(0);
     }
 
     /**
