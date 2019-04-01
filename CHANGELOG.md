@@ -1,7 +1,8 @@
-Latest release: 4.3.0 (2018/10/02)
+Latest release: 5.0.0 (2019/04/01)
 
 All previous release change logs:
 
+* [5.0.0 (2019/04/01)](Documentation/Changelog/5.0.0.md) [Full list of changes](https://github.com/FluidTYPO3/fluidpages/compare/4.3.0...5.0.0)
 * [4.3.0 (2018/10/02)](Documentation/Changelog/4.3.0.md) [Full list of changes](https://github.com/FluidTYPO3/fluidpages/compare/4.2.0...4.3.0)
 * [4.2.0 (2018/07/10)](Documentation/Changelog/4.2.0.md) [Full list of changes](https://github.com/FluidTYPO3/fluidpages/compare/4.1.0...4.2.0)
 * [4.1.0 (2017/03/04)](Documentation/Changelog/4.1.0.md) [Full list of changes](https://github.com/FluidTYPO3/fluidpages/compare/4.0.0...4.1.0)
