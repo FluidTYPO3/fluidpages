@@ -3,7 +3,6 @@ defined ('TYPO3_MODE') or die ('Access denied.');
 
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fluidpages']);
 
-
 if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay'])
     && TRUE === (boolean) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['pagesLanguageConfigurationOverlay']) {
 
@@ -13,6 +12,9 @@ if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']
             'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform',
             'config' => [
                 'type' => 'flex',
+                'ds' => [
+                    'default' => '<T3DataStructure><ROOT><el></el></ROOT></T3DataStructure>'
+                ]
             ]
         ],
         'tx_fed_page_flexform_sub' => [
@@ -20,6 +22,9 @@ if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']
             'label' => 'LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_flexform_sub',
             'config' => [
                 'type' => 'flex',
+                'ds' => [
+                    'default' => '<T3DataStructure><ROOT><el></el></ROOT></T3DataStructure>'
+                ]                
             ]
         ],
     ]);
@@ -29,5 +34,3 @@ if (TRUE === isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']
         '--div--;LLL:EXT:fluidpages/Resources/Private/Language/locallang.xlf:pages.tx_fed_page_configuration,tx_fed_page_flexform,tx_fed_page_flexform_sub'
     );
 }
-
-

@@ -184,12 +184,12 @@ class PageProvider extends AbstractProvider implements ProviderInterface
      */
     public function getControllerActionFromRecord(array $row)
     {
-        if (PageControllerInterface::DOKTYPE_RAW === (integer) $row['doktype']) {
-            return 'raw';
-        }
         $action = $this->getControllerActionReferenceFromRecord($row) ?? 'default';
         $parts = explode('->', $action);
         $controllerActionName = end($parts);
+        if (empty($controllerActionName)) {
+            return 'default';
+        }
         $controllerActionName{0} = strtolower($controllerActionName{0});
         return $controllerActionName;
     }
@@ -418,6 +418,9 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         $records = [];
         while (0 < $record[$parentFieldName]) {
             $record = $this->recordService->getSingle($this->getTableName($record), '*', $record[$parentFieldName]);
+            if (!$record) {
+                break;
+            }
             $parentFieldName = $this->getParentFieldName($record);
             array_push($records, $record);
         }

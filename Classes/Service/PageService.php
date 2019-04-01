@@ -116,6 +116,9 @@ class PageService implements SingletonInterface
             'tx_fed_page_controller_action,' . $fieldList,
             $pageUid
         );
+        if (null === $page) {
+            return null;
+        }
 
         // Initialize with possibly-empty values and loop root line
         // to fill values as they are detected.
@@ -137,6 +140,10 @@ class PageService implements SingletonInterface
             // Note: 't3ver_oid' is analysed in order to make versioned records inherit the original record's
             // configuration as an emulated first parent page.
             $resolveParentPageUid = (integer) (0 > $page['pid'] ? $page['t3ver_oid'] : $page['pid']);
+            // Avoid useless SQL query if uid is 0, because uids in the database start from 1.
+            if (0 === $resolveParentPageUid) {
+                break;
+            }
             $page = $this->workspacesAwareRecordService->getSingle(
                 'pages',
                 $fieldList,
