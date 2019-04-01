@@ -30,11 +30,6 @@ class SubPageProviderTest extends AbstractTestCase
     public function testGetControllerActionFromRecord(array $record, $fieldName, $expected)
     {
         $instance = new SubPageProvider();
-        if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype']) {
-            /** @var PageService $service */
-            $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\PageService')->setMethods(array('getPageTemplateConfiguration'))->getMock();
-            $instance->injectPageService($service);
-        }
         // make sure PageProvider is now using the right field name
         $instance->trigger($record, null, $fieldName);
         $result = $instance->getControllerActionFromRecord($record);
@@ -47,7 +42,6 @@ class SubPageProviderTest extends AbstractTestCase
     public function getControllerActionFromRecordTestValues()
     {
         return array(
-            array(array('doktype' => PageControllerInterface::DOKTYPE_RAW), '', 'raw'),
             array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => ''), 'tx_fed_page_flexform_sub', 'default'),
             array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => 'fluidpages->action'), 'tx_fed_page_flexform_sub', 'action'),
         );

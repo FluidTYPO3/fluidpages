@@ -154,11 +154,6 @@ class PageProviderTest extends AbstractTestCase
     public function testGetControllerActionFromRecord(array $record, $fieldName, $expectsMessage, $expected)
     {
         $instance = new PageProvider();
-        if (PageControllerInterface::DOKTYPE_RAW !== $record['doktype'] && true === empty($record[$fieldName])) {
-            /** @var PageService $service */
-            $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\PageService')->setMethods(array('getPageTemplateConfiguration'))->getMock();
-            $instance->injectPageService($service);
-        }
         if (true === $expectsMessage) {
             /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
             $configurationService = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService')->getMock();
@@ -176,7 +171,6 @@ class PageProviderTest extends AbstractTestCase
     public function getControllerActionFromRecordTestValues()
     {
         return array(
-            array(array('doktype' => PageControllerInterface::DOKTYPE_RAW), '', false, 'raw'),
             array(array('doktype' => 0, 'tx_fed_page_controller_action' => ''), 'tx_fed_page_flexform', true, 'default'),
             array(array('doktype' => 0, 'tx_fed_page_controller_action' => 'fluidpages->action'), 'tx_fed_page_flexform', false, 'action'),
         );
