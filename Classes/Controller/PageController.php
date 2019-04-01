@@ -73,24 +73,6 @@ class PageController extends AbstractFluxController implements PageControllerInt
     }
 
     /**
-     * @return string
-     */
-    public function rawAction()
-    {
-        $record = $this->getRecord();
-        $templateFileReference = $record['tx_fluidpages_templatefile'];
-        $templatePathAndFilename = $this->pageConfigurationService->convertFileReferenceToTemplatePathAndFilename(
-            $templateFileReference
-        );
-        $paths = $this->pageConfigurationService->getViewConfigurationByFileReference($templateFileReference);
-        $this->provider->setTemplatePathAndFilename($templatePathAndFilename);
-        $this->view->setTemplatePathAndFilename($templatePathAndFilename);
-        $this->view->setTemplateRootPaths((array) $paths['templateRootPaths']);
-        $this->view->setPartialRootPaths((array) $paths['partialRootPaths']);
-        $this->view->setLayoutRootPaths((array) $paths['layoutRootPaths']);
-    }
-
-    /**
      * @return array|null
      */
     public function getRecord()

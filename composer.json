@@ -8,7 +8,7 @@
     "typo3/cms-frontend": "^8.7 | ^9 | dev-master",
     "typo3/cms-recordlist": "^8.7 | ^9 | dev-master",
     "fluidtypo3/flux": "^9.0 | dev-development",
-    "php": ">=7.0.0"
+    "php": ">=7.1.0"
   },
   "type": "typo3-cms-extension",
   "keywords": [
