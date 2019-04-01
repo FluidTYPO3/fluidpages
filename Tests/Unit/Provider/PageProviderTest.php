@@ -154,6 +154,10 @@ class PageProviderTest extends AbstractTestCase
     public function testGetControllerActionFromRecord(array $record, $fieldName, $expectsMessage, $expected)
     {
         $instance = new PageProvider();
+        /** @var PageService $service */
+        $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\PageService')->setMethods(array('getPageTemplateConfiguration'))->getMock();
+        $instance->injectPageService($service);
+
         if (true === $expectsMessage) {
             /** @var ConfigurationService|\PHPUnit_Framework_MockObject_MockObject $configurationService */
             $configurationService = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\ConfigurationService')->getMock();
