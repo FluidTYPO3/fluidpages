@@ -158,7 +158,7 @@ class PageLayoutDataProvider
         if (NULL !== $thumbnail) {
             $thumbnail = ltrim($thumbnail, '/');
             $thumbnail = GeneralUtility::getFileAbsFileName($thumbnail);
-            $thumbnail = $thumbnail ? MiscellaneousUtility::createIcon($thumbnail, 64, 64) : null;
+            $thumbnail = $thumbnail ? MiscellaneousUtility::createIcon($thumbnail) : null;
         }
         $template = pathinfo($form->getOption(Form::OPTION_TEMPLATEFILE), PATHINFO_FILENAME);
         $label = $form->getLabel();
