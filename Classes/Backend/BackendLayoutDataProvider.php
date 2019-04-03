@@ -89,7 +89,10 @@ class BackendLayoutDataProvider extends DefaultDataProvider implements DataProvi
         DataProviderContext $dataProviderContext,
         BackendLayoutCollection $backendLayoutCollection
     ) {
-        $backendLayoutCollection->add($this->getBackendLayout('fluidpages', $dataProviderContext->getPageId()));
+        $backendLayout = $this->getBackendLayout('fluidpages', $dataProviderContext->getPageId());
+        if ($backendLayout) {
+            $backendLayoutCollection->add($backendLayout);
+        }
     }
 
     /**
