@@ -56,6 +56,13 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup'] = unserialize($GLO
     ],
 ]);
 
+if (is_callable([\FluidTYPO3\Flux\Integration\FormEngine\UserFunctions::class, 'fluxFormFieldDisplayCondition'])) {
+    // Flux version is recent enough to support the custom displayCond from Flux that hides the entire "flex" field
+    // if there are no fields in the DS it uses.
+    $GLOBALS['TCA']['pages']['columns']['tx_fed_page_flexform']['displayCond'] = 'USER:' . \FluidTYPO3\Flux\Integration\FormEngine\UserFunctions::class . '->fluxFormFieldDisplayCondition:pages:tx_fed_page_flexform';
+    $GLOBALS['TCA']['pages']['columns']['tx_fed_page_flexform_sub']['displayCond'] = 'USER:' . \FluidTYPO3\Flux\Integration\FormEngine\UserFunctions::class . '->fluxFormFieldDisplayCondition:pages:tx_fed_page_flexform_sub';
+}
+
 $doktypes = '0,1,4';
 $additionalDoktypes = trim($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fluidpages']['setup']['doktypes'], ',');
 if (FALSE === empty($additionalDoktypes)) {
