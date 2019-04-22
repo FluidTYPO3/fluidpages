@@ -200,8 +200,8 @@ class PageProvider extends AbstractProvider implements ProviderInterface
      */
     public function getControllerActionReferenceFromRecord(array $row)
     {
-        if (true === empty($row[self::FIELD_ACTION_MAIN])) {
-            $row = $this->pageService->getPageTemplateConfiguration($row['uid']);
+        if (empty($row[self::FIELD_ACTION_MAIN])) {
+            return $this->pageService->getPageTemplateConfiguration($row['uid'])[self::FIELD_ACTION_SUB];
         }
         return $row[self::FIELD_ACTION_MAIN];
     }

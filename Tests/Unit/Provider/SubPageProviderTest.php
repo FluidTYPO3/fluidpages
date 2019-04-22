@@ -25,13 +25,19 @@ class SubPageProviderTest extends AbstractTestCase
      * @dataProvider getControllerActionFromRecordTestValues
      * @param array $record
      * @param string $fieldName
+     * @param bool $expectsPageService
      * @param string $expected
      */
-    public function testGetControllerActionFromRecord(array $record, $fieldName, $expected)
+    public function testGetControllerActionFromRecord(array $record, $fieldName, $expectsPageService, $expected)
     {
         $instance = new SubPageProvider();
         $service = $this->getMockBuilder('FluidTYPO3\\Fluidpages\\Service\\PageService')->setMethods(array('getPageTemplateConfiguration'))->getMock();
         $instance->injectPageService($service);
+        if ($expectsPageService) {
+            $service->expects($this->once())->method('getPageTemplateConfiguration')->willReturn($record);
+        } else {
+            $service->expects($this->never())->method('getPageTemplateConfiguration');
+        }
         // make sure PageProvider is now using the right field name
         $instance->trigger($record, null, $fieldName);
         $result = $instance->getControllerActionFromRecord($record);
@@ -44,8 +50,9 @@ class SubPageProviderTest extends AbstractTestCase
     public function getControllerActionFromRecordTestValues()
     {
         return array(
-            array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => ''), 'tx_fed_page_flexform_sub', 'default'),
-            array(array('doktype' => 0, 'tx_fed_page_controller_action_sub' => 'fluidpages->action'), 'tx_fed_page_flexform_sub', 'action'),
+            array(array('doktype' => 0, 'tx_fed_page_controller_action' => '', 'tx_fed_page_controller_action_sub' => ''), 'tx_fed_page_flexform_sub', true, 'default'),
+            array(array('doktype' => 0, 'tx_fed_page_controller_action' => 'fluidpages->direct', 'tx_fed_page_controller_action_sub' => 'fluidpages->action'), 'tx_fed_page_flexform_sub', false, 'direct'),
+            array(array('doktype' => 0, 'tx_fed_page_controller_action' => '', 'tx_fed_page_controller_action_sub' => 'fluidpages->parent'), 'tx_fed_page_flexform_sub', true, 'parent'),
         );
     }
 

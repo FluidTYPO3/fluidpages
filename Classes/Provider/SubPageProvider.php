@@ -38,16 +38,4 @@ class SubPageProvider extends PageProvider implements ProviderInterface
     {
         return 'Page';
     }
-
-    /**
-     * @param array $row
-     * @return string
-     */
-    public function getControllerActionReferenceFromRecord(array $row)
-    {
-        if (true === empty($row[self::FIELD_ACTION_SUB])) {
-            $row = $this->pageService->getPageTemplateConfiguration($row['uid']);
-        }
-        return $row[self::FIELD_ACTION_SUB];
-    }
 }

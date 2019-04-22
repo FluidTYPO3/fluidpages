@@ -8,6 +8,7 @@ namespace FluidTYPO3\Fluidpages\Backend;
  * LICENSE.md file that was distributed with this source code.
  */
 
+use FluidTYPO3\Fluidpages\Provider\PageProvider;
 use FluidTYPO3\Fluidpages\Service\ConfigurationService;
 use FluidTYPO3\Flux\Provider\ProviderInterface;
 use FluidTYPO3\Flux\Service\WorkspacesAwareRecordService;
@@ -121,8 +122,9 @@ class BackendLayoutDataProvider extends DefaultDataProvider implements DataProvi
      */
     protected function resolveProvider(array $record)
     {
-        // Stop processing if no fluidpages template configured in rootline
         $record = $this->recordService->getSingle('pages', '*', $record['uid']);
+
+        // Stop processing if no fluidpages template configured in rootline
         if (null === $record) {
             return [];
         }
