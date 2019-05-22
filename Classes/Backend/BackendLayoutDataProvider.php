@@ -111,7 +111,7 @@ class BackendLayoutDataProvider extends DefaultDataProvider implements DataProvi
         }
         $grid = $this->resolveProvider($record)->getGrid($record);
         if (!$grid->hasChildren()) {
-            return parent::getBackendLayout($identifier, $pageUid);
+            return parent::getBackendLayout('default', $pageUid);
         }
         return $grid->buildBackendLayout(0);
     }
