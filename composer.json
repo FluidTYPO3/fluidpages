@@ -28,10 +28,6 @@
     "irc": "irc://irc.freenode.org/fedext",
     "issues": "https://github.com/FluidTYPO3/fluidcontent/issues"
   },
-  "suggest": {
-    "fluidtypo3/fluidcontent": "Gives the ability to render custom content elements with pure fluid.",
-    "fluidtypo3/fluidcontent_core": "Gives the ability to render core content elements with pure fluid."
-  },
   "autoload": {
     "psr-4": {
       "FluidTYPO3\\Fluidpages\\": "Classes/"
