@@ -22,6 +22,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Fluid\View\TemplateView;
+use TYPO3Fluid\Fluid\Component\Error\ChildNotFoundException;
 use TYPO3Fluid\Fluid\View\Exception\InvalidSectionException;
 
 /**
@@ -242,6 +243,8 @@ class PageService implements SingletonInterface
                     $form->setExtensionName($extensionName);
                     $output[$extensionName][$filename] = $form;
                 } catch (InvalidSectionException $error) {
+                    $logger->log(GeneralUtility::SYSLOG_SEVERITY_ERROR, $error->getMessage());
+                } catch (ChildNotFoundException $error) {
                     $logger->log(GeneralUtility::SYSLOG_SEVERITY_ERROR, $error->getMessage());
                 }
             }
