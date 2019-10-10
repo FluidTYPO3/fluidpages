@@ -122,8 +122,8 @@ class PageService implements SingletonInterface
 
         // Initialize with possibly-empty values and loop root line
         // to fill values as they are detected.
-        $resolvedMainTemplateIdentity = $page['tx_fed_page_controller_action'];
-        $resolvedSubTemplateIdentity = $page['tx_fed_page_controller_action_sub'];
+        $resolvedMainTemplateIdentity = is_array($page['tx_fed_page_controller_action']) ? $page['tx_fed_page_controller_action'][0] : $page['tx_fed_page_controller_action'];
+        $resolvedSubTemplateIdentity = is_array($page['tx_fed_page_controller_action_sub']) ? $page['tx_fed_page_controller_action_sub'][0] : $page['tx_fed_page_controller_action_sub'];
         do {
             $containsSubDefinition = (false !== strpos($page['tx_fed_page_controller_action_sub'], '->'));
             $isCandidate = ((integer) $page['uid'] !== $pageUid);

@@ -203,7 +203,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface
         if (empty($row[self::FIELD_ACTION_MAIN])) {
             return $this->pageService->getPageTemplateConfiguration($row['uid'])[self::FIELD_ACTION_SUB];
         }
-        return $row[self::FIELD_ACTION_MAIN];
+        return is_array($row[self::FIELD_ACTION_MAIN]) ? $row[self::FIELD_ACTION_MAIN][0] : $row[self::FIELD_ACTION_MAIN];
     }
 
     /**
