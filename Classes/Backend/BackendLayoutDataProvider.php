@@ -107,11 +107,11 @@ class BackendLayoutDataProvider extends DefaultDataProvider implements DataProvi
     {
         $record = $this->recordService->getSingle('pages', '*', $pageUid);
         if (null === $record) {
-            return new BackendLayout('empty', 'Empty', '');
+            return new BackendLayout('grid', 'Empty', '');
         }
         $grid = $this->resolveProvider($record)->getGrid($record);
         if (!$grid->hasChildren()) {
-            return parent::getBackendLayout($identifier, $pageUid);
+            return new BackendLayout('grid', 'Empty', '');
         }
         return $grid->buildBackendLayout(0);
     }
