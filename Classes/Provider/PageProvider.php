@@ -156,7 +156,7 @@ class PageProvider extends AbstractProvider implements ProviderInterface
             $action = $this->getControllerActionFromRecord($row);
             $action = ucfirst($action);
             $templatePathAndFilename = $templatePaths->resolveTemplateFileForControllerAndActionAndFormat(
-                'Page',
+                $this->getControllerNameFromRecord($row),
                 $action
             );
         }
